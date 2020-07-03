@@ -84,5 +84,9 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'history_order',
   });
+
+  history_order.associate = function (models) {
+    history_order.belongsTo(models.account, { foreignKey: 'account_id' });
+  }
   return history_order;
 };

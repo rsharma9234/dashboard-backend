@@ -78,5 +78,9 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'open_order',
   });
+
+  open_order.associate = function (models) {
+    open_order.belongsTo(models.account, { foreignKey: 'account_id' });
+  }
   return open_order;
 };

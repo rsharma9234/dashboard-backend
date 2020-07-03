@@ -5,13 +5,11 @@ const accountModel = models.account;
 
 const fetchAllAccounts = async (req, res, next) => {
     try{
-        console.log('fetchAllAccounts')
         let accountInfo = await accountModel.findAll({
             attributes: { exclude: ['password'] },
             where:{ status:1},
             raw:true
         });
-        console.log(accountInfo, 'accountInfo')
         return res.status(200).json({ rows: accountInfo});
 
     } catch(err) {
