@@ -29,6 +29,8 @@ module.exports = (sequelize, DataTypes) => {
 
   account.associate = function (models) {
     account.hasMany(models.accounts_detail, { foreignKey: 'account_id', sourceKey: 'id' });
+    account.hasMany(models.open_order, { foreignKey: 'account_id', sourceKey: 'id' });
+    account.hasMany(models.history_order, { foreignKey: 'account_id', sourceKey: 'id' });
   };
 
   return account;
