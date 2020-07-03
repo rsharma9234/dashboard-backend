@@ -2,6 +2,7 @@
 
 const models = require('../models');
 const accountModel = models.account;
+const mainLoginModel = models.main_login;
 
 const fetchAllAccounts = async (req, res, next) => {
     try{
@@ -33,7 +34,22 @@ const addUser = async (req, res, next) => {
             where:{ status:1}, raw:true
         });
         return res.status(200).json({ rows: accountInfo});
-        
+    
+    } catch(err) {
+        return res.status(err.status || 500).json(err);
+    };
+}
+
+
+const mainLogin = async (req, res, next) => {
+    try{
+        let { username, password} = req.body;
+        let accountInfo = await mainLoginModel.findAll({
+            attributes: { exclude: ['password'] },
+            where:{ username, password},
+            raw:true
+        });
+        return res.status(200).json({ rows: accountInfo});
 
     } catch(err) {
         return res.status(err.status || 500).json(err);
@@ -41,5 +57,5 @@ const addUser = async (req, res, next) => {
 }
 
 module.exports = {
-    fetchAllAccounts, addUser
+    fetchAllAccounts, addUser, mainLogin
 };
