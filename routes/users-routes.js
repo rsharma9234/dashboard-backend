@@ -12,5 +12,9 @@ router.get('/allAccounts', [
     usersController.fetchAllAccounts
 ]);
 
+router.post('/mainLogin', [
+    usersController.mainLogin
+]);
+
 
 module.exports = router;
