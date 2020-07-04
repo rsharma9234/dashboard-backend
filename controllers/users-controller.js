@@ -27,7 +27,7 @@ const addUser = async (req, res, next) => {
             }
         });
         if(accountOneInfo){
-           await accountModel.update({status:1}, { where:{ login }});
+           await accountModel.update({status:1, alias}, { where:{ login }});
         }
         let accountInfo = await accountModel.findAll({
             attributes: { exclude: ['password'] },
