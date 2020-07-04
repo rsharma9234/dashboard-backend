@@ -44,13 +44,30 @@ const addUser = async (req, res, next) => {
 const mainLogin = async (req, res, next) => {
     try{
         let { username, password} = req.body;
+        let accountCheck= await mainLoginModel.findOne({
+            where:{ username},
+            raw:true
+        });
+        if(accountCheck===null){
+            let err = new Error()
+            err.status = 404;
+            err.name = 'username';
+            err.message = 'Invalid username.';
+            return res.status(200).json(err);
+        }
+        if(accountCheck.password !== password){
+            let err = new Error()
+            err.status = 404;
+            err.name = 'password';
+            err.message = 'Invalid password.';
+            return res.status(200).json(err);
+        }
         let accountInfo = await mainLoginModel.findAll({
             attributes: { exclude: ['password'] },
             where:{ username, password},
             raw:true
         });
         return res.status(200).json({ rows: accountInfo});
-
     } catch(err) {
         return res.status(err.status || 500).json(err);
     };
