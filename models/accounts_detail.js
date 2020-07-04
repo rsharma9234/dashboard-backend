@@ -16,25 +16,31 @@ module.exports = (sequelize, DataTypes) => {
     // }
   };
   accounts_detail.init({
-    account_id:{
-      type : DataTypes.INTEGER,
+    account_id: {
+      type: DataTypes.INTEGER,
       allowNull: false
     },
     balance: DataTypes.DOUBLE,
-    equity:  DataTypes.DOUBLE,
-    margin:DataTypes.DOUBLE,
+    equity: DataTypes.DOUBLE,
+    margin: DataTypes.DOUBLE,
     free_margin: DataTypes.DOUBLE,
+    margin_level: {
+      type: DataTypes.DOUBLE(20, 0),
+      defaultValue: 0
+    },
     profit: DataTypes.DOUBLE,
     currency: DataTypes.STRING(50)
   }, {
-    createdAt:false,
-    updatedAt:false,
+    createdAt: false,
+    updatedAt: false,
     sequelize,
     modelName: 'accounts_detail',
   });
 
   accounts_detail.associate = function (models) {
-    accounts_detail.belongsTo(models.account, { foreignKey: 'account_id' });
+    accounts_detail.belongsTo(models.account, {
+      foreignKey: 'account_id'
+    });
   }
 
   return accounts_detail;

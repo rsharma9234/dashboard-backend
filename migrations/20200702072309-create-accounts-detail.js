@@ -9,26 +9,30 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       account_id: {
-        type : Sequelize.INTEGER,
+        type: Sequelize.INTEGER,
         allowNull: false
       },
       balance: {
-          type : Sequelize.DOUBLE
+        type: Sequelize.DOUBLE
       },
       equity: {
-          type : Sequelize.DOUBLE
+        type: Sequelize.DOUBLE
       },
       margin: {
-          type : Sequelize.DOUBLE
+        type: Sequelize.DOUBLE
       },
       free_margin: {
-          type : Sequelize.DOUBLE
+        type: Sequelize.DOUBLE
+      },
+      margin_level: {
+        type: Sequelize.DOUBLE(20, 0),
+        defaultValue: 0
       },
       profit: {
-          type : Sequelize.DOUBLE
+        type: Sequelize.DOUBLE
       },
       currency: {
-        type :Sequelize.STRING(50)
+        type: Sequelize.STRING(50)
       }
 
       // },
