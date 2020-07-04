@@ -69,7 +69,6 @@ const fetchAllAccountsBySymbolHistory = async (req, res, next) => {
             historyNewOrderInfo = await Promise.all(uniqueAccounts.map(async(data) => {
                 let historyOrderInfos = await historyOrderModel.findAll({
                     attributes: [
-                        'account_id', 
                         [Sequelize.literal('SUM(swap)'), 'swap'], 
                         [Sequelize.literal('SUM(taxes)'), 'taxes'],
                         [Sequelize.literal('SUM(commission)'), 'commission'],
@@ -79,7 +78,7 @@ const fetchAllAccountsBySymbolHistory = async (req, res, next) => {
                     ],
                     where:{ account_id: data.account_id, symbol: symbol},
                     include:[{
-                        attributes: ['login'],
+                        attributes: ['login', 'id'],
                         model:accountModel
                     }]
                 });
@@ -103,7 +102,7 @@ const fetchAllAccountsBySymbolHistory = async (req, res, next) => {
             // historyOrderInfo.map(data => data.toJSON());
             // return res.status(200).json({ rows: historyOrderInfo, data:historyNewOrderInfo, uniqueAccounts});
         if(historyNewOrderInfo && historyNewOrderInfo.length>0){
-            return res.status(200).json({ rows: historyNewOrderInfo,});
+            return res.status(200).json({ rows: historyNewOrderInfo, uniqueAccounts:uniqueAccounts});
         }
         return res.status(200).json({ rows: []});
     } catch(err) {
