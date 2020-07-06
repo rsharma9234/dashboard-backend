@@ -14,33 +14,44 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   filtered_profile.init({
+    profile_name: DataTypes.STRING,
     from_account_id: DataTypes.INTEGER,
     to_account_id: DataTypes.INTEGER,
-    from_account_dateFrom: {
+
+    startdateFrom: {
       type: DataTypes.DATE,
       default: new Date(),
-      field: 'from_account_dateFrom'
+      field: 'startdateFrom'
     },
-    from_account_dateTo: {
+    enddateFrom: {
       type: DataTypes.DATE,
       default: new Date(),
-      field: 'from_account_dateTo'
+      field: 'enddateFrom'
     },
     from_symbols: DataTypes.STRING,
-    to_account_dateFrom: {
+
+    startdateTo: {
       type: DataTypes.DATE,
       default: new Date(),
-      field: 'from_account_dateFrom'
+      field: 'startdateTo'
     },
-    to_account_dateTo: {
+    enddateTo: {
       type: DataTypes.DATE,
       default: new Date(),
-      field: 'from_account_dateTo'
+      field: 'enddateTo'
     },
     to_symbols: DataTypes.STRING,
+    status: DataTypes.INTEGER(1),
   }, {
     sequelize,
     modelName: 'filtered_profile',
   });
+
+
+  // filtered_profile.associate = function (models) {
+  //   filtered_profile.belongsTo(models.account, { foreignKey: 'from_account_id' });
+  //   filtered_profile.belongsTo(models.account, { foreignKey: 'to_account_id' });
+  // }
+
   return filtered_profile;
 };
