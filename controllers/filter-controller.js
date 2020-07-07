@@ -37,12 +37,10 @@ const fetchFilterData = async (req, res, next) => {
       let newInfo = filterInfo.map( (data) => {
         let newRecord = accountInfo.filter(rec => rec.id == data.from_account_id);
         let newToRecord = accountInfo.filter(rec => rec.id == data.to_account_id);
-        console.log(newRecord, 'newRecord')
         data.accountFromInfo = newRecord;
         data.accountToInfo = newToRecord
         return data;
        });
-       console.log(newInfo, 'newInfo')
       return res.status(200).json({ rows: newInfo});
       // return res.status(200).json({ rows: filterInfo});
 
@@ -67,10 +65,51 @@ const updateFilterData = async (req, res, next) => {
         await filterModel.update({status:0}, { where:{ id }});
       }
    }
-  console.log(filterInfo,'filterInfo');
-  
-      // return res.status(200).json({ rows: filterInfo});
+  } catch(err) {
+      return res.status(err.status || 500).json(err);
+  };
+}
 
+const deleteFilter = async (req, res, next) => {
+  try{
+    let {id} = req.body;
+    let deleteInfo = await filterModel.findOne({
+      where:{
+        id
+    }
+    });
+    if(deleteInfo){
+      await filterModel.destroy({where:{id}})
+      // await filterModel.update({status:1}, { where:{ id }});
+      return res.status(200).json({ rows: "Deleted"});
+   }
+  } catch(err) {
+      return res.status(err.status || 500).json(err);
+  };
+}
+
+const updateFilterDataFull = async (req, res, next) => {
+  try{
+    let {id,profile_name,from_account_id,to_account_id,startdateFrom,enddateFrom,startdateTo,enddateTo,from_symbols,to_symbols} = req.body;
+    let filterUpdate = await filterModel.findOne({
+      where:{
+        id
+    }
+    });
+    if(filterUpdate){
+      await filterModel.update({
+        profile_name: profile_name,
+        from_account_id: from_account_id,
+        to_account_id: to_account_id,
+        startdateFrom: startdateFrom,
+        enddateFrom: enddateFrom,
+        startdateTo: startdateTo,
+        enddateTo: enddateTo,
+        from_symbols: from_symbols,
+        to_symbols: to_symbols,
+      }, { where:{ id }});
+      return res.status(200).json({ rows: "Updated"});
+   }
   } catch(err) {
       return res.status(err.status || 500).json(err);
   };
@@ -80,5 +119,7 @@ const updateFilterData = async (req, res, next) => {
 module.exports = {
   addFilterData,
   fetchFilterData,
-  updateFilterData
+  updateFilterData,
+  deleteFilter,
+  updateFilterDataFull
 };

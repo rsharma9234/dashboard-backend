@@ -8,7 +8,7 @@ const fetchAllAccounts = async (req, res, next) => {
     try{
         let accountInfo = await accountModel.findAll({
             attributes: { exclude: ['password'] },
-            where:{ status:1},
+            // where:{ status:1},
             raw:true
         });
         return res.status(200).json({ rows: accountInfo});
@@ -73,6 +73,23 @@ const mainLogin = async (req, res, next) => {
     };
 }
 
+const updateUser = async (req, res, next) => {
+    try{
+      let {id,alias} = req.body;
+      let filterInfo = await accountModel.findOne({
+        where:{
+          id
+      }
+      });
+      if(filterInfo){
+          await accountModel.update({alias:alias}, { where:{ id }});
+          return res.status(200).json({ rows: "Updated"});
+     }
+    } catch(err) {
+        return res.status(err.status || 500).json(err);
+    };
+  }
+
 module.exports = {
-    fetchAllAccounts, addUser, mainLogin
+    fetchAllAccounts, addUser, mainLogin,updateUser
 };

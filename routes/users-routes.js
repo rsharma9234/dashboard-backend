@@ -16,5 +16,9 @@ router.post('/mainLogin', [
     usersController.mainLogin
 ]);
 
+router.post('/updateuser', [
+    usersController.updateUser
+]);
+
 
 module.exports = router;

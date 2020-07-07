@@ -29,7 +29,11 @@ module.exports = {
         field: 'enddateTo'
       },
       to_symbols: Sequelize.STRING,
-      status: DataTypes.INTEGER(1),
+      status: {
+        type: DataTypes.INTEGER(1),
+        default: 0,
+        field: 'status'
+    },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

@@ -15,6 +15,12 @@ router.get('/fetchfilterdata', [
 router.post('/updatefilterdata', [
   filterController.updateFilterData
 ]);
+router.post('/deletefilter', [
+  filterController.deleteFilter
+]);
+router.post('/updatefilterdatafull', [
+  filterController.updateFilterDataFull
+]);
 
 
 

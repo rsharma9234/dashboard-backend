@@ -41,7 +41,11 @@ module.exports = (sequelize, DataTypes) => {
       field: 'enddateTo'
     },
     to_symbols: DataTypes.STRING,
-    status: DataTypes.INTEGER(1),
+    status: {
+      type: DataTypes.INTEGER(1),
+      default: 0,
+      field: 'status'
+  }
   }, {
     sequelize,
     modelName: 'filtered_profile',
