@@ -8,26 +8,32 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      profile_name: DataTypes.STRING,
       from_account_id: Sequelize.INTEGER,
       to_account_id: Sequelize.INTEGER,
-      from_account_dateFrom: {
+      startdateFrom: {
         type: Sequelize.DATE,
-        field: 'from_account_dateFrom'
+        field: 'startdateFrom'
       },
-      from_account_dateTo: {
+      enddateFrom: {
         type: Sequelize.DATE,
-        field: 'from_account_dateTo'
+        field: 'enddateFrom'
       },
       from_symbols: Sequelize.STRING,
-      to_account_dateFrom: {
+      startdateTo: {
         type: Sequelize.DATE,
-        field: 'from_account_dateFrom'
+        field: 'startdateTo'
       },
-      to_account_dateTo: {
+      enddateTo: {
         type: Sequelize.DATE,
-        field: 'from_account_dateTo'
+        field: 'enddateTo'
       },
       to_symbols: Sequelize.STRING,
+      status: {
+        type: DataTypes.INTEGER(1),
+        default: 0,
+        field: 'status'
+    },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
