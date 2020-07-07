@@ -60,9 +60,11 @@ const updateFilterData = async (req, res, next) => {
     if(filterInfo){
       if(filterInfo.status == 0){
         await filterModel.update({status:1}, { where:{ id }});
+        return res.status(200).json({ rows: "Update"});
       }
       if(filterInfo.status == 1){
         await filterModel.update({status:0}, { where:{ id }});
+        return res.status(200).json({ rows: "Update"});
       }
    }
   } catch(err) {
