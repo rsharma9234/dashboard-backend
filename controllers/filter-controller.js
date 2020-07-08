@@ -3,6 +3,7 @@
 const models = require('../models');
 const filterModel = models.filtered_profile;
 const accountModel = models.account;
+const accountsDetailModel = models.accounts_detail;
 
 const addFilterData = async (req, res, next) => {
   
@@ -31,14 +32,18 @@ const fetchFilterData = async (req, res, next) => {
   try{
     let accountInfo = await accountModel.findAll({
       attributes: ['login', 'id', 'alias'],
-      raw:true
+      include:[accountsDetailModel]
     });
     let filterInfo = await filterModel.findAll({raw:true});
       let newInfo = filterInfo.map( (data) => {
         let newRecord = accountInfo.filter(rec => rec.id == data.from_account_id);
         let newToRecord = accountInfo.filter(rec => rec.id == data.to_account_id);
+        let newDetailFrom = accountInfo.filter(rec => rec.id == data.from_account_id);
+        let newDetailTo = accountInfo.filter(rec => rec.id == data.to_account_id);
         data.accountFromInfo = newRecord;
-        data.accountToInfo = newToRecord
+        data.accountToInfo = newToRecord;
+        data.accountDetailFrom = newDetailFrom;
+        data.accountDetailTo = newDetailTo;
         return data;
        });
       return res.status(200).json({ rows: newInfo});

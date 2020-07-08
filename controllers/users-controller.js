@@ -28,12 +28,14 @@ const addUser = async (req, res, next) => {
         });
         if(accountOneInfo){
            await accountModel.update({status:1, alias}, { where:{ login }});
+           let accountInfo = await accountModel.findAll({
+               attributes: { exclude: ['password'] },
+               where:{ status:1}, raw:true
+           });
+           return res.status(200).json({ rows: accountInfo});
+        }else{
+            return res.status(200).json({ rows: 'error'});
         }
-        let accountInfo = await accountModel.findAll({
-            attributes: { exclude: ['password'] },
-            where:{ status:1}, raw:true
-        });
-        return res.status(200).json({ rows: accountInfo});
     
     } catch(err) {
         return res.status(err.status || 500).json(err);
