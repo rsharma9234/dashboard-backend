@@ -54,14 +54,42 @@ const fetchFilterData = async (req, res, next) => {
   };
 }
 
-const updateFilterData = async (req, res, next) => {
+
+const fetchActivefilterdata = async (req, res, next) => {
+  try{
+    let accountInfo = await accountModel.findAll({
+      attributes: ['login', 'id', 'alias'],
+      include:[accountsDetailModel]
+    });
+    let filterInfo = await filterModel.findAll({
+        where:{
+          status:1
+        }, raw:true});
+      let newInfo = filterInfo.map( (data) => {
+        let fromSymbol = JSON.parse(data.from_symbols)
+        let toSymbol = JSON.parse(data.to_symbols)
+        let combineSymbols = fromSymbol.concat(toSymbol);
+        let uniqueSymbols = combineSymbols.filter((item, i, ar) => ar.indexOf(item) === i);
+        let newRecord = accountInfo.filter(rec => rec.id == data.from_account_id);
+        let newToRecord = accountInfo.filter(rec => rec.id == data.to_account_id);
+        data.accountFromInfo = newRecord;
+        data.accountToInfo = newToRecord;
+        data.symbols = uniqueSymbols;
+        return data;
+       });
+      return res.status(200).json({ rows: newInfo});
+
+  } catch(err) {
+      return res.status(err.status || 500).json(err);
+  };
+}
+
+const updateFilterDataBkp = async (req, res, next) => {
   try{
     let {id} = req.body;
-    let filterInfo = await filterModel.findOne({
-      where:{
-        id
-    }
-    });
+    let filterInfo = await filterModel.findOne({where:{ id} });
+
+    
     if(filterInfo){
       if(filterInfo.status == 0){
         await filterModel.update({status:1}, { where:{ id }});
@@ -71,6 +99,34 @@ const updateFilterData = async (req, res, next) => {
         await filterModel.update({status:0}, { where:{ id }});
         return res.status(200).json({ rows: "Update"});
       }
+   }
+  } catch(err) {
+      return res.status(err.status || 500).json(err);
+  };
+}
+
+
+const updateFilterData = async (req, res, next) => {
+  try{
+    let {id, status} = req.body;
+    let filterInfos = await filterModel.findOne({where:{ id:id}, raw:true });
+    let accountInfo = await accountModel.findAll({
+      attributes: ['login', 'id', 'alias'],
+      include:[accountsDetailModel]
+    });
+    if(filterInfos!=null){
+        await filterModel.update({status:0}, {where:{status:1}});
+        await filterModel.update({status:status}, { where:{ id:id }});
+        let filterInfo = await filterModel.findAll({raw:true});
+        let newInfo = filterInfo.map( (data) => {
+          let newRecord = accountInfo.filter(rec => rec.id == data.from_account_id);
+          let newToRecord = accountInfo.filter(rec => rec.id == data.to_account_id);
+          data.accountFromInfo = newRecord;
+          data.accountToInfo = newToRecord;
+          return data;
+         });
+         console.log(newInfo, 'newInfo')
+        return res.status(200).json({ rows: newInfo});
    }
   } catch(err) {
       return res.status(err.status || 500).json(err);
@@ -128,5 +184,6 @@ module.exports = {
   fetchFilterData,
   updateFilterData,
   deleteFilter,
-  updateFilterDataFull
+  updateFilterDataFull,
+  fetchActivefilterdata
 };

@@ -12,6 +12,10 @@ router.get('/fetchfilterdata', [
   filterController.fetchFilterData
 ]);
 
+router.get('/fetchActivefilterdata', [
+  filterController.fetchActivefilterdata
+]);
+
 router.post('/updatefilterdata', [
   filterController.updateFilterData
 ]);

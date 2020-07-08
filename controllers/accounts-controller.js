@@ -7,6 +7,7 @@ const symbolModel = models.symbol;
 const openOrderModel = models.open_order;
 const historyOrderModel = models.history_order;
 const Sequelize = require("sequelize");
+const Op = Sequelize.Op;
 
 const fetchAllAccounts = async (req, res, next) => {
     try{
@@ -34,7 +35,7 @@ const fetchAllSymbol = async (req, res, next) => {
     };
 }
 
-const fetchAllAccountsBySymbolOpen = async (req, res, next) => {
+const fetchAllAccountsBySymbolOpenBkp = async (req, res, next) => {
     try{
         const {symbol} = req.body;
         let openOrderInfo = await openOrderModel.findAll({
@@ -55,7 +56,7 @@ const fetchAllAccountsBySymbolOpen = async (req, res, next) => {
     };
 }
 
-const fetchAllAccountsBySymbolHistory = async (req, res, next) => {
+const fetchAllAccountsBySymbolHistoryBkp  = async (req, res, next) => {
     try{
         const {symbol} = req.body;
 
@@ -105,6 +106,165 @@ const fetchAllAccountsBySymbolHistory = async (req, res, next) => {
             return res.status(200).json({ rows: historyNewOrderInfo});
         }
         return res.status(200).json({ rows: []});
+    } catch(err) {
+        return res.status(err.status || 500).json(err);
+    };
+}
+
+
+const fetchAllAccountsBySymbolOpen = async (req, res, next) => {
+    try{
+        const {startdateFrom, enddateFrom, startdateTo, enddateTo, to_account_id, from_account_id, symbol} = req.body;
+          
+        let openOrderInfo = await openOrderModel.findAll({
+            where:{ symbol: symbol},
+            include:[{
+                attributes: ['login', 'id', 'alias'],
+                model:accountModel
+            }]
+        });
+
+        let fromOpenOrderInfo = await openOrderModel.findAll({
+            where:{ 
+                symbol: symbol,
+                account_id:from_account_id,
+                open_time: {
+                    [Op.gte]: startdateFrom,
+                    [Op.lt]: enddateFrom,
+                }
+            },
+            include:[{
+                attributes: ['login', 'id', 'alias'],
+                model:accountModel
+            }]
+        });
+        let toOpenOrderInfo = await openOrderModel.findAll({
+            where:{ 
+                symbol: symbol,
+                account_id:to_account_id,
+                open_time: {
+                    [Op.gte]: startdateTo,
+                    [Op.lt]: enddateTo,
+                }
+            },
+            include:[{
+                attributes: ['login', 'id', 'alias'],
+                model:accountModel
+            }]
+        });
+        
+        if(openOrderInfo && openOrderInfo.length>0){
+            openOrderInfo.map(data => data.toJSON());
+            fromOpenOrderInfo.map(data => data.toJSON());
+            toOpenOrderInfo.map(data => data.toJSON());
+            return res.status(200).json({ rows: openOrderInfo, fromOpenOrderInfo, toOpenOrderInfo});
+        }
+        return res.status(200).json({ rows: [], fromOpenOrderInfo:[], toOpenOrderInfo:[]});
+    } catch(err) {
+        return res.status(err.status || 500).json(err);
+    };
+}
+
+const fetchAllAccountsBySymbolHistory = async (req, res, next) => {
+    try{
+        // const {symbol} = req.body;
+        const {startdateFrom, enddateFrom, startdateTo, enddateTo, to_account_id, from_account_id, symbol} = req.body;
+
+
+        // let uniqueAccounts = await historyOrderModel.findAll({
+        //     attributes: [[Sequelize.fn('DISTINCT', Sequelize.col('account_id')), 'account_id']],
+        //     where:{ symbol: symbol}
+        // });
+
+        // let historyNewOrderInfo=[];
+        // if(uniqueAccounts && uniqueAccounts.length>0){
+        //     historyNewOrderInfo = await Promise.all(uniqueAccounts.map(async(data) => {
+        //         let historyOrderInfos = await historyOrderModel.findAll({
+        //             attributes: [
+        //                 [Sequelize.literal('SUM(swap)'), 'swap'], 
+        //                 [Sequelize.literal('SUM(taxes)'), 'taxes'],
+        //                 [Sequelize.literal('SUM(commission)'), 'commission'],
+        //                 [Sequelize.literal('SUM(lots)'), 'lots'],
+        //                 [Sequelize.literal('SUM(profit)'), 'profit'],
+        //                 [Sequelize.literal('SUM(profit+commission+taxes+swap)'), 'total']
+        //             ],
+        //             where:{ account_id: data.account_id, symbol: symbol},
+        //             include:[{
+        //                 attributes: ['login', 'id', 'alias'],
+        //                 model:accountModel
+        //             }]
+        //         });
+        //         if(historyOrderInfos && historyOrderInfos.length>0){
+        //             historyOrderInfos.map(nt=> nt.toJSON());
+        //             return historyOrderInfos[0];
+        //         }
+        //         return [];
+        //     }));
+        // }
+
+        let fromHistoryOrderInfo = await historyOrderModel.findAll({
+            attributes: [
+                [Sequelize.literal('SUM(swap)'), 'swap'], 
+                [Sequelize.literal('SUM(taxes)'), 'taxes'],
+                [Sequelize.literal('SUM(commission)'), 'commission'],
+                [Sequelize.literal('SUM(lots)'), 'lots'],
+                [Sequelize.literal('SUM(profit)'), 'profit'],
+                [Sequelize.literal('SUM(profit+commission+taxes+swap)'), 'total']
+            ],
+            where:{ 
+                account_id:from_account_id,
+                symbol: symbol,
+                open_time: {
+                    [Op.gte]: startdateFrom,
+                },
+                close_time: {
+                    [Op.lt]: enddateFrom,
+                }
+            },
+            include:[{
+                attributes: ['login', 'id', 'alias'],
+                model:accountModel
+            }]
+        });
+        let toHistoryOrderInfo = await historyOrderModel.findAll({
+            attributes: [
+                [Sequelize.literal('SUM(swap)'), 'swap'], 
+                [Sequelize.literal('SUM(taxes)'), 'taxes'],
+                [Sequelize.literal('SUM(commission)'), 'commission'],
+                [Sequelize.literal('SUM(lots)'), 'lots'],
+                [Sequelize.literal('SUM(profit)'), 'profit'],
+                [Sequelize.literal('SUM(profit+commission+taxes+swap)'), 'total']
+            ],
+            where:{ 
+                account_id:to_account_id,
+                symbol: symbol,
+                open_time: {
+                    [Op.gte]: startdateTo,
+                },
+                close_time: {
+                    [Op.lt]: enddateTo,
+                }
+            },
+            include:[{
+                attributes: ['login', 'id', 'alias'],
+                model:accountModel
+            }]
+        });
+
+        // if(historyNewOrderInfo && historyNewOrderInfo.length>0){
+        let rows = [];
+        if(fromHistoryOrderInfo.length>0 || toHistoryOrderInfo.length>0){
+            (fromHistoryOrderInfo.length>0) && fromHistoryOrderInfo.map(data => data.toJSON());
+            (toHistoryOrderInfo.length>0) && toHistoryOrderInfo.map(data => data.toJSON());
+
+                // rows.push(fromHistoryOrderInfo[0])
+                // rows.push(toHistoryOrderInfo[0])
+            
+
+            // return res.status(200).json({ rows: historyNewOrderInfo});
+            return res.status(200).json({ rows: rows, fromHistoryOrderInfo:fromHistoryOrderInfo, toHistoryOrderInfo:toHistoryOrderInfo});
+        }
+        return res.status(200).json({ rows: [], toHistoryOrderInfo:[],fromHistoryOrderInfo:[]});
     } catch(err) {
         return res.status(err.status || 500).json(err);
     };
