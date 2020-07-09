@@ -20,5 +20,13 @@ router.post('/fetchAllBySymbolHistory', [
     accountsController.fetchAllAccountsBySymbolHistory
 ]);
 
+router.get('/fetchAllOpenTrade', [
+  accountsController.fetchAllOpenTrade
+]);
+
+router.get('/fetchAllHistoryTrade', [
+  accountsController.fetchAllHistoryTrade
+])
+
 
 module.exports = router;
