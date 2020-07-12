@@ -4,6 +4,10 @@ var express = require('express');
 var router = express.Router();
 var usersController = require('../controllers').usersController;
 
+router.post('/checkUserConnected', [
+    usersController.checkUserConnected
+]);
+
 router.post('/addUser', [
     usersController.addUser
 ]);

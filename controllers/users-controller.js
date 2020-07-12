@@ -33,22 +33,42 @@ const addUser = async (req, res, next) => {
 
         console.log(accountOneInfo, '---test-----', accountModel, '--mod--')
         if (accountOneInfo) {
-            //    await accountModel.update({status:1, alias}, { where:{ login }});
-            //    let accountInfo = await accountModel.findAll({
-            //        attributes: { exclude: ['password'] },
-            //        where:{ status:1}, raw:true
-            //    });
-
             return res.json({ status: 202, rows: 'User already exist' });
         } else {
             console.log("---else---")
             accountModel.create({ 'login': req.body.login, password: req.body.password, 'broker': broker, 'alias': alias, 'status': 0, active: 1 })
-            return res.status(200).json({ rows:'error' });
+            return res.status(200).json({ status: true });
         }
 
     } catch (err) {
         console.log(err,'errrrrrrrrrrr');
         
+        return res.status(err.status || 500).json(err);
+    };
+}
+
+const checkUserConnected = async (req, res, next) => {
+    try {
+        let { login, broker } = req.body;
+        let accountOneInfo = await accountModel.findOne({
+            attributes: { exclude: ['password'] },
+            where: {
+                login: login,
+                broker: broker,
+                launched: 1
+            }
+        });
+        if (accountOneInfo) {
+            console.log(accountOneInfo,'accountOneInfo in conenction check');
+            await accountModel.update({ status: 1 }, { where: { login, broker } });
+            return res.status(200).json({ connected: true });
+        } else {
+            console.log(accountOneInfo,'accountOneInfo in conenction check not found');
+            return res.status(200).json({ connected: false });
+        }
+
+    } catch (err) {
+        console.log(err,'error in conenction');
         return res.status(err.status || 500).json(err);
     };
 }
@@ -104,5 +124,5 @@ const updateUser = async (req, res, next) => {
 }
 
 module.exports = {
-    fetchAllAccounts, addUser, mainLogin, updateUser
+    fetchAllAccounts, addUser, mainLogin, updateUser, checkUserConnected
 };
