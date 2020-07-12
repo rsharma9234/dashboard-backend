@@ -19,7 +19,10 @@ module.exports = (sequelize, DataTypes) => {
     password: DataTypes.STRING(50),
     broker: DataTypes.STRING(50),
     alias: DataTypes.STRING(50),
-    status:DataTypes.INTEGER(1)
+    status:DataTypes.INTEGER(1),
+    active:DataTypes.INTEGER(1),
+    launched:DataTypes.INTEGER(1),
+
   },{
     createdAt:false,
     updatedAt:false,
