@@ -458,6 +458,7 @@ const fetchAllOpenTrade = async (req, res, next) => {
             if(fromsymbols && fromsymbols.length>0){
                 let openOrderInfos = await openOrderModel.findAll({
                     attributes: [
+                        'order_type',
                         [Sequelize.literal('SUM(swap)'), 'swap'], 
                         [Sequelize.literal('SUM(taxes)'), 'taxes'],
                         [Sequelize.literal('SUM(commission)'), 'commission'],
@@ -476,12 +477,14 @@ const fetchAllOpenTrade = async (req, res, next) => {
                 });
                 if(openOrderInfos && openOrderInfos.length>0){
                     openOrderInfos.map(nt=> nt.toJSON());
+                    console.log(openOrderInfos, 'openOrderInfosopenOrderInfosopenOrderInfos');
                     openOrderFromInfo= openOrderInfos;
                 }
             }
             if(tosymbols && tosymbols.length>0){
                 let openOrderInfos = await openOrderModel.findAll({
                     attributes: [
+                        'order_type',
                         [Sequelize.literal('SUM(swap)'), 'swap'], 
                         [Sequelize.literal('SUM(taxes)'), 'taxes'],
                         [Sequelize.literal('SUM(commission)'), 'commission'],
