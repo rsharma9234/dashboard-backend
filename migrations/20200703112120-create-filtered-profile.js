@@ -8,7 +8,7 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      profile_name: DataTypes.STRING,
+      profile_name: Sequelize.STRING,
       from_account_id: Sequelize.INTEGER,
       to_account_id: Sequelize.INTEGER,
       startdateFrom: {
@@ -30,7 +30,7 @@ module.exports = {
       },
       to_symbols: Sequelize.STRING,
       status: {
-        type: DataTypes.INTEGER(1),
+        type: Sequelize.INTEGER(1),
         default: 0,
         field: 'status'
     },

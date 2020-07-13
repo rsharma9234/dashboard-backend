@@ -4,9 +4,9 @@ const models = require('../models');
 const filterModel = models.filtered_profile;
 const accountModel = models.account;
 const accountsDetailModel = models.accounts_detail;
+const CustomSwapModel = models.custom_swap;
 
 const addFilterData = async (req, res, next) => {
-  
   try{
       // let Data = {
       //   profile_name: req.body.profile_name, 
@@ -61,10 +61,8 @@ const fetchActivefilterdata = async (req, res, next) => {
       attributes: ['login', 'id', 'alias'],
       include:[accountsDetailModel]
     });
-    let filterInfo = await filterModel.findAll({
-        where:{
-          status:1
-        }, raw:true});
+    let filterInfo = await filterModel.findAll({where:{status:1 }, raw:true});
+    let swapInfo = await CustomSwapModel.findAll({raw:true});
       let newInfo = filterInfo.map( (data) => {
         let fromSymbol = JSON.parse(data.from_symbols)
         let toSymbol = JSON.parse(data.to_symbols)
@@ -72,9 +70,14 @@ const fetchActivefilterdata = async (req, res, next) => {
         let uniqueSymbols = combineSymbols.filter((item, i, ar) => ar.indexOf(item) === i);
         let newRecord = accountInfo.filter(rec => rec.id == data.from_account_id);
         let newToRecord = accountInfo.filter(rec => rec.id == data.to_account_id);
+        let newFromSwapRecord = swapInfo.filter(rec => rec.account_id == data.from_account_id);
+        let newToSwapRecord = swapInfo.filter(rec => rec.account_id == data.to_account_id);
         data.accountFromInfo = newRecord;
         data.accountToInfo = newToRecord;
         data.symbols = uniqueSymbols;
+        // data.swap_info = newSwapRecord;
+        data.swapFrominfo = newFromSwapRecord;
+        data.swapToinfo = newToSwapRecord;
         return data;
        });
       return res.status(200).json({ rows: newInfo});

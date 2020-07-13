@@ -9,6 +9,7 @@ const symbolModel = models.symbol;
 const openOrderModel = models.open_order;
 const historyOrderModel = models.history_order;
 const filteredProfileModel = models.filtered_profile;
+const CustomSwapModel = models.custom_swap;
 
 const fetchAllAccounts = async (req, res, next) => {
     try{
@@ -432,7 +433,7 @@ const fetchAllOpenTrade = async (req, res, next) => {
             attributes: ['login', 'id', 'alias'],
             include:[accountsDetailModel]
         });
-
+        let swapInfo = await CustomSwapModel.findAll({raw:true});
         if(filteredInfo!=null){
             let openOrderFromInfo=[];
             let openOrderToInfo=[];
@@ -449,8 +450,16 @@ const fetchAllOpenTrade = async (req, res, next) => {
 
             let newRecord = accountInfo.filter(rec => rec.id == fromAccountId);
             let newToRecord = accountInfo.filter(rec => rec.id == toAccountId);
+
+            let newFromSwapRecord = swapInfo.filter(rec => rec.account_id == fromAccountId);
+            let newToSwapRecord = swapInfo.filter(rec => rec.account_id == toAccountId);
+
+            
             filteredInfo.accountFromInfo = newRecord;
             filteredInfo.accountToInfo = newToRecord;
+            
+            filteredInfo.swapFrominfo = newFromSwapRecord;
+            filteredInfo.swapToinfo = newToSwapRecord;
 
             // let combineSymbols = fromsymbols.concat(tosymbols);
             // let uniqueSymbols = combineSymbols.filter((item, i, ar) => ar.indexOf(item) === i);
@@ -477,7 +486,6 @@ const fetchAllOpenTrade = async (req, res, next) => {
                 });
                 if(openOrderInfos && openOrderInfos.length>0){
                     openOrderInfos.map(nt=> nt.toJSON());
-                    console.log(openOrderInfos, 'openOrderInfosopenOrderInfosopenOrderInfos');
                     openOrderFromInfo= openOrderInfos;
                 }
             }

@@ -34,6 +34,7 @@ module.exports = (sequelize, DataTypes) => {
     account.hasMany(models.accounts_detail, { foreignKey: 'account_id', sourceKey: 'id' });
     account.hasMany(models.open_order, { foreignKey: 'account_id', sourceKey: 'id' });
     account.hasMany(models.history_order, { foreignKey: 'account_id', sourceKey: 'id' });
+    account.hasMany(models.custom_swap, { foreignKey: 'account_id', sourceKey: 'id' });
     // account.hasMany(models.filtered_profile, { foreignKey: 'from_account_id', sourceKey: 'id' });
     // account.hasMany(models.filtered_profile, { foreignKey: 'to_account_id', sourceKey: 'id' });
   };
