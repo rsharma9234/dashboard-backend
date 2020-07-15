@@ -5,6 +5,7 @@ const filterModel = models.filtered_profile;
 const accountModel = models.account;
 const accountsDetailModel = models.accounts_detail;
 const CustomSwapModel = models.custom_swap;
+const symbolModel = models.symbol;
 
 const addFilterData = async (req, res, next) => {
   try{
@@ -53,6 +54,39 @@ const fetchFilterData = async (req, res, next) => {
       return res.status(err.status || 500).json(err);
   };
 }
+
+
+
+
+const fetchSymbolData = async (req, res, next) => {
+  try{
+    console.log('test=-----------------=--=-=-');
+    
+    console.log(req.body,"reqqqqq--------------------------->>>>>>");
+    
+    // let accountSymbolInfo = await accountModel.findAll({
+    //   attributes: ['login', 'id', ],
+    //   include:[accountsDetailModel]
+    // });
+    let symbolInfo = await symbolModel.findAll({raw:true});
+      // let newSymbolInfo = symbolInfo.map( (data) => {
+      //   let newRecord = accountSymbolInfo.filter(rec => rec.id == data.from_account_id);
+      //   let newToRecord = accountSymbolInfo.filter(rec => rec.id == data.to_account_id);
+      //   data.accountFromInfo = newRecord;
+      //   data.accountToInfo = newToRecord;
+       
+      //   return data;
+      //  });
+      return res.status(200).json({newSymbolInfo});
+      // return res.status(200).json({ rows: filterInfo});
+
+  } catch(err) {
+      return res.status(err.status || 500).json(err);
+  };
+}
+
+
+
 
 
 const fetchActivefilterdata = async (req, res, next) => {
@@ -188,5 +222,6 @@ module.exports = {
   updateFilterData,
   deleteFilter,
   updateFilterDataFull,
-  fetchActivefilterdata
+  fetchActivefilterdata,
+  fetchSymbolData
 };
