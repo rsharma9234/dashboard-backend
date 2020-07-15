@@ -12,6 +12,10 @@ router.get('/fetchAllSymbol', [
     accountsController.fetchAllSymbol
 ]);
 
+router.get('/fetchAllSymbolByAccount/:account_id', [
+  accountsController.fetchAllSymbolByAccount
+]);
+
 router.post('/fetchAllBySymbolOpen', [
     accountsController.fetchAllAccountsBySymbolOpen
 ]);

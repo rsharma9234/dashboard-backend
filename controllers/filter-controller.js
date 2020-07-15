@@ -162,7 +162,7 @@ const updateFilterData = async (req, res, next) => {
           data.accountToInfo = newToRecord;
           return data;
          });
-         console.log(newInfo, 'newInfo')
+        //  console.log(newInfo, 'newInfo')
         return res.status(200).json({ rows: newInfo});
    }
   } catch(err) {
