@@ -37,6 +37,26 @@ const fetchAllSymbol = async (req, res, next) => {
     };
 }
 
+const fetchAllSymbolByAccount = async (req, res, next) => {
+    try{
+        const {account_id} = req.params;
+
+        let rows = await historyOrderModel.findAll({
+            attributes: [[Sequelize.fn('DISTINCT', Sequelize.col('symbol')), 'symbol']],
+            where:{ account_id: account_id}
+        });
+
+        if(rows && rows.length>0){
+            let allSymbols = rows.filter(data => data.symbol!='').map(data => data.symbol);
+            return res.status(200).json({rows: allSymbols});
+        }
+
+        return res.status(200).json({rows});
+    } catch(err) {
+        return res.status(err.status || 500).json(err);
+    };
+}
+
 const fetchAllAccountsBySymbolOpenBkp = async (req, res, next) => {
     try{
         const {symbol} = req.body;
@@ -440,13 +460,15 @@ const fetchAllOpenTrade = async (req, res, next) => {
             let fromAccountId= filteredInfo.from_account_id;
             let fromsymbols = JSON.parse(filteredInfo.from_symbols);
             let startdateFrom = filteredInfo.startdateFrom;
-            let enddateFrom = filteredInfo.enddateFrom;
-            
+            // let enddateFrom = filteredInfo.enddateFrom;
+            let enddateFrom = (filteredInfo.enddateFrom==null || filteredInfo.enddateFrom=='') ? new Date() : filteredInfo.enddateFrom;
             
             let toAccountId= filteredInfo.to_account_id;
             let tosymbols = JSON.parse(filteredInfo.to_symbols);
             let startdateTo = filteredInfo.startdateTo;
-            let enddateTo = filteredInfo.enddateTo;
+            // let enddateTo = filteredInfo.enddateTo;
+            let enddateTo = (filteredInfo.enddateTo==null || filteredInfo.enddateTo=='') ? new Date() : filteredInfo.enddateTo;
+
 
             let newRecord = accountInfo.filter(rec => rec.id == fromAccountId);
             let newToRecord = accountInfo.filter(rec => rec.id == toAccountId);
@@ -543,13 +565,16 @@ const fetchAllHistoryTrade = async (req, res, next) => {
             let fromAccountId= filteredInfo.from_account_id;
             let fromsymbols = JSON.parse(filteredInfo.from_symbols);
             let startdateFrom = filteredInfo.startdateFrom;
-            let enddateFrom = filteredInfo.enddateFrom;
+            // let enddateFrom = filteredInfo.enddateFrom;
+            let enddateFrom = (filteredInfo.enddateFrom==null || filteredInfo.enddateFrom=='') ? new Date() : filteredInfo.enddateFrom;
             
             
             let toAccountId= filteredInfo.to_account_id;
             let tosymbols = JSON.parse(filteredInfo.to_symbols);
             let startdateTo = filteredInfo.startdateTo;
-            let enddateTo = filteredInfo.enddateTo;
+            // let enddateTo = filteredInfo.enddateTo;
+            let enddateTo = (filteredInfo.enddateTo==null || filteredInfo.enddateTo=='') ? new Date() : filteredInfo.enddateTo;
+
 
             let newRecord = accountInfo.filter(rec => rec.id == fromAccountId);
             let newToRecord = accountInfo.filter(rec => rec.id == toAccountId);
@@ -623,5 +648,6 @@ module.exports = {
     fetchAllAccountsBySymbolOpen,
     fetchAllAccountsBySymbolHistory,
     fetchAllOpenTrade,
-    fetchAllHistoryTrade
+    fetchAllHistoryTrade,
+    fetchAllSymbolByAccount
 };

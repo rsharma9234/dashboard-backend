@@ -29,13 +29,12 @@ const addUser = async (req, res, next) => {
                 login: login
             }
         });
-        console.log(accountOneInfo, "apiiiiiiiii");
-
-        console.log(accountOneInfo, '---test-----', accountModel, '--mod--')
+        // console.log(accountOneInfo, "apiiiiiiiii");
+        // console.log(accountOneInfo, '---test-----', accountModel, '--mod--')
         if (accountOneInfo) {
             return res.json({ status: 202, rows: 'User already exist' });
         } else {
-            console.log("---else---")
+            // console.log("---else---")
             accountModel.create({ 'login': req.body.login, password: req.body.password, 'broker': broker, 'alias': alias, 'status': 0, active: 1 })
             return res.status(200).json({ status: true });
         }
@@ -59,11 +58,11 @@ const checkUserConnected = async (req, res, next) => {
             }
         });
         if (accountOneInfo) {
-            console.log(accountOneInfo,'accountOneInfo in conenction check');
+            // console.log(accountOneInfo,'accountOneInfo in conenction check');
             await accountModel.update({ status: 1 }, { where: { login, broker } });
             return res.status(200).json({ connected: true });
         } else {
-            console.log(accountOneInfo,'accountOneInfo in conenction check not found');
+            // console.log(accountOneInfo,'accountOneInfo in conenction check not found');
             return res.status(200).json({ connected: false });
         }
 
