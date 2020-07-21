@@ -7,106 +7,111 @@ const accountModel = models.account;
 const accountsDetailModel = models.accounts_detail;
 const symbolModel = models.symbol;
 const openOrderModel = models.open_order;
-const historyOrderModel = models.history_order;
+const historyOrderModel = models.history_order; ``
 const filteredProfileModel = models.filtered_profile;
 const CustomSwapModel = models.custom_swap;
+const custom_deposite = models.custom_deposite
 
 const fetchAllAccounts = async (req, res, next) => {
-    try{
+    try {
         let accountInfo = await accountModel.findAll({
             attributes: { exclude: ['password'] },
-            include:[accountsDetailModel]
+            include: [accountsDetailModel]
         });
-        if(accountInfo && accountInfo.length>0){
-            accountInfo.map(data => data.toJSON());
-            return res.status(200).json({ rows: accountInfo});
-        }
-        return res.status(200).json({ rows: []});
 
-    } catch(err) {
+        if (accountInfo && accountInfo.length > 0) {
+            accountInfo.map(data => data.toJSON());
+            return res.status(200).json({ rows: accountInfo });
+        }
+        return res.status(200).json({ rows: [] });
+
+    } catch (err) {
         return res.status(err.status || 500).json(err);
     };
 }
 
 const fetchAllSymbol = async (req, res, next) => {
-    try{
-        let symbolInfo = await symbolModel.findAll({raw:true});
-        return res.status(200).json({ rows: symbolInfo});
-    } catch(err) {
+    try {
+        let symbolInfo = await symbolModel.findAll({ raw: true });
+        return res.status(200).json({ rows: symbolInfo });
+    }
+    catch (err) {
         return res.status(err.status || 500).json(err);
     };
+
 }
 
+
 const fetchAllSymbolByAccount = async (req, res, next) => {
-    try{
-        const {account_id} = req.params;
+    try {
+        const { account_id } = req.params;
 
         let rows = await historyOrderModel.findAll({
             attributes: [[Sequelize.fn('DISTINCT', Sequelize.col('symbol')), 'symbol']],
-            where:{ account_id: account_id}
+            where: { account_id: account_id }
         });
 
-        if(rows && rows.length>0){
-            let allSymbols = rows.filter(data => data.symbol!='').map(data => data.symbol);
-            return res.status(200).json({rows: allSymbols});
+        if (rows && rows.length > 0) {
+            let allSymbols = rows.filter(data => data.symbol != '').map(data => data.symbol);
+            return res.status(200).json({ rows: allSymbols });
         }
 
-        return res.status(200).json({rows});
-    } catch(err) {
+        return res.status(200).json({ rows });
+    } catch (err) {
         return res.status(err.status || 500).json(err);
     };
 }
 
 const fetchAllAccountsBySymbolOpenBkp = async (req, res, next) => {
-    try{
-        const {symbol} = req.body;
+    try {
+        const { symbol } = req.body;
         let openOrderInfo = await openOrderModel.findAll({
-            where:{ symbol: symbol},
-            include:[{
+            where: { symbol: symbol },
+            include: [{
                 attributes: ['login', 'id', 'alias'],
-                model:accountModel
+                model: accountModel
             }]
         });
-        
-        if(openOrderInfo && openOrderInfo.length>0){
+
+        if (openOrderInfo && openOrderInfo.length > 0) {
             openOrderInfo.map(data => data.toJSON());
-            return res.status(200).json({ rows: openOrderInfo});
+            return res.status(200).json({ rows: openOrderInfo });
         }
-        return res.status(200).json({ rows: []});
-    } catch(err) {
+        return res.status(200).json({ rows: [] });
+    } catch (err) {
         return res.status(err.status || 500).json(err);
     };
 }
 
-const fetchAllAccountsBySymbolHistoryBkp  = async (req, res, next) => {
-    try{
-        const {symbol} = req.body;
+const fetchAllAccountsBySymbolHistoryBkp = async (req, res, next) => {
+    try {
+        const { symbol } = req.body;
 
         let uniqueAccounts = await historyOrderModel.findAll({
             attributes: [[Sequelize.fn('DISTINCT', Sequelize.col('account_id')), 'account_id']],
-            where:{ symbol: symbol}
+            where: { symbol: symbol }
         });
 
-        let historyNewOrderInfo=[];
-        if(uniqueAccounts && uniqueAccounts.length>0){
-            historyNewOrderInfo = await Promise.all(uniqueAccounts.map(async(data) => {
+        let historyNewOrderInfo = [];
+        if (uniqueAccounts && uniqueAccounts.length > 0) {
+            historyNewOrderInfo = await Promise.all(uniqueAccounts.map(async (data) => {
                 let historyOrderInfos = await historyOrderModel.findAll({
                     attributes: [
-                        [Sequelize.literal('SUM(swap)'), 'swap'], 
+                        [Sequelize.literal('SUM(swap)'), 'swap'],
                         [Sequelize.literal('SUM(taxes)'), 'taxes'],
                         [Sequelize.literal('SUM(commission)'), 'commission'],
                         [Sequelize.literal('SUM(lots)'), 'lots'],
                         [Sequelize.literal('SUM(profit)'), 'profit'],
                         [Sequelize.literal('SUM(profit+commission+taxes+swap)'), 'total']
                     ],
-                    where:{ account_id: data.account_id, symbol: symbol},
-                    include:[{
+                    where: { account_id: data.account_id, symbol: symbol },
+                    include: [{
                         attributes: ['login', 'id', 'alias'],
-                        model:accountModel
+                        model: accountModel
                     }]
                 });
-                if(historyOrderInfos && historyOrderInfos.length>0){
-                    historyOrderInfos.map(nt=> nt.toJSON());
+                if (historyOrderInfos && historyOrderInfos.length > 0) {
+                    historyOrderInfos.map(nt => nt.toJSON());
                     return historyOrderInfos[0];
                 }
                 return [];
@@ -120,77 +125,77 @@ const fetchAllAccountsBySymbolHistoryBkp  = async (req, res, next) => {
         //         model:accountModel
         //     }]
         // });
-        
+
         // if(historyOrderInfo && historyOrderInfo.length>0){
-            // historyOrderInfo.map(data => data.toJSON());
-            // return res.status(200).json({ rows: historyOrderInfo, data:historyNewOrderInfo, uniqueAccounts});
-        if(historyNewOrderInfo && historyNewOrderInfo.length>0){
-            return res.status(200).json({ rows: historyNewOrderInfo});
+        // historyOrderInfo.map(data => data.toJSON());
+        // return res.status(200).json({ rows: historyOrderInfo, data:historyNewOrderInfo, uniqueAccounts});
+        if (historyNewOrderInfo && historyNewOrderInfo.length > 0) {
+            return res.status(200).json({ rows: historyNewOrderInfo });
         }
-        return res.status(200).json({ rows: []});
-    } catch(err) {
+        return res.status(200).json({ rows: [] });
+    } catch (err) {
         return res.status(err.status || 500).json(err);
     };
 }
 
 
 const fetchAllAccountsBySymbolOpen = async (req, res, next) => {
-    try{
-        const {startdateFrom, enddateFrom, startdateTo, enddateTo, to_account_id, from_account_id, symbol} = req.body;
-          
+    try {
+        const { startdateFrom, enddateFrom, startdateTo, enddateTo, to_account_id, from_account_id, symbol } = req.body;
+
         let openOrderInfo = await openOrderModel.findAll({
-            where:{ symbol: symbol},
-            include:[{
+            where: { symbol: symbol },
+            include: [{
                 attributes: ['login', 'id', 'alias'],
-                model:accountModel
+                model: accountModel
             }]
         });
 
         let fromOpenOrderInfo = await openOrderModel.findAll({
-            where:{ 
+            where: {
                 symbol: symbol,
-                account_id:from_account_id,
+                account_id: from_account_id,
                 open_time: {
                     [Op.gte]: startdateFrom,
                     [Op.lt]: enddateFrom,
                 }
             },
-            include:[{
+            include: [{
                 attributes: ['login', 'id', 'alias'],
-                model:accountModel
+                model: accountModel
             }]
         });
         let toOpenOrderInfo = await openOrderModel.findAll({
-            where:{ 
+            where: {
                 symbol: symbol,
-                account_id:to_account_id,
+                account_id: to_account_id,
                 open_time: {
                     [Op.gte]: startdateTo,
                     [Op.lt]: enddateTo,
                 }
             },
-            include:[{
+            include: [{
                 attributes: ['login', 'id', 'alias'],
-                model:accountModel
+                model: accountModel
             }]
         });
-        
-        if(openOrderInfo && openOrderInfo.length>0){
+
+        if (openOrderInfo && openOrderInfo.length > 0) {
             openOrderInfo.map(data => data.toJSON());
             fromOpenOrderInfo.map(data => data.toJSON());
             toOpenOrderInfo.map(data => data.toJSON());
-            return res.status(200).json({ rows: openOrderInfo, fromOpenOrderInfo, toOpenOrderInfo});
+            return res.status(200).json({ rows: openOrderInfo, fromOpenOrderInfo, toOpenOrderInfo });
         }
-        return res.status(200).json({ rows: [], fromOpenOrderInfo:[], toOpenOrderInfo:[]});
-    } catch(err) {
+        return res.status(200).json({ rows: [], fromOpenOrderInfo: [], toOpenOrderInfo: [] });
+    } catch (err) {
         return res.status(err.status || 500).json(err);
     };
 }
 
 const fetchAllAccountsBySymbolHistory = async (req, res, next) => {
-    try{
+    try {
         // const {symbol} = req.body;
-        const {startdateFrom, enddateFrom, startdateTo, enddateTo, to_account_id, from_account_id, symbol} = req.body;
+        const { startdateFrom, enddateFrom, startdateTo, enddateTo, to_account_id, from_account_id, symbol } = req.body;
 
 
         // let uniqueAccounts = await historyOrderModel.findAll({
@@ -226,15 +231,15 @@ const fetchAllAccountsBySymbolHistory = async (req, res, next) => {
 
         let fromHistoryOrderInfo = await historyOrderModel.findAll({
             attributes: [
-                [Sequelize.literal('SUM(swap)'), 'swap'], 
+                [Sequelize.literal('SUM(swap)'), 'swap'],
                 [Sequelize.literal('SUM(taxes)'), 'taxes'],
                 [Sequelize.literal('SUM(commission)'), 'commission'],
                 [Sequelize.literal('SUM(lots)'), 'lots'],
                 [Sequelize.literal('SUM(profit)'), 'profit'],
                 [Sequelize.literal('SUM(profit+commission+taxes+swap)'), 'total']
             ],
-            where:{ 
-                account_id:from_account_id,
+            where: {
+                account_id: from_account_id,
                 symbol: symbol,
                 open_time: {
                     [Op.gte]: startdateFrom,
@@ -243,22 +248,22 @@ const fetchAllAccountsBySymbolHistory = async (req, res, next) => {
                     [Op.lt]: enddateFrom,
                 }
             },
-            include:[{
+            include: [{
                 attributes: ['login', 'id', 'alias'],
-                model:accountModel
+                model: accountModel
             }]
         });
         let toHistoryOrderInfo = await historyOrderModel.findAll({
             attributes: [
-                [Sequelize.literal('SUM(swap)'), 'swap'], 
+                [Sequelize.literal('SUM(swap)'), 'swap'],
                 [Sequelize.literal('SUM(taxes)'), 'taxes'],
                 [Sequelize.literal('SUM(commission)'), 'commission'],
                 [Sequelize.literal('SUM(lots)'), 'lots'],
                 [Sequelize.literal('SUM(profit)'), 'profit'],
                 [Sequelize.literal('SUM(profit+commission+taxes+swap)'), 'total']
             ],
-            where:{ 
-                account_id:to_account_id,
+            where: {
+                account_id: to_account_id,
                 symbol: symbol,
                 open_time: {
                     [Op.gte]: startdateTo,
@@ -267,53 +272,81 @@ const fetchAllAccountsBySymbolHistory = async (req, res, next) => {
                     [Op.lt]: enddateTo,
                 }
             },
-            include:[{
+            include: [{
                 attributes: ['login', 'id', 'alias'],
-                model:accountModel
+                model: accountModel
+            }]
+        });
+
+
+        let commissionHistoryOrderInfo = await historyOrderModel.findAll({
+            attributes: [
+                [Sequelize.literal('SUM(swap)'), 'swap'],
+                [Sequelize.literal('SUM(taxes)'), 'taxes'],
+                [Sequelize.literal('SUM(commission)'), 'commission'],
+                [Sequelize.literal('SUM(lots)'), 'lots'],
+                [Sequelize.literal('SUM(profit)'), 'profit'],
+                [Sequelize.literal('SUM(profit+commission+taxes+swap)'), 'total']
+            ],
+            where: {
+                account_id: commission_acount_id,
+                symbol: symbol,
+                open_time: {
+                    [Op.gte]: startdateTo,
+                },
+                close_time: {
+                    [Op.lt]: enddateTo,
+                }
+            },
+            include: [{
+                attributes: ['login', 'id', 'alias'],
+                model: accountModel
             }]
         });
 
         // if(historyNewOrderInfo && historyNewOrderInfo.length>0){
         let rows = [];
-        if(fromHistoryOrderInfo.length>0 || toHistoryOrderInfo.length>0){
-            (fromHistoryOrderInfo.length>0) && fromHistoryOrderInfo.map(data => data.toJSON());
-            (toHistoryOrderInfo.length>0) && toHistoryOrderInfo.map(data => data.toJSON());
+        if (fromHistoryOrderInfo.length > 0 || commissionHistoryOrderInfo.length > 0 || toHistoryOrderInfo.length > 0) {
+            (fromHistoryOrderInfo.length > 0) && fromHistoryOrderInfo.map(data => data.toJSON());
+            (fromHistoryOrderInfo.length > 0) && fromHistoryOrderInfo.map(data => data.toJSON());
+            (fromHistoryOrderInfo.length > 0) && fromHistoryOrderInfo.map(data => data.toJSON());
+            // (commissionHistoryOrderInfo.length>0) && commissionHistoryOrderInfo.map(data => data.toJSON());
 
-                // rows.push(fromHistoryOrderInfo[0])
-                // rows.push(toHistoryOrderInfo[0])
-            
+            // rows.push(fromHistoryOrderInfo[0])
+            // rows.push(toHistoryOrderInfo[0])
+
 
             // return res.status(200).json({ rows: historyNewOrderInfo});
-            return res.status(200).json({ rows: rows, fromHistoryOrderInfo:fromHistoryOrderInfo, toHistoryOrderInfo:toHistoryOrderInfo});
+            return res.status(200).json({ rows: rows, fromHistoryOrderInfo: fromHistoryOrderInfo, toHistoryOrderInfo: toHistoryOrderInfo, commissionHistoryOrderInfo: commissionHistoryOrderInfo });
         }
-        return res.status(200).json({ rows: [], toHistoryOrderInfo:[],fromHistoryOrderInfo:[]});
-    } catch(err) {
+        return res.status(200).json({ rows: [], toHistoryOrderInfo: [], fromHistoryOrderInfo: [], commissionHistoryOrderInfo: [] });
+    } catch (err) {
         return res.status(err.status || 500).json(err);
     };
 }
 
 
 const fetchAllOpenTradebkp = async (req, res, next) => {
-    try{
+    try {
         let filteredInfo = await filteredProfileModel.findOne({
-            where:{ status: 1},
-            raw:true
+            where: { status: 1 },
+            raw: true
         });
         let accountInfo = await accountModel.findAll({
             attributes: ['login', 'id', 'alias'],
-            include:[accountsDetailModel]
+            include: [accountsDetailModel]
         });
-        
-        if(filteredInfo!=null){
-            let openOrderFromInfo=[];
-            let openOrderToInfo=[];
-            let fromAccountId= filteredInfo.from_account_id;
+
+        if (filteredInfo != null) {
+            let openOrderFromInfo = [];
+            let openOrderToInfo = [];
+            let fromAccountId = filteredInfo.from_account_id;
             let fromsymbols = JSON.parse(filteredInfo.from_symbols);
             let startdateFrom = filteredInfo.startdateFrom;
             let enddateFrom = filteredInfo.enddateFrom;
-            
-            
-            let toAccountId= filteredInfo.to_account_id;
+
+
+            let toAccountId = filteredInfo.to_account_id;
             let tosymbols = JSON.parse(filteredInfo.to_symbols);
             let startdateTo = filteredInfo.startdateTo;
             let enddateTo = filteredInfo.enddateTo;
@@ -327,33 +360,37 @@ const fetchAllOpenTradebkp = async (req, res, next) => {
             let combineSymbols = fromsymbols.concat(tosymbols);
             let uniqueSymbols = combineSymbols.filter((item, i, ar) => ar.indexOf(item) === i);
 
-            if(fromsymbols && fromsymbols.length>0){
-                openOrderFromInfo = await Promise.all(fromsymbols.map(async(symbol) => {
+            if (fromsymbols && fromsymbols.length > 0) {
+                openOrderFromInfo = await Promise.all(fromsymbols.map(async (symbol) => {
                     let openOrderInfos = await openOrderModel.findAll({
-                        where:{ account_id: fromAccountId, symbol: symbol,
+                        where: {
+                            account_id: fromAccountId, symbol: symbol,
                             open_time: {
                                 [Op.gte]: startdateFrom,
                                 [Op.lt]: enddateFrom,
-                            }}
+                            }
+                        }
                     });
-                    if(openOrderInfos && openOrderInfos.length>0){
-                        openOrderInfos.map(nt=> nt.toJSON());
+                    if (openOrderInfos && openOrderInfos.length > 0) {
+                        openOrderInfos.map(nt => nt.toJSON());
                         return openOrderInfos[0];
                     }
                     // return [];
                 }));
             }
-            if(tosymbols && tosymbols.length>0){
-                openOrderToInfo = await Promise.all(tosymbols.map(async(symbol) => {
+            if (tosymbols && tosymbols.length > 0) {
+                openOrderToInfo = await Promise.all(tosymbols.map(async (symbol) => {
                     let openOrderInfos = await openOrderModel.findAll({
-                        where:{ account_id: toAccountId, symbol: symbol,
+                        where: {
+                            account_id: toAccountId, symbol: symbol,
                             open_time: {
                                 [Op.gte]: startdateTo,
                                 [Op.lt]: enddateTo,
-                            }}
+                            }
+                        }
                     });
-                    if(openOrderInfos && openOrderInfos.length>0){
-                        openOrderInfos.map(nt=> nt.toJSON());
+                    if (openOrderInfos && openOrderInfos.length > 0) {
+                        openOrderInfos.map(nt => nt.toJSON());
                         return openOrderInfos[0];
                     }
                 }));
@@ -361,15 +398,15 @@ const fetchAllOpenTradebkp = async (req, res, next) => {
             let showArr = []
             let showArrs = []
             Promise.all([uniqueSymbols.forEach((symbol) => {
-                let emptyArr={};
-                let emptyArrs={};
+                let emptyArr = {};
+                let emptyArrs = {};
                 // showArr[symbol] = [];
-                let fromInfo = openOrderFromInfo.find(data => data!=null && data.symbol === symbol)
-                let toInfo = openOrderToInfo.find(data => data!=null && data.symbol === symbol)
+                let fromInfo = openOrderFromInfo.find(data => data != null && data.symbol === symbol)
+                let toInfo = openOrderToInfo.find(data => data != null && data.symbol === symbol)
                 let firstCondition = false;
 
-                if(fromInfo!=undefined && toInfo!=undefined){
-                    firstCondition=true;
+                if (fromInfo != undefined && toInfo != undefined) {
+                    firstCondition = true;
                     let arr = [];
                     let data = {
                         fromInfo,
@@ -377,11 +414,11 @@ const fetchAllOpenTradebkp = async (req, res, next) => {
                     }
                     arr.push(data)
                     // emptyArrs[symbol] = [data]
-                    emptyArrs[symbol] = [{ fromInfo, toInfo}]
+                    emptyArrs[symbol] = [{ fromInfo, toInfo }]
                     showArrs.push(emptyArrs);
                 }
                 // if(fromInfo && fromInfo.length>0){
-                if(fromInfo!=undefined && !firstCondition){
+                if (fromInfo != undefined && !firstCondition) {
                     // console.log('isnside fromInfo')
                     // (showArr[symbol]).push(fromInfo);
                     // (showArr[symbol]) = (fromInfo);
@@ -392,22 +429,22 @@ const fetchAllOpenTradebkp = async (req, res, next) => {
                     // emptyArr[symbol] = arr
                     // // (emptyArr[symbol]).push(fromInfo)
                     // firstCondition = true;
-                    
+
                     // // emptyArr[symbol] = fromInfo
                     // showArrs.push(emptyArr);
-                    emptyArrs[symbol] = [{"fromInfo":fromInfo}]
+                    emptyArrs[symbol] = [{ "fromInfo": fromInfo }]
                     showArrs.push(emptyArrs);
 
                     // (showArr).push(fromInfo);
                 }
-                if(toInfo!=undefined && !firstCondition){
+                if (toInfo != undefined && !firstCondition) {
                     // console.log('isnside fromInfo')
                     // (showArr[symbol]).push(fromInfo);
                     // (showArr[symbol]) = (fromInfo);
                     // emptyArrs[symbol] = [data]
-                    emptyArrs[symbol] = [{"toInfo":toInfo}]
+                    emptyArrs[symbol] = [{ "toInfo": toInfo }]
                     showArrs.push(emptyArrs);
-                    
+
                     // arr.push({toInfo:toInfo})
                     // console.log(arr, 'arr')
                     // // emptyArr[symbol] = (fromInfo)
@@ -419,55 +456,75 @@ const fetchAllOpenTradebkp = async (req, res, next) => {
                     // (showArr).push(fromInfo);
                 }
                 // // if(toInfo && toInfo.length>0){
-                    // if(toInfo!=undefined){
-                    
+                // if(toInfo!=undefined){
+
                 //     // console.log('isnside toInfo')
                 //     // (emptyArr[symbol]).push(toInfo[0]);
                 //     // emptyArr[symbol] = fromInfo
-           
+
                 return showArr
             })]);
-  
-  
+
+
             // openOrderInfo.map(data => data.toJSON());
-            return res.status(200).json({ 
+            return res.status(200).json({
                 // rows: filteredInfo, openOrderFromInfo:openOrderFromInfo,openOrderToInfo:openOrderToInfo, 
-                showArr:showArr,
+                showArr: showArr,
                 showArrs
             });
         }
-        return res.status(200).json({ rows: []});
-    } catch(err) {
+        return res.status(200).json({ rows: [] });
+    } catch (err) {
         return res.status(err.status || 500).json(err);
     };
 }
 
+const fetchCommissionTotal = async (req, res, next) => {
+    let total = 0;
+    try {
+        let totalprice = await historyOrderModel.findAll({
+            where: { order_type: 6, account_id: 7 },
+            raw: true
+        }).then(history => {
+            history.map(item => {
+                total = total + item.profit;
+                console.log(item.profit, total, 'profite');
+            })
+            return res.status(200).json({ totalProfit: total });
+        });
+    }
+    catch (err) {
+        return res.status(err.status || 500).json(err);
+    }
+};
+
 
 const fetchAllOpenTrade = async (req, res, next) => {
-    try{
+    try {
         let filteredInfo = await filteredProfileModel.findOne({
-            where:{ status: 1},
-            raw:true
+            where: { status: 1 },
+            raw: true
+
         });
         let accountInfo = await accountModel.findAll({
             attributes: ['login', 'id', 'alias'],
-            include:[accountsDetailModel]
+            include: [accountsDetailModel]
         });
-        let swapInfo = await CustomSwapModel.findAll({raw:true});
-        if(filteredInfo!=null){
-            let openOrderFromInfo=[];
-            let openOrderToInfo=[];
-            let fromAccountId= filteredInfo.from_account_id;
+        let swapInfo = await CustomSwapModel.findAll({ raw: true });
+        if (filteredInfo != null) {
+            let openOrderFromInfo = [];
+            let openOrderToInfo = [];
+            let fromAccountId = filteredInfo.from_account_id;
             let fromsymbols = JSON.parse(filteredInfo.from_symbols);
             let startdateFrom = filteredInfo.startdateFrom;
             // let enddateFrom = filteredInfo.enddateFrom;
-            let enddateFrom = (filteredInfo.enddateFrom==null || filteredInfo.enddateFrom=='') ? new Date() : filteredInfo.enddateFrom;
-            
-            let toAccountId= filteredInfo.to_account_id;
+            let enddateFrom = (filteredInfo.enddateFrom == null || filteredInfo.enddateFrom == '') ? new Date() : filteredInfo.enddateFrom;
+
+            let toAccountId = filteredInfo.to_account_id;
             let tosymbols = JSON.parse(filteredInfo.to_symbols);
             let startdateTo = filteredInfo.startdateTo;
             // let enddateTo = filteredInfo.enddateTo;
-            let enddateTo = (filteredInfo.enddateTo==null || filteredInfo.enddateTo=='') ? new Date() : filteredInfo.enddateTo;
+            let enddateTo = (filteredInfo.enddateTo == null || filteredInfo.enddateTo == '') ? new Date() : filteredInfo.enddateTo;
 
 
             let newRecord = accountInfo.filter(rec => rec.id == fromAccountId);
@@ -476,178 +533,221 @@ const fetchAllOpenTrade = async (req, res, next) => {
             let newFromSwapRecord = swapInfo.filter(rec => rec.account_id == fromAccountId);
             let newToSwapRecord = swapInfo.filter(rec => rec.account_id == toAccountId);
 
-            
+
             filteredInfo.accountFromInfo = newRecord;
             filteredInfo.accountToInfo = newToRecord;
-            
+
             filteredInfo.swapFrominfo = newFromSwapRecord;
             filteredInfo.swapToinfo = newToSwapRecord;
 
             // let combineSymbols = fromsymbols.concat(tosymbols);
             // let uniqueSymbols = combineSymbols.filter((item, i, ar) => ar.indexOf(item) === i);
 
-            if(fromsymbols && fromsymbols.length>0){
+            if (fromsymbols && fromsymbols.length > 0) {
                 let openOrderInfos = await openOrderModel.findAll({
                     attributes: [
                         'order_type',
-                        [Sequelize.literal('SUM(swap)'), 'swap'], 
+                        [Sequelize.literal('SUM(swap)'), 'swap'],
                         [Sequelize.literal('SUM(taxes)'), 'taxes'],
                         [Sequelize.literal('SUM(commission)'), 'commission'],
                         [Sequelize.literal('SUM(lots)'), 'lots'],
                         [Sequelize.literal('SUM(profit)'), 'profit'],
                         [Sequelize.literal('SUM(profit+commission+swap)'), 'total']
                     ],
-                    where:{ account_id: fromAccountId, 
-                        symbol:  {
+                    where: {
+                        account_id: fromAccountId,
+                        symbol: {
                             [Op.in]: fromsymbols
                         },
                         open_time: {
                             [Op.gte]: startdateFrom,
                             [Op.lt]: enddateFrom,
-                        }}
+                        }
+                    }
                 });
-                if(openOrderInfos && openOrderInfos.length>0){
-                    openOrderInfos.map(nt=> nt.toJSON());
-                    openOrderFromInfo= openOrderInfos;
+                if (openOrderInfos && openOrderInfos.length > 0) {
+                    openOrderInfos.map(nt => nt.toJSON());
+                    openOrderFromInfo = openOrderInfos;
                 }
             }
-            if(tosymbols && tosymbols.length>0){
+            if (tosymbols && tosymbols.length > 0) {
                 let openOrderInfos = await openOrderModel.findAll({
                     attributes: [
                         'order_type',
-                        [Sequelize.literal('SUM(swap)'), 'swap'], 
+                        [Sequelize.literal('SUM(swap)'), 'swap'],
                         [Sequelize.literal('SUM(taxes)'), 'taxes'],
                         [Sequelize.literal('SUM(commission)'), 'commission'],
                         [Sequelize.literal('SUM(lots)'), 'lots'],
                         [Sequelize.literal('SUM(profit)'), 'profit'],
                         [Sequelize.literal('SUM(profit+commission+swap)'), 'total']
                     ],
-                    where:{ account_id: toAccountId, 
+                    where: {
+                        account_id: toAccountId,
                         symbol: {
                             [Op.in]: tosymbols
                         },
                         open_time: {
                             [Op.gte]: startdateTo,
                             [Op.lt]: enddateTo,
-                        }}
+                        }
+                    }
                 });
 
-                if(openOrderInfos && openOrderInfos.length>0){
+                if (openOrderInfos && openOrderInfos.length > 0) {
                     openOrderToInfo = openOrderInfos;
                 }
             }
-            return res.status(200).json({ 
-                rows: filteredInfo, 
-                fromOpenOrderInfo:openOrderFromInfo,
-                toOpenOrderInfo:openOrderToInfo,
+            return res.status(200).json({
+                rows: filteredInfo,
+                fromOpenOrderInfo: openOrderFromInfo,
+                toOpenOrderInfo: openOrderToInfo,
             });
         }
-        return res.status(200).json({ rows: [], fromOpenOrderInfo:[], toOpenOrderInfo:[]});
-    } catch(err) {
+        return res.status(200).json({ rows: [], fromOpenOrderInfo: [], toOpenOrderInfo: [] });
+    } catch (err) {
         return res.status(err.status || 500).json(err);
     };
 }
 
 const fetchAllHistoryTrade = async (req, res, next) => {
-    try{
+    try {
         let filteredInfo = await filteredProfileModel.findOne({
-            where:{ status: 1},
-            raw:true
+            where: { status: 1 },
+            raw: true
         });
         let accountInfo = await accountModel.findAll({
             attributes: ['login', 'id', 'alias'],
-            include:[accountsDetailModel]
+            include: [accountsDetailModel]
         });
-
-        if(filteredInfo!=null){
-            let openOrderFromInfo=[];
-            let openOrderToInfo=[];
-            let fromAccountId= filteredInfo.from_account_id;
+        let historyOrderInfo = await historyOrderModel.findAll({
+            where: { order_type: 6, },
+            raw: true
+        })
+        if (filteredInfo != null) {
+            let openOrderFromInfo = [];
+            let openOrderToInfo = [];
+            let fromAccountId = filteredInfo.from_account_id;
             let fromsymbols = JSON.parse(filteredInfo.from_symbols);
             let startdateFrom = filteredInfo.startdateFrom;
             // let enddateFrom = filteredInfo.enddateFrom;
-            let enddateFrom = (filteredInfo.enddateFrom==null || filteredInfo.enddateFrom=='') ? new Date() : filteredInfo.enddateFrom;
-            
-            
-            let toAccountId= filteredInfo.to_account_id;
+            let enddateFrom = (filteredInfo.enddateFrom == null || filteredInfo.enddateFrom == '') ? new Date() : filteredInfo.enddateFrom;
+
+
+
+            let toAccountId = filteredInfo.to_account_id;
             let tosymbols = JSON.parse(filteredInfo.to_symbols);
+            let ml = filteredInfo.commission_acount_id;
             let startdateTo = filteredInfo.startdateTo;
             // let enddateTo = filteredInfo.enddateTo;
-            let enddateTo = (filteredInfo.enddateTo==null || filteredInfo.enddateTo=='') ? new Date() : filteredInfo.enddateTo;
+            let enddateTo = (filteredInfo.enddateTo == null || filteredInfo.enddateTo == '') ? new Date() : filteredInfo.enddateTo;
 
 
             let newRecord = accountInfo.filter(rec => rec.id == fromAccountId);
             let newToRecord = accountInfo.filter(rec => rec.id == toAccountId);
+            let newCommissionRecord = accountInfo.filter(rec => rec.id == ml);
+            let equity = (newCommissionRecord[0].accounts_details[0].equity);
+            let history = historyOrderInfo.map((data) => {
+                return data.profit
+
+            })
+            let history_info = 0
+            console.log(ml,"ml-----------------------------------");
+            
+            let customDeposite = await custom_deposite.findAll({
+               
+                where: { account_id: ml },
+                raw: true
+              })
+              console.log(customDeposite,"test----===-=---------------------------------------------");
+              
+              if(customDeposite.length ){
+
+                 history_info = equity - customDeposite[0].value 
+
+              }else {
+
+                   history_info = equity - eval(history.join('+')) 
+              }
+            console.log(custom_deposite, "'custom_deposite")
             filteredInfo.accountFromInfo = newRecord;
             filteredInfo.accountToInfo = newToRecord;
+            filteredInfo.history_info = history_info;
+            filteredInfo.accountCommissionInfo = newCommissionRecord;
 
-            if(fromsymbols && fromsymbols.length>0){
+            if (fromsymbols && fromsymbols.length > 0) {
                 let openOrderInfos = await historyOrderModel.findAll({
                     attributes: [
-                        [Sequelize.literal('SUM(swap)'), 'swap'], 
+                        [Sequelize.literal('SUM(swap)'), 'swap'],
                         [Sequelize.literal('SUM(taxes)'), 'taxes'],
                         [Sequelize.literal('SUM(commission)'), 'commission'],
                         [Sequelize.literal('SUM(lots)'), 'lots'],
                         [Sequelize.literal('SUM(profit)'), 'profit'],
                         [Sequelize.literal('SUM(profit+commission+taxes+swap)'), 'total']
                     ],
-                    where:{ account_id: fromAccountId, 
-                        symbol:  {
+                    where: {
+                        account_id: fromAccountId,
+                        symbol: {
                             [Op.in]: fromsymbols
                         },
                         open_time: {
                             [Op.gte]: startdateFrom,
                             [Op.lt]: enddateFrom,
-                        }}
+                        }
+                    }
                 });
-                if(openOrderInfos && openOrderInfos.length>0){
-                    openOrderInfos.map(nt=> nt.toJSON());
-                    openOrderFromInfo= openOrderInfos;
+                if (openOrderInfos && openOrderInfos.length > 0) {
+                    openOrderInfos.map(nt => nt.toJSON());
+                    openOrderFromInfo = openOrderInfos;
                 }
             }
-            if(tosymbols && tosymbols.length>0){
+            if (tosymbols && tosymbols.length > 0) {
                 let openOrderInfos = await historyOrderModel.findAll({
                     attributes: [
-                        [Sequelize.literal('SUM(swap)'), 'swap'], 
+                        [Sequelize.literal('SUM(swap)'), 'swap'],
                         [Sequelize.literal('SUM(taxes)'), 'taxes'],
                         [Sequelize.literal('SUM(commission)'), 'commission'],
                         [Sequelize.literal('SUM(lots)'), 'lots'],
                         [Sequelize.literal('SUM(profit)'), 'profit'],
                         [Sequelize.literal('SUM(profit+commission+taxes+swap)'), 'total']
                     ],
-                    
-                    where:{ account_id: toAccountId, 
+
+                    where: {
+                        account_id: toAccountId,
                         symbol: {
                             [Op.in]: tosymbols
                         },
                         open_time: {
                             [Op.gte]: startdateTo,
                             [Op.lt]: enddateTo,
-                        }}
-                });
+                        }
+                    }
+                }); openOrderInfos
 
-                if(openOrderInfos && openOrderInfos.length>0){
+                if (openOrderInfos && openOrderInfos.length > 0) {
                     openOrderToInfo = openOrderInfos;
                 }
             }
-            return res.status(200).json({ 
-                rows: filteredInfo, 
-                fromHistoryOrderInfo:openOrderFromInfo,
-                toHistoryOrderInfo:openOrderToInfo,
+            return res.status(200).json({
+                rows: filteredInfo,
+                fromHistoryOrderInfo: openOrderFromInfo,
+                toHistoryOrderInfo: openOrderToInfo,
             });
         }
-        return res.status(200).json({ rows: [], fromHistoryOrderInfo:[], toHistoryOrderInfo:[]});
-    } catch(err) {
+        return res.status(200).json({ rows: [], fromHistoryOrderInfo: [], toHistoryOrderInfo: [], commissionHistoryOrderInfo: [] });
+    } catch (err) {
+        console.log(err,"err-------------------------------");
+        
         return res.status(err.status || 500).json(err);
     };
 }
 
 module.exports = {
-    fetchAllAccounts, 
+    fetchAllAccounts,
     fetchAllSymbol,
     fetchAllAccountsBySymbolOpen,
     fetchAllAccountsBySymbolHistory,
     fetchAllOpenTrade,
     fetchAllHistoryTrade,
+    fetchCommissionTotal,
     fetchAllSymbolByAccount
 };

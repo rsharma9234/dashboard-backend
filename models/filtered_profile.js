@@ -17,6 +17,7 @@ module.exports = (sequelize, DataTypes) => {
     profile_name: DataTypes.STRING,
     from_account_id: DataTypes.INTEGER,
     to_account_id: DataTypes.INTEGER,
+    commission_acount_id:DataTypes.INTEGER,
 
     startdateFrom: {
       type: DataTypes.DATE,

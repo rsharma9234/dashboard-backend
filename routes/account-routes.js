@@ -31,6 +31,9 @@ router.get('/fetchAllOpenTrade', [
 router.get('/fetchAllHistoryTrade', [
   accountsController.fetchAllHistoryTrade
 ])
+router.get('/fetchCommissionTotal', [
+  accountsController.fetchCommissionTotal
+])
 
 
 module.exports = router;

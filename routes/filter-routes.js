@@ -15,10 +15,9 @@ router.get('/fetchfilterdata', [
 router.get('/fetchActivefilterdata', [
   filterController.fetchActivefilterdata
 ]);
-
-router.post('/fetchSymbolData', [
-  filterController.fetchSymbolData
-]);
+// router.get('/updateCustomDeposite/:account_id', [
+//   filterController.getData
+// ]);
 
 router.post('/updatefilterdata', [
   filterController.updateFilterData
