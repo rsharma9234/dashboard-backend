@@ -479,24 +479,24 @@ const fetchAllOpenTradebkp = async (req, res, next) => {
     };
 }
 
-const fetchCommissionTotal = async (req, res, next) => {
-    let total = 0;
-    try {
-        let totalprice = await historyOrderModel.findAll({
-            where: { order_type: 6, account_id: 7 },
-            raw: true
-        }).then(history => {
-            history.map(item => {
-                total = total + item.profit;
-                console.log(item.profit, total, 'profite');
-            })
-            return res.status(200).json({ totalProfit: total });
-        });
-    }
-    catch (err) {
-        return res.status(err.status || 500).json(err);
-    }
-};
+// const fetchCommissionTotal = async (req, res, next) => {
+//     let total = 0;
+//     try {
+//         let totalprice = await historyOrderModel.findAll({
+//             where: { order_type: 6, account_id: 7 },
+//             raw: true
+//         }).then(history => {
+//             history.map(item => {
+//                 total = total + item.profit;
+//                 console.log(item.profit, total, 'profite');
+//             })
+//             return res.status(200).json({ totalProfit: total });
+//         });
+//     }
+//     catch (err) {
+//         return res.status(err.status || 500).json(err);
+//     }
+// };
 
 
 const fetchAllOpenTrade = async (req, res, next) => {
@@ -619,8 +619,14 @@ const fetchAllHistoryTrade = async (req, res, next) => {
             attributes: ['login', 'id', 'alias'],
             include: [accountsDetailModel]
         });
+        let ml = filteredInfo.commission_acount_id;
+        console.log(ml,"ml");
+        
         let historyOrderInfo = await historyOrderModel.findAll({
-            where: { order_type: 6, },
+            attributes: [
+                [Sequelize.literal('SUM(profit)'), 'profit'],
+            ],
+            where: { order_type: 6,  account_id: ml },
             raw: true
         })
         if (filteredInfo != null) {
@@ -636,7 +642,6 @@ const fetchAllHistoryTrade = async (req, res, next) => {
 
             let toAccountId = filteredInfo.to_account_id;
             let tosymbols = JSON.parse(filteredInfo.to_symbols);
-            let ml = filteredInfo.commission_acount_id;
             let startdateTo = filteredInfo.startdateTo;
             // let enddateTo = filteredInfo.enddateTo;
             let enddateTo = (filteredInfo.enddateTo == null || filteredInfo.enddateTo == '') ? new Date() : filteredInfo.enddateTo;
@@ -645,30 +650,35 @@ const fetchAllHistoryTrade = async (req, res, next) => {
             let newRecord = accountInfo.filter(rec => rec.id == fromAccountId);
             let newToRecord = accountInfo.filter(rec => rec.id == toAccountId);
             let newCommissionRecord = accountInfo.filter(rec => rec.id == ml);
-            let equity = (newCommissionRecord[0].accounts_details[0].equity);
-            let history = historyOrderInfo.map((data) => {
-                return data.profit
-
-            })
-            let history_info = 0
-            console.log(ml,"ml-----------------------------------");
+            console.log(newCommissionRecord,"testtttt");
             
+            let equity = (newCommissionRecord[0].accounts_details[0].equity);
+            console.log(equity,"ttt");
+            
+            // let history = historyOrderInfo.map((data) => {
+                //     return data.profit
+                
+                // })
+                let history_info = 0
+                console.log(historyOrderInfo ,"-------");
+            if(historyOrderInfo[0].profit !== null){
+                // history_info = equity - eval((historyOrderInfo.profit).join('+')) 
+                history_info = equity - eval((historyOrderInfo[0].profit) )
+
+            }else{
+
             let customDeposite = await custom_deposite.findAll({
-               
                 where: { account_id: ml },
                 raw: true
               })
-              console.log(customDeposite,"test----===-=---------------------------------------------");
               
               if(customDeposite.length ){
-
                  history_info = equity - customDeposite[0].value 
-
-              }else {
-
-                   history_info = equity - eval(history.join('+')) 
+            //   }else {
+            //        history_info = equity - eval(history.join('+')) 
               }
-            console.log(custom_deposite, "'custom_deposite")
+            }
+
             filteredInfo.accountFromInfo = newRecord;
             filteredInfo.accountToInfo = newToRecord;
             filteredInfo.history_info = history_info;
@@ -748,6 +758,5 @@ module.exports = {
     fetchAllAccountsBySymbolHistory,
     fetchAllOpenTrade,
     fetchAllHistoryTrade,
-    fetchCommissionTotal,
     fetchAllSymbolByAccount
 };
