@@ -30,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     profit: DataTypes.DOUBLE,
     currency: DataTypes.STRING(50),
-    // last_seen:DataType,
+    last_seen:DataTypes.STRING,  
   }, 
   
   {

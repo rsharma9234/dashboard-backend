@@ -12,7 +12,6 @@ const customTable = models.custom_deposite
 
 
 const addFilterData = async (req, res, next) => {
-  console.log(req,"reeuest->>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<")
   try {
     // let Data = {
     //   profile_name: req.body.profile_name, 
