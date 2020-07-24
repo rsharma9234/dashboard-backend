@@ -533,16 +533,36 @@ const fetchAllOpenTrade = async (req, res, next) => {
             let newFromSwapRecord = swapInfo.filter(rec => rec.account_id == fromAccountId);
             let newToSwapRecord = swapInfo.filter(rec => rec.account_id == toAccountId);
 
+            // let CustomSwapModelData = swapInfo.filter(rec => rec.account_id == toAccountId);
+
+            // let historyOrderInfonew = await historyOrderModel.findOne({
+            //     attributes: [
+            //         [Sequelize.literal('(swap + 50)'), 'swap'],
+            //         [Sequelize.literal('(taxes)'), 'taxes'],
+            //         [Sequelize.literal('(commission)'), 'commission'],
+            //         [Sequelize.literal('(lots)'), 'lots'],
+
+            //     ],
+            //     where: { account_id: toAccountId },
+            //     raw: true
+            // })
+            // if (CustomSwapModelData.length > 0) {
+
+            //     filteredInfo.toAccountHistoryInfo = historyOrderInfonew;
+
+            // }
+
+
+
 
             filteredInfo.accountFromInfo = newRecord;
             filteredInfo.accountToInfo = newToRecord;
 
             filteredInfo.swapFrominfo = newFromSwapRecord;
             filteredInfo.swapToinfo = newToSwapRecord;
-
             // let combineSymbols = fromsymbols.concat(tosymbols);
             // let uniqueSymbols = combineSymbols.filter((item, i, ar) => ar.indexOf(item) === i);
-
+            console.log(fromsymbols,"openOrderModel->>>>>>>>>>>>>>>>>>>>>>>>.")
             if (fromsymbols && fromsymbols.length > 0) {
                 let openOrderInfos = await openOrderModel.findAll({
                     attributes: [
@@ -570,6 +590,7 @@ const fetchAllOpenTrade = async (req, res, next) => {
                     openOrderFromInfo = openOrderInfos;
                 }
             }
+            
             if (tosymbols && tosymbols.length > 0) {
                 let openOrderInfos = await openOrderModel.findAll({
                     attributes: [
@@ -580,7 +601,7 @@ const fetchAllOpenTrade = async (req, res, next) => {
                         [Sequelize.literal('SUM(lots)'), 'lots'],
                         [Sequelize.literal('SUM(profit)'), 'profit'],
                         [Sequelize.literal('SUM(profit+commission+swap)'), 'total']
-                    ],
+                    ],  
                     where: {
                         account_id: toAccountId,
                         symbol: {
@@ -620,15 +641,17 @@ const fetchAllHistoryTrade = async (req, res, next) => {
             include: [accountsDetailModel]
         });
         let ml = filteredInfo.commission_acount_id;
-        console.log(ml,"ml");
-        
+
         let historyOrderInfo = await historyOrderModel.findAll({
             attributes: [
                 [Sequelize.literal('SUM(profit)'), 'profit'],
             ],
-            where: { order_type: 6,  account_id: ml },
+            where: { order_type: 6, account_id: ml },
             raw: true
         })
+
+
+
         if (filteredInfo != null) {
             let openOrderFromInfo = [];
             let openOrderToInfo = [];
@@ -646,43 +669,39 @@ const fetchAllHistoryTrade = async (req, res, next) => {
             // let enddateTo = filteredInfo.enddateTo;
             let enddateTo = (filteredInfo.enddateTo == null || filteredInfo.enddateTo == '') ? new Date() : filteredInfo.enddateTo;
 
-
             let newRecord = accountInfo.filter(rec => rec.id == fromAccountId);
             let newToRecord = accountInfo.filter(rec => rec.id == toAccountId);
             let newCommissionRecord = accountInfo.filter(rec => rec.id == ml);
-            console.log(newCommissionRecord,"testtttt");
-            
+
             let equity = (newCommissionRecord[0].accounts_details[0].equity);
-            console.log(equity,"ttt");
-            
+
             // let history = historyOrderInfo.map((data) => {
-                //     return data.profit
-                
-                // })
-                let history_info = 0
-                console.log(historyOrderInfo ,"-------");
-            if(historyOrderInfo[0].profit !== null){
+            //     return data.profit
+
+            // })
+            let history_info = 0
+            if (historyOrderInfo[0].profit !== null) {
                 // history_info = equity - eval((historyOrderInfo.profit).join('+')) 
-                history_info = equity - eval((historyOrderInfo[0].profit) )
+                history_info = eval((historyOrderInfo[0].profit)) - equity
 
-            }else{
+            } else {
+                let customDeposite = await custom_deposite.findAll({
+                    where: { account_id: ml },
+                    raw: true
+                })
 
-            let customDeposite = await custom_deposite.findAll({
-                where: { account_id: ml },
-                raw: true
-              })
-              
-              if(customDeposite.length ){
-                 history_info = equity - customDeposite[0].value 
-            //   }else {
-            //        history_info = equity - eval(history.join('+')) 
-              }
+                if (customDeposite.length) {
+                    history_info = equity - customDeposite[0].value
+                    //   }else {
+                    //        history_info = equity - eval(history.join('+')) 
+                }
             }
 
             filteredInfo.accountFromInfo = newRecord;
             filteredInfo.accountToInfo = newToRecord;
             filteredInfo.history_info = history_info;
             filteredInfo.accountCommissionInfo = newCommissionRecord;
+
 
             if (fromsymbols && fromsymbols.length > 0) {
                 let openOrderInfos = await historyOrderModel.findAll({
@@ -745,8 +764,7 @@ const fetchAllHistoryTrade = async (req, res, next) => {
         }
         return res.status(200).json({ rows: [], fromHistoryOrderInfo: [], toHistoryOrderInfo: [], commissionHistoryOrderInfo: [] });
     } catch (err) {
-        console.log(err,"err-------------------------------");
-        
+
         return res.status(err.status || 500).json(err);
     };
 }

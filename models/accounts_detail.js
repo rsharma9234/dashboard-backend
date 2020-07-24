@@ -29,8 +29,11 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: 0
     },
     profit: DataTypes.DOUBLE,
-    currency: DataTypes.STRING(50)
-  }, {
+    currency: DataTypes.STRING(50),
+    // last_seen:DataType,
+  }, 
+  
+  {
     createdAt: false,
     updatedAt: false,
     sequelize,

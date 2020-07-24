@@ -31,16 +31,18 @@ const addUser = async (req, res, next) => {
         });
         // console.log(accountOneInfo, "apiiiiiiiii");
         // console.log(accountOneInfo, '---test-----', accountModel, '--mod--')
-        if (accountOneInfo) {
-            return res.json({ status: 202, rows: 'User already exist' });
-        } else {
+        // if (accountOneInfo) {
+        //     return res.json({ status: 202, rows: 'User Dosent  exist',
+        //  });
+
+        // }
+        //  else {
             // console.log("---else---")
             accountModel.create({ 'login': req.body.login, password: req.body.password, 'broker': broker, 'alias': alias, 'status': 0, active: 1 })
             return res.status(200).json({ status: true });
-        }
-
+        
+    // }
     } catch (err) {
-        console.log(err,'errrrrrrrrrrr');
         
         return res.status(err.status || 500).json(err);
     };
