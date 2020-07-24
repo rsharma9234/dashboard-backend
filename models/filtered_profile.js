@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
     from_account_id: DataTypes.INTEGER,
     to_account_id: DataTypes.INTEGER,
     commission_acount_id:DataTypes.INTEGER,
-
+   
     startdateFrom: {
       type: DataTypes.DATE,
       default: new Date(),
@@ -46,7 +46,9 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER(1),
       default: 0,
       field: 'status'
-  }
+  },
+  auto_close:DataTypes.INTEGER,
+
   }, {
     sequelize,
     modelName: 'filtered_profile',

@@ -33,7 +33,10 @@ module.exports = {
       },
       currency: {
         type: Sequelize.STRING(50)
-      }
+      },
+      last_seen: {
+        type: Sequelize.DOUBLE
+      },
 
       // },
       // createdAt: {
