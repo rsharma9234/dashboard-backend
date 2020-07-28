@@ -26,24 +26,28 @@ const addUser = async (req, res, next) => {
         let { login, password, broker, alias } = req.body;
         let accountOneInfo = await accountModel.findOne({
             where: {
-                login: login
-            }
-        });
-        // console.log(accountOneInfo, "apiiiiiiiii");
-        // console.log(accountOneInfo, '---test-----', accountModel, '--mod--')
-        // if (accountOneInfo) {
-        //     return res.json({ status: 202, rows: 'User Dosent  exist',
-        //  });
+                login: login,
+                // password:password,
+                // broker:broker,
+                // alias:alias
 
-        // }
-        //  else {
-            // console.log("---else---")
+
+            },
+            raw: true
+
+        });
+        if (accountOneInfo) {
+            if (accountOneInfo.status === 0) {
+                return res.status(200).json({ status: true });
+            }
+            return res.status(200).json({ message: 'already exists', status: '500' });
+        }
+        else {
             accountModel.create({ 'login': req.body.login, password: req.body.password, 'broker': broker, 'alias': alias, 'status': 0, active: 1 })
             return res.status(200).json({ status: true });
-        
-    // }
+        }
+
     } catch (err) {
-        
         return res.status(err.status || 500).json(err);
     };
 }
@@ -69,7 +73,6 @@ const checkUserConnected = async (req, res, next) => {
         }
 
     } catch (err) {
-        console.log(err,'error in conenction');
         return res.status(err.status || 500).json(err);
     };
 }
@@ -106,7 +109,6 @@ const mainLogin = async (req, res, next) => {
         return res.status(err.status || 500).json(err);
     };
 }
-
 const updateUser = async (req, res, next) => {
     try {
         let { id, alias } = req.body;
