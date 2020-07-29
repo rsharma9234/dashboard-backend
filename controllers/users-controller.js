@@ -27,11 +27,9 @@ const addUser = async (req, res, next) => {
         let accountOneInfo = await accountModel.findOne({
             where: {
                 login: login,
-                // password:password,
-                // broker:broker,
-                // alias:alias
-
-
+                password:password,
+                broker:broker,
+                alias:alias
             },
             raw: true
 
@@ -51,7 +49,6 @@ const addUser = async (req, res, next) => {
         return res.status(err.status || 500).json(err);
     };
 }
-
 const checkUserConnected = async (req, res, next) => {
     try {
         let { login, broker } = req.body;
@@ -64,11 +61,9 @@ const checkUserConnected = async (req, res, next) => {
             }
         });
         if (accountOneInfo) {
-            // console.log(accountOneInfo,'accountOneInfo in conenction check');
             await accountModel.update({ status: 1 }, { where: { login, broker } });
             return res.status(200).json({ connected: true });
         } else {
-            // console.log(accountOneInfo,'accountOneInfo in conenction check not found');
             return res.status(200).json({ connected: false });
         }
 
@@ -92,11 +87,25 @@ const mainLogin = async (req, res, next) => {
             err.message = 'Invalid username.';
             return res.status(200).json(err);
         }
+         if (accountCheck.username != username ) {
+            let err = new Error()
+            err.status = 404;
+            err.name = 'username';
+            err.message = 'Invalid username';
+            return res.status(200).json(err);
+        }
         if (accountCheck.password !== password) {
             let err = new Error()
             err.status = 404;
             err.name = 'password';
             err.message = 'Invalid password.';
+            return res.status(200).json(err);
+        }
+         if (accountCheck.username != username ) {
+            let err = new Error()
+            err.status = 404;
+            err.name = 'username';
+            err.message = 'Invalid password';
             return res.status(200).json(err);
         }
         let accountInfo = await mainLoginModel.findAll({
