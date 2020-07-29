@@ -26,10 +26,7 @@ const addUser = async (req, res, next) => {
         let { login, password, broker, alias } = req.body;
         let accountOneInfo = await accountModel.findOne({
             where: {
-                login: login,
-                password:password,
-                broker:broker,
-                alias:alias
+                login: login
             },
             raw: true
 
