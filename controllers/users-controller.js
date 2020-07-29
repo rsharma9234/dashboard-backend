@@ -27,11 +27,9 @@ const addUser = async (req, res, next) => {
         let accountOneInfo = await accountModel.findOne({
             where: {
                 login: login,
-                // password:password,
-                // broker:broker,
-                // alias:alias
-
-
+                password:password,
+                broker:broker,
+                alias:alias
             },
             raw: true
 
@@ -92,11 +90,25 @@ const mainLogin = async (req, res, next) => {
             err.message = 'Invalid username.';
             return res.status(200).json(err);
         }
+         if (accountCheck.username != username ) {
+            let err = new Error()
+            err.status = 404;
+            err.name = 'username';
+            err.message = 'Invalid username';
+            return res.status(200).json(err);
+        }
         if (accountCheck.password !== password) {
             let err = new Error()
             err.status = 404;
             err.name = 'password';
             err.message = 'Invalid password.';
+            return res.status(200).json(err);
+        }
+         if (accountCheck.username != username ) {
+            let err = new Error()
+            err.status = 404;
+            err.name = 'username';
+            err.message = 'Invalid password';
             return res.status(200).json(err);
         }
         let accountInfo = await mainLoginModel.findAll({
