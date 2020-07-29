@@ -49,7 +49,6 @@ const addUser = async (req, res, next) => {
         return res.status(err.status || 500).json(err);
     };
 }
-
 const checkUserConnected = async (req, res, next) => {
     try {
         let { login, broker } = req.body;
@@ -62,11 +61,9 @@ const checkUserConnected = async (req, res, next) => {
             }
         });
         if (accountOneInfo) {
-            // console.log(accountOneInfo,'accountOneInfo in conenction check');
             await accountModel.update({ status: 1 }, { where: { login, broker } });
             return res.status(200).json({ connected: true });
         } else {
-            // console.log(accountOneInfo,'accountOneInfo in conenction check not found');
             return res.status(200).json({ connected: false });
         }
 
