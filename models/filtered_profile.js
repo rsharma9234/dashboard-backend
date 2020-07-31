@@ -18,6 +18,10 @@ module.exports = (sequelize, DataTypes) => {
     from_account_id: DataTypes.INTEGER,
     to_account_id: DataTypes.INTEGER,
     commission_acount_id:DataTypes.INTEGER,
+    from_magic_number : DataTypes.STRING,
+    to_magic_number:DataTypes.STRING,
+    from_include_exclude_status:DataTypes.INTEGER,
+    to_include_exclude_status:DataTypes.INTEGER,
    
     startdateFrom: {
       type: DataTypes.DATE,
@@ -48,8 +52,9 @@ module.exports = (sequelize, DataTypes) => {
       field: 'status'
   },
   auto_close:DataTypes.INTEGER,
-
-  }, {
+ 
+  }, 
+   {
     sequelize,
     modelName: 'filtered_profile',
   });

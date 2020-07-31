@@ -191,6 +191,7 @@ const fetchAllAccountsBySymbolOpen = async (req, res, next) => {
     } catch (err) {
         return res.status(err.status || 500).json(err);
     };
+
 }
 
 const fetchAllAccountsBySymbolHistory = async (req, res, next) => {
@@ -500,7 +501,142 @@ const fetchAllOpenTradebkp = async (req, res, next) => {
 // };
 
 
-const fetchAllOpenTrade = async (req, res, next) => {
+// const fetchAllOpenTrade = async (req, res, next) => {
+//     try {
+//         let filteredInfo = await filteredProfileModel.findOne({
+//             where: { status: 1 },
+//             raw: true
+
+//         });
+//         let accountInfo = await accountModel.findAll({
+//             attributes: ['login', 'id', 'alias'],
+//             include: [accountsDetailModel]
+//         });
+//         let swapInfo = await CustomSwapModel.findAll({ raw: true });
+//         if (filteredInfo != null) {
+//             let openOrderFromInfo = [];
+//             let openOrderToInfo = [];
+//             let fromAccountId = filteredInfo.from_account_id;
+//             let fromsymbols = JSON.parse(filteredInfo.from_symbols);
+//             let startdateFrom = filteredInfo.startdateFrom;
+//             // let enddateFrom = filteredInfo.enddateFrom;
+//             let enddateFrom = (filteredInfo.enddateFrom == null || filteredInfo.enddateFrom == '') ? new Date() : filteredInfo.enddateFrom;
+
+//             let toAccountId = filteredInfo.to_account_id;
+//             let tosymbols = JSON.parse(filteredInfo.to_symbols);
+//             let startdateTo = filteredInfo.startdateTo;
+//             // let enddateTo = filteredInfo.enddateTo;
+//             let enddateTo = (filteredInfo.enddateTo == null || filteredInfo.enddateTo == '') ? new Date() : filteredInfo.enddateTo;
+
+
+//             let newRecord = accountInfo.filter(rec => rec.id == fromAccountId);
+//             let newToRecord = accountInfo.filter(rec => rec.id == toAccountId);
+//             let newFromSwapRecord = swapInfo.filter(rec => rec.account_id == fromAccountId);
+//             let newToSwapRecord = swapInfo.filter(rec => rec.account_id == toAccountId);
+
+//             // let CustomSwapModelData = swapInfo.filter(rec => rec.account_id == toAccountId);
+
+//             // let CustomSwapModel1 = await CustomSwapModel.findAll({
+//             //     attributes: ['open_value'],
+
+//             //     where: { account_id: toAccountId },
+//             //     raw: true
+//             // })
+//             // console.log(CustomSwapModel1, "CustomSwapModel1===================================");
+
+//             // console.log(CustomSwapModelData, 'CustomSwapModelData=============================================');
+
+//             // if (CustomSwapModelData.length > 0) {
+
+//             //     filteredInfo.toAccountHistoryInfo = historyOrderInfonew;
+
+//             // }
+//             // let fetchAllMagicNumbers = await openOrderModel.findAll({
+//             //     attributes: ['magic_number'],
+//             //     where:{magic_number: from_magic_number}
+//             // })
+//             // console.log(fetchAllMagicNumbers,"fetchAllMagicNumbers=========>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+
+
+
+
+//             filteredInfo.accountFromInfo = newRecord;
+//             filteredInfo.accountToInfo = newToRecord;
+
+
+//             filteredInfo.swapFrominfo = newFromSwapRecord;
+//             filteredInfo.swapToinfo = newToSwapRecord;
+//             // let combineSymbols = fromsymbols.concat(tosymbols);
+//             // let uniqueSymbols = combineSymbols.filter((item, i, ar) => ar.indexOf(item) === i);
+
+//             if (fromsymbols && fromsymbols.length > 0) {
+//                 let openOrderInfos = await openOrderModel.findAll({
+//                     attributes: [
+//                         'order_type',
+//                         [Sequelize.literal('SUM(swap)'), 'swap'],
+//                         [Sequelize.literal('SUM(taxes)'), 'taxes'],
+//                         [Sequelize.literal('SUM(commission)'), 'commission'],
+//                         [Sequelize.literal('SUM(lots)'), 'lots'],
+//                         [Sequelize.literal('SUM(profit)'), 'profit'],
+//                         [Sequelize.literal('SUM(profit+commission+swap)'), 'total']
+//                     ],
+//                     where: {
+//                         account_id: fromAccountId,
+//                         symbol: {
+//                             [Op.in]: fromsymbols
+//                         },
+//                         open_time: {
+//                             [Op.gte]: startdateFrom,
+//                             [Op.lt]: enddateFrom,
+//                         }
+//                     }
+//                 });
+//                 if (openOrderInfos && openOrderInfos.length > 0) {
+//                     openOrderInfos.map(nt => nt.toJSON());
+//                     openOrderFromInfo = openOrderInfos;
+//                 }
+//             }
+//             if (tosymbols && tosymbols.length > 0) {
+//                 let openOrderInfos = await openOrderModel.findAll({
+//                     attributes: [
+//                         'order_type',
+//                         [Sequelize.literal('SUM(swap)'), 'swap'],
+//                         [Sequelize.literal('SUM(taxes)'), 'taxes'],
+//                         [Sequelize.literal('SUM(commission)'), 'commission'],
+//                         [Sequelize.literal('SUM(lots)'), 'lots'],
+//                         [Sequelize.literal('SUM(profit)'), 'profit'],
+//                         [Sequelize.literal('SUM(profit+commission+swap)'), 'total']
+//                     ],
+//                     where: {
+//                         account_id: toAccountId,
+//                         symbol: {
+//                             [Op.in]: tosymbols
+//                         },
+//                         open_time: {
+//                             [Op.gte]: startdateTo,
+//                             [Op.lt]: enddateTo,
+//                         }
+//                     }
+//                 });
+
+//                 if (openOrderInfos && openOrderInfos.length > 0) {
+//                     openOrderToInfo = openOrderInfos;
+//                 }
+//             }
+//             return res.status(200).json({
+//                 rows: filteredInfo,
+//                 fromOpenOrderInfo: openOrderFromInfo,
+//                 toOpenOrderInfo: openOrderToInfo,
+//             });
+//         }
+//         return res.status(200).json({ rows: [], fromOpenOrderInfo: [], toOpenOrderInfo: [] });
+//     } catch (err) {
+//         return res.status(err.status || 500).json(err);
+//     };
+// }
+
+
+const fetchAllOpenTrade = async (req, res, next) => {//open postions data goes here
     try {
         let filteredInfo = await filteredProfileModel.findOne({
             where: { status: 1 },
@@ -536,10 +672,10 @@ const fetchAllOpenTrade = async (req, res, next) => {
             // let CustomSwapModelData = swapInfo.filter(rec => rec.account_id == toAccountId);
 
             // let CustomSwapModel1 = await CustomSwapModel.findAll({
-            //     attributes: ['open_value'],
+            // attributes: ['open_value'],
 
-            //     where: { account_id: toAccountId },
-            //     raw: true
+            // where: { account_id: toAccountId },
+            // raw: true
             // })
             // console.log(CustomSwapModel1, "CustomSwapModel1===================================");
 
@@ -547,7 +683,7 @@ const fetchAllOpenTrade = async (req, res, next) => {
 
             // if (CustomSwapModelData.length > 0) {
 
-            //     filteredInfo.toAccountHistoryInfo = historyOrderInfonew;
+            // filteredInfo.toAccountHistoryInfo = historyOrderInfonew;
 
             // }
 
@@ -560,8 +696,14 @@ const fetchAllOpenTrade = async (req, res, next) => {
             filteredInfo.swapToinfo = newToSwapRecord;
             // let combineSymbols = fromsymbols.concat(tosymbols);
             // let uniqueSymbols = combineSymbols.filter((item, i, ar) => ar.indexOf(item) === i);
+            let CustomSwap = await CustomSwapModel.findAll({
+                attributes: ['account_id', 'open_value'],
+                where: { account_id: { [Op.in]: [toAccountId, fromAccountId] } },
+                raw: true
+            })
 
             if (fromsymbols && fromsymbols.length > 0) {
+
                 let openOrderInfos = await openOrderModel.findAll({
                     attributes: [
                         'order_type',
@@ -581,10 +723,27 @@ const fetchAllOpenTrade = async (req, res, next) => {
                             [Op.gte]: startdateFrom,
                             [Op.lt]: enddateFrom,
                         }
-                    }
+                    },
+                    raw: true
                 });
+
                 if (openOrderInfos && openOrderInfos.length > 0) {
-                    openOrderInfos.map(nt => nt.toJSON());
+                    let foundRec = CustomSwap.filter(data => {
+                        return (data.account_id === fromAccountId)
+                    })
+
+                    if (openOrderInfos[0].swap !== null && foundRec.length > 0 && foundRec[0].open_value !== 0 && foundRec[0].open_value !== undefined) {
+
+                        let objectINfo = openOrderInfos[0]
+
+                        Object.keys(objectINfo).forEach((key) => { objectINfo[key] !== null ? objectINfo[key] : objectINfo[key] = 0 })
+                        let value = foundRec && foundRec.length > 0 ? foundRec[0].close_value : 0
+                        openOrderInfos[0].swap = openOrderInfos[0].swap + value
+                        openOrderInfos[0].total = openOrderInfos[0].total + value
+
+
+                    }
+
                     openOrderFromInfo = openOrderInfos;
                 }
             }
@@ -608,10 +767,25 @@ const fetchAllOpenTrade = async (req, res, next) => {
                             [Op.gte]: startdateTo,
                             [Op.lt]: enddateTo,
                         }
-                    }
-                });
+                    },
+                    raw: true
 
+                });
                 if (openOrderInfos && openOrderInfos.length > 0) {
+                    let foundRec = CustomSwap.filter(data => {
+                        return (data.account_id === toAccountId)
+                    })
+
+                    if (openOrderInfos[0].swap !== null && foundRec.length > 0 && foundRec[0].open_value !== 0 && foundRec[0].open_value !== undefined) {
+                        let objectINfo = openOrderInfos[0]
+
+                        Object.keys(objectINfo).forEach((key) => { objectINfo[key] !== null ? objectINfo[key] : objectINfo[key] = 0 })
+                        let value = foundRec && foundRec.length > 0 ? foundRec[0].close_value : 0
+                        openOrderInfos[0].swap = openOrderInfos[0].swap + value
+                        openOrderInfos[0].total = openOrderInfos[0].total + value
+
+
+                    }
                     openOrderToInfo = openOrderInfos;
                 }
             }
@@ -646,7 +820,7 @@ const fetchLastUpdatedTime = async (req, res, next) => {
             })
             let moments = lastUpdated.map(data => moment(data.last_seen))
             let maxDate = moment.max(moments)
-            let date = moment(maxDate).utc().format('YYYY-MM-DD hh:mm:ss')
+            let date = moment(maxDate).utc().format('DD-MM-YYYY  HH:mm:ss')
 
 
             return res.status(200).json({ filteredInfoTime: date, });
@@ -655,7 +829,174 @@ const fetchLastUpdatedTime = async (req, res, next) => {
         return res.status(err.status || 500).json(err);
     };
 }
-const fetchAllHistoryTrade = async (req, res, next) => {
+// const fetchAllHistoryTrade = async (req, res, next) => {
+//     try {
+//         let filteredInfo = await filteredProfileModel.findOne({
+//             where: { status: 1 },
+//             raw: true
+//         });
+//         let accountInfo = await accountModel.findAll({
+//             attributes: ['login', 'id', 'alias'],
+//             include: [accountsDetailModel]
+//         });
+
+//         let ml = filteredInfo.commission_acount_id;
+
+//         let historyOrderInfo = await historyOrderModel.findAll({
+//             attributes: [
+//                 [Sequelize.literal('SUM(profit)'), 'profit'], // coming null
+//             ],
+//             where: { order_type: 6, account_id: ml },
+//             raw: true
+//         })
+
+
+//         if (filteredInfo != null) {
+//             let openOrderFromInfo = [];
+//             let openOrderToInfo = [];
+//             let fromAccountId = filteredInfo.from_account_id;
+//             let fromsymbols = JSON.parse(filteredInfo.from_symbols);
+//             let startdateFrom = filteredInfo.startdateFrom;
+//             // let enddateFrom = filteredInfo.enddateFrom;
+//             let enddateFrom = (filteredInfo.enddateFrom == null || filteredInfo.enddateFrom == '') ? new Date() : filteredInfo.enddateFrom;
+
+
+
+//             let toAccountId = filteredInfo.to_account_id;
+//             let tosymbols = JSON.parse(filteredInfo.to_symbols);
+//             let startdateTo = filteredInfo.startdateTo;
+//             // let enddateTo = filteredInfo.enddateTo;
+//             let enddateTo = (filteredInfo.enddateTo == null || filteredInfo.enddateTo == '') ? new Date() : filteredInfo.enddateTo;
+
+
+//             let newRecord = accountInfo.filter(rec => rec.id == fromAccountId);
+//             let newToRecord = accountInfo.filter(rec => rec.id == toAccountId);
+//             let newCommissionRecord = accountInfo.filter(rec => rec.id == ml);
+//             let to_include_exclude = filteredInfo.to_include_exclude_status
+//             let from_include_exclude = filteredInfo.from_include_exclude_status
+//             console.log(from_include_exclude, to_include_exclude, "to_include_exclude  ---------------->")
+//             let equity = (newCommissionRecord[0].accounts_details[0].equity);
+
+
+//             let history_info = 0
+//             if (historyOrderInfo[0].profit !== null) {
+
+//                 history_info = eval((historyOrderInfo[0].profit)) - equity
+
+//             } else {
+//                 let customDeposite = await custom_deposite.findAll({
+//                     where: { account_id: ml },
+//                     raw: true
+//                 })
+
+//                 if (customDeposite.length) {
+//                     history_info = equity - customDeposite[0].value
+
+//                 }
+//             }
+
+//             filteredInfo.accountFromInfo = newRecord;
+//             filteredInfo.accountToInfo = newToRecord;
+//             filteredInfo.history_info = history_info;
+//             filteredInfo.accountCommissionInfo = newCommissionRecord;
+
+
+
+//             let CustomSwap = await CustomSwapModel.findAll({
+//                 attributes: ['account_id', 'close_value'],
+//                 where: { account_id: { [Op.in]: [toAccountId, fromAccountId] } },
+//                 raw: true
+//             })
+//             if (fromsymbols && fromsymbols.length > 0) {
+
+//                 let openOrderInfos = await historyOrderModel.findAll({
+//                     attributes: [
+//                         [Sequelize.literal('SUM(swap)'), 'swap'],
+//                         [Sequelize.literal('SUM(taxes)'), 'taxes'],
+//                         [Sequelize.literal('SUM(commission)'), 'commission'],
+//                         [Sequelize.literal('SUM(lots)'), 'lots'],
+//                         [Sequelize.literal('SUM(profit)'), 'profit'],
+//                         [Sequelize.literal('SUM(profit+commission+taxes+swap)'), 'total']
+//                     ],
+//                     where: {
+//                         account_id: fromAccountId,
+//                         symbol: {
+//                             [Op.in]: fromsymbols
+//                         },
+//                         open_time: {
+//                             [Op.gte]: startdateFrom,
+//                             [Op.lt]: enddateFrom,
+//                         }
+//                     }
+//                 });
+//                 if (openOrderInfos && openOrderInfos.length > 0) {
+//                     openOrderInfos.map(nt => nt.toJSON());
+//                     if (openOrderInfos !== null) {
+//                         let foundRec = CustomSwap.filter(data => {
+//                             return (data.account_id === fromAccountId)
+//                         })
+//                         openOrderInfos[0].swap = openOrderInfos[0].swap + (foundRec && foundRec.length > 0) ? foundRec[0].close_value : 0
+//                     }
+//                     openOrderFromInfo = openOrderInfos;
+//                 }
+//             }
+//             if (tosymbols && tosymbols.length > 0) {
+//                 let openOrderInfos = await historyOrderModel.findAll({
+//                     attributes: [
+//                         [Sequelize.literal('SUM(swap)'), 'swap'],
+//                         [Sequelize.literal('SUM(taxes)'), 'taxes'],
+//                         [Sequelize.literal('SUM(commission)'), 'commission'],
+//                         [Sequelize.literal('SUM(lots)'), 'lots'],
+//                         [Sequelize.literal('SUM(profit)'), 'profit'],
+//                         [Sequelize.literal('SUM(profit+commission+taxes+swap)'), 'total']
+//                     ],
+
+//                     where: {
+//                         account_id: toAccountId,
+//                         symbol: {
+//                             [Op.in]: tosymbols
+//                         },
+//                         open_time: {
+//                             [Op.gte]: startdateTo,
+//                             [Op.lt]: enddateTo,
+//                         }
+//                     },
+//                     raw: true
+//                 });
+
+
+//                 if (openOrderInfos && openOrderInfos.length > 0) {
+
+//                     if (openOrderInfos !== null) {
+//                         let foundRec = CustomSwap.filter(data => {
+//                             return (data.account_id === toAccountId)
+//                         })
+//                         if (foundRec[0].close_value !== 0) {
+//                             let objectINfo = openOrderInfos[0]
+//                             Object.keys(objectINfo).forEach((key) => { objectINfo[key] = 0 })
+//                             openOrderInfos[0].swap = openOrderInfos[0].swap + (foundRec && foundRec.length > 0) ? foundRec[0].close_value : 0
+//                         }
+//                     }
+//                     openOrderToInfo = openOrderInfos;
+
+//                 }
+//             }
+//             return res.status(200).json({
+//                 rows: filteredInfo,
+//                 fromHistoryOrderInfo: openOrderFromInfo,
+//                 toHistoryOrderInfo: openOrderToInfo,
+//             });
+//         }
+//         return res.status(200).json({ rows: [], fromHistoryOrderInfo: [], toHistoryOrderInfo: [], commissionHistoryOrderInfo: [] });
+//     } catch (err) {
+//         console.log(err, 'errrrrrrrrrrrrrrr----------------->')
+//         return res.status(err.status || 500).json(err);
+//     };
+// }
+
+
+
+const fetchAllHistoryTrade = async (req, res, next) => { // close position data goes here
     try {
         let filteredInfo = await filteredProfileModel.findOne({
             where: { status: 1 },
@@ -682,6 +1023,8 @@ const fetchAllHistoryTrade = async (req, res, next) => {
             let openOrderToInfo = [];
             let fromAccountId = filteredInfo.from_account_id;
             let fromsymbols = JSON.parse(filteredInfo.from_symbols);
+            // let tomagicAccount = JSON.parse(filteredInfo.TO_magic_number)
+            // let frommagicAccount =JSON.parse(filteredInfo.from_magic_number)
             let startdateFrom = filteredInfo.startdateFrom;
             // let enddateFrom = filteredInfo.enddateFrom;
             let enddateFrom = (filteredInfo.enddateFrom == null || filteredInfo.enddateFrom == '') ? new Date() : filteredInfo.enddateFrom;
@@ -698,17 +1041,20 @@ const fetchAllHistoryTrade = async (req, res, next) => {
             let newRecord = accountInfo.filter(rec => rec.id == fromAccountId);
             let newToRecord = accountInfo.filter(rec => rec.id == toAccountId);
             let newCommissionRecord = accountInfo.filter(rec => rec.id == ml);
-
+            // let to_include_exclude = filteredInfo.to_include_exclude_status
+            // let from_include_exclude = filteredInfo.from_include_exclude_status
+            // console.log(from_include_exclude, to_include_exclude, "to_include_exclude  ---------------->")
 
             let equity = (newCommissionRecord[0].accounts_details[0].equity);
 
             // let history = historyOrderInfo.map((data) => {
-            //     return data.profit
+            // return data.profit
 
             // })
+
             let history_info = 0
             if (historyOrderInfo[0].profit !== null) {
-                // history_info = equity - eval((historyOrderInfo.profit).join('+')) 
+                // history_info = equity - eval((historyOrderInfo.profit).join('+'))
                 history_info = eval((historyOrderInfo[0].profit)) - equity
 
             } else {
@@ -719,8 +1065,8 @@ const fetchAllHistoryTrade = async (req, res, next) => {
 
                 if (customDeposite.length) {
                     history_info = equity - customDeposite[0].value
-                    //   }else {
-                    //        history_info = equity - eval(history.join('+')) 
+                    // }else {
+                    // history_info = equity - eval(history.join('+'))
                 }
             }
 
@@ -736,6 +1082,33 @@ const fetchAllHistoryTrade = async (req, res, next) => {
                 where: { account_id: { [Op.in]: [toAccountId, fromAccountId] } },
                 raw: true
             })
+            if (from_include_exclude !== 0) {
+                let openOrderInfos = await historyOrderModel.findAll({
+                    attributes: [
+                        [Sequelize.literal('SUM(swap)'), 'swap'],
+                        [Sequelize.literal('SUM(taxes)'), 'taxes'],
+                        [Sequelize.literal('SUM(commission)'), 'commission'],
+                        [Sequelize.literal('SUM(lots)'), 'lots'],
+                        [Sequelize.literal('SUM(profit)'), 'profit'],
+                        [Sequelize.literal('SUM(profit+commission+taxes+swap)'), 'total']
+                    ],
+                    where: {
+                        account_id: fromAccountId,
+                        symbol: {
+                            [Op.in]: fromsymbols
+                        },
+                        open_time: {
+                            [Op.gte]: startdateFrom,
+                            [Op.lt]: enddateFrom,
+                        }
+                    },
+                    raw: true
+                });
+          
+
+            }
+
+
             if (fromsymbols && fromsymbols.length > 0) {
 
 
@@ -758,25 +1131,38 @@ const fetchAllHistoryTrade = async (req, res, next) => {
                             [Op.gte]: startdateFrom,
                             [Op.lt]: enddateFrom,
                         }
-                    }
+                    },
+                    raw: true
                 });
                 if (openOrderInfos && openOrderInfos.length > 0) {
-                    openOrderInfos.map(nt => nt.toJSON());
-                    if (openOrderInfos !== null) {
-                        let foundRec = CustomSwap.filter(data => {
-                            return (data.account_id === fromAccountId)
-                        })
-                        openOrderInfos[0].swap = openOrderInfos[0].swap + (foundRec && foundRec.length > 0) ? foundRec[0].close_value : 0
+                    // openOrderInfos.map(nt => nt.toJSON());
+
+
+                    let foundRec = CustomSwap.filter(data => {
+                        return (data.account_id === fromAccountId)
+                    })
+
+
+                    if (openOrderInfos[0].swap !== null && foundRec.length > 0 && foundRec[0].close_value !== 0 && foundRec[0].close_value !== undefined) {
+                        let objectINfo = openOrderInfos[0]
+
+                        Object.keys(objectINfo).forEach((key) => { objectINfo[key] !== null ? objectINfo[key] : objectINfo[key] = 0 })
+                        let value = foundRec && foundRec.length > 0 ? foundRec[0].close_value : 0
+                        openOrderInfos[0].swap = openOrderInfos[0].swap + value
+                        openOrderInfos[0].total = openOrderInfos[0].total + value
+
                     }
+
+
                     openOrderFromInfo = openOrderInfos;
                 }
             }
             if (tosymbols && tosymbols.length > 0) {
                 // let CustomSwap = await CustomSwapModel.findAll({
-                //     attributes: ['close_value'],
+                // attributes: ['close_value'],
 
-                //     where: { account_id: toAccountId},
-                //     raw: true
+                // where: { account_id: toAccountId},
+                // raw: true
                 // })
                 // let data = CustomSwap.length>0? CustomSwap[0].close_value:0
 
@@ -802,19 +1188,23 @@ const fetchAllHistoryTrade = async (req, res, next) => {
                     },
                     raw: true
                 });
+                console.log(openOrderInfos, 'openOrderInfos -----------------------------------hist')
 
 
                 if (openOrderInfos && openOrderInfos.length > 0) {
-
                     if (openOrderInfos !== null) {
                         let foundRec = CustomSwap.filter(data => {
                             return (data.account_id === toAccountId)
                         })
-                        if (foundRec[0].close_value !== 0) {
-                            let objectINfo = openOrderInfos[0]
-                            Object.keys(objectINfo).forEach((key) => { objectINfo[key] = 0 })
 
-                            openOrderInfos[0].swap = openOrderInfos[0].swap + (foundRec && foundRec.length > 0) ? foundRec[0].close_value : 0
+                        if (openOrderInfos[0].swap !== null && foundRec.length > 0 && foundRec[0].close_value !== 0 && foundRec[0].close_value !== undefined) {
+                            let objectINfo = openOrderInfos[0]
+                            Object.keys(objectINfo).forEach((key) => { objectINfo[key] !== null ? objectINfo[key] : objectINfo[key] = 0 })
+                            let value = foundRec && foundRec.length > 0 ? foundRec[0].close_value : 0
+                            openOrderInfos[0].swap = openOrderInfos[0].swap + value
+                            openOrderInfos[0].total = openOrderInfos[0].total + value
+
+
 
 
                         }
@@ -835,7 +1225,7 @@ const fetchAllHistoryTrade = async (req, res, next) => {
         }
         return res.status(200).json({ rows: [], fromHistoryOrderInfo: [], toHistoryOrderInfo: [], commissionHistoryOrderInfo: [] });
     } catch (err) {
-
+        console.log(err)
         return res.status(err.status || 500).json(err);
     };
 }
