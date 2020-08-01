@@ -662,6 +662,7 @@ const fetchAllOpenTrade = async (req, res, next) => {//open postions data goes h
             let startdateTo = filteredInfo.startdateTo;
             // let enddateTo = filteredInfo.enddateTo;
             let enddateTo = (filteredInfo.enddateTo == null || filteredInfo.enddateTo == '') ? new Date() : filteredInfo.enddateTo;
+            console.log(fromAccountId, toAccountId,"open--------------fromAccountId--------------------->")
 
 
             let newRecord = accountInfo.filter(rec => rec.id == fromAccountId);
@@ -726,6 +727,7 @@ const fetchAllOpenTrade = async (req, res, next) => {//open postions data goes h
                     },
                     raw: true
                 });
+                console.log(openOrderInfos,"open--------------fromAccountId--------------------->")
 
                 if (openOrderInfos && openOrderInfos.length > 0) {
                     let foundRec = CustomSwap.filter(data => {
@@ -1032,6 +1034,7 @@ const fetchAllHistoryTrade = async (req, res, next) => { // close position data 
 
 
             let toAccountId = filteredInfo.to_account_id;
+            console.log(fromAccountId, toAccountId,"close--------------fromAccountId--------------------->")
             let tosymbols = JSON.parse(filteredInfo.to_symbols);
             let startdateTo = filteredInfo.startdateTo;
             // let enddateTo = filteredInfo.enddateTo;
@@ -1082,31 +1085,31 @@ const fetchAllHistoryTrade = async (req, res, next) => { // close position data 
                 where: { account_id: { [Op.in]: [toAccountId, fromAccountId] } },
                 raw: true
             })
-            if (from_include_exclude !== 0) {
-                let openOrderInfos = await historyOrderModel.findAll({
-                    attributes: [
-                        [Sequelize.literal('SUM(swap)'), 'swap'],
-                        [Sequelize.literal('SUM(taxes)'), 'taxes'],
-                        [Sequelize.literal('SUM(commission)'), 'commission'],
-                        [Sequelize.literal('SUM(lots)'), 'lots'],
-                        [Sequelize.literal('SUM(profit)'), 'profit'],
-                        [Sequelize.literal('SUM(profit+commission+taxes+swap)'), 'total']
-                    ],
-                    where: {
-                        account_id: fromAccountId,
-                        symbol: {
-                            [Op.in]: fromsymbols
-                        },
-                        open_time: {
-                            [Op.gte]: startdateFrom,
-                            [Op.lt]: enddateFrom,
-                        }
-                    },
-                    raw: true
-                });
+            // if (from_include_exclude !== 0) {
+            //     let openOrderInfos = await historyOrderModel.findAll({
+            //         attributes: [
+            //             [Sequelize.literal('SUM(swap)'), 'swap'],
+            //             [Sequelize.literal('SUM(taxes)'), 'taxes'],
+            //             [Sequelize.literal('SUM(commission)'), 'commission'],
+            //             [Sequelize.literal('SUM(lots)'), 'lots'],
+            //             [Sequelize.literal('SUM(profit)'), 'profit'],
+            //             [Sequelize.literal('SUM(profit+commission+taxes+swap)'), 'total']
+            //         ],
+            //         where: {
+            //             account_id: fromAccountId,
+            //             symbol: {
+            //                 [Op.in]: fromsymbols
+            //             },
+            //             open_time: {
+            //                 [Op.gte]: startdateFrom,
+            //                 [Op.lt]: enddateFrom,
+            //             }
+            //         },
+            //         raw: true
+            //     });
           
 
-            }
+            // }
 
 
             if (fromsymbols && fromsymbols.length > 0) {
