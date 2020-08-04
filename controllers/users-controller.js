@@ -11,7 +11,10 @@ const fetchAllAccounts = async (req, res, next) => {
             // where:{ status:1},
             raw: true
         });
-        return res.status(200).json({ rows: accountInfo });
+
+        return res.status(200).json({
+            rows: accountInfo
+        });
 
     } catch (err) {
         return res.status(err.status || 500).json(err);
@@ -84,7 +87,7 @@ const mainLogin = async (req, res, next) => {
             err.message = 'Invalid username.';
             return res.status(200).json(err);
         }
-         if (accountCheck.username != username ) {
+        if (accountCheck.username != username) {
             let err = new Error()
             err.status = 404;
             err.name = 'username';
@@ -98,7 +101,7 @@ const mainLogin = async (req, res, next) => {
             err.message = 'Invalid password.';
             return res.status(200).json(err);
         }
-         if (accountCheck.username != username ) {
+        if (accountCheck.username != username) {
             let err = new Error()
             err.status = 404;
             err.name = 'username';
