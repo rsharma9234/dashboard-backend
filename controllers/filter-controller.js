@@ -12,6 +12,7 @@ const customTable = models.custom_deposite
 
 
 const addFilterData = async (req, res, next) => {
+  console.log(req.body,"req.body ------------->>")
   try {
     // let Data = {
     //   profile_name: req.body.profile_name, 
@@ -41,16 +42,12 @@ const fetchFilterData = async (req, res, next) => {
     });
     let filterInfo = await filterModel.findAll({ raw: true });
 
-
-
     let newInfo = filterInfo.map((data) => {
       let newRecord = accountInfo.filter(rec => rec.id == data.from_account_id);
       let newToRecord = accountInfo.filter(rec => rec.id == data.to_account_id);
       let newCommissionRecord = accountInfo.filter(rec => rec.id == data.commission_acount_id);
       let newDetailFrom = accountInfo.filter(rec => rec.id == data.from_account_id);
       let newDetailTo = accountInfo.filter(rec => rec.id == data.to_account_id);
-
-
 
       data.accountFromInfo = newRecord;
       data.accountToInfo = newToRecord;
@@ -149,7 +146,6 @@ const fetchActivefilterdata = async (req, res, next) => {
       let newToSwapRecord = swapInfo.filter(rec => rec.account_id == data.to_account_id);
       let newCommission_acount_info = accountInfo.filter(rec => rec.id == data.commission_acount_id);
 
-
       data.accountFromInfo = newRecord;
       data.accountToInfo = newToRecord;
       data.symbols = uniqueSymbols;
@@ -159,7 +155,7 @@ const fetchActivefilterdata = async (req, res, next) => {
       data.swapToinfo = newToSwapRecord;
       return data;
     });
-
+    
     return res.status(200).json({ rows: newInfo });
 
   } catch (err) {
@@ -205,8 +201,13 @@ const updateFilterData = async (req, res, next) => {
       let newInfo = filterInfo.map((data) => {
         let newRecord = accountInfo.filter(rec => rec.id == data.from_account_id);
         let newToRecord = accountInfo.filter(rec => rec.id == data.to_account_id);
+        let newCommission_acount_info = accountInfo.filter(rec => rec.id == data.commission_acount_id);
+
         data.accountFromInfo = newRecord;
         data.accountToInfo = newToRecord;
+        data.commission_acount_info = newCommission_acount_info
+
+
         return data;
       });
       //  console.log(newInfo, 'newInfo')
@@ -237,7 +238,7 @@ const deleteFilter = async (req, res, next) => {
 
 const updateFilterDataFull = async (req, res, next) => {
   try {
-    let { id, profile_name, from_account_id, to_account_id, startdateFrom, enddateFrom, startdateTo, enddateTo, from_symbols, to_symbols } = req.body;
+    let { id, profile_name, from_account_id, to_account_id, commission_acount_id,startdateFrom, enddateFrom, startdateTo, enddateTo, from_symbols, to_symbols } = req.body;
     let filterUpdate = await filterModel.findOne({
       where: {
         id
@@ -248,6 +249,7 @@ const updateFilterDataFull = async (req, res, next) => {
         profile_name: profile_name,
         from_account_id: from_account_id,
         to_account_id: to_account_id,
+        commission_acount_id:commission_acount_id,
         startdateFrom: startdateFrom,
         enddateFrom: enddateFrom,
         startdateTo: startdateTo,
