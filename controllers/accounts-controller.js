@@ -10,8 +10,10 @@ const openOrderModel = models.open_order;
 const historyOrderModel = models.history_order; ``
 const filteredProfileModel = models.filtered_profile;
 const CustomSwapModel = models.custom_swap;
-const custom_deposite = models.custom_deposite
+const CustomDeposite = models.custom_deposite
 const moment = require('moment');
+
+
 const fetchAllAccounts = async (req, res, next) => {
 
     try {
@@ -19,6 +21,7 @@ const fetchAllAccounts = async (req, res, next) => {
             attributes: { exclude: ['password'] },
             include: [accountsDetailModel]
         });
+
 
         if (accountInfo && accountInfo.length > 0) {
             accountInfo.map(data => data.toJSON());
@@ -40,6 +43,15 @@ const fetchAllSymbol = async (req, res, next) => {
         return res.status(err.status || 500).json(err);
     };
 
+}
+
+const fetchDetailsAccounts = async (req, res, next) => {
+    try {
+        return res.status(201).json({ rows: accountInfo });
+
+    } catch (err) {
+        return res.status(err.status || 500).json(err);
+    };
 }
 
 
@@ -636,7 +648,7 @@ const fetchAllOpenTradebkp = async (req, res, next) => {
 // }
 
 
-const fetchAllOpenTrade = async (req, res, next) => {//open postions data goes here
+const fetchAllOpenTrade = async (req, res, next) => {            //open postions data goes here
     try {
         let filteredInfo = await filteredProfileModel.findOne({
             where: { status: 1 },
@@ -647,6 +659,31 @@ const fetchAllOpenTrade = async (req, res, next) => {//open postions data goes h
             attributes: ['login', 'id', 'alias'],
             include: [accountsDetailModel]
         });
+        let accountTableDetails = await accountsDetailModel.findAll({
+            attributes: { exclude: ['id'] },
+            raw: true
+        });
+
+        let customDepositeTable = await CustomDeposite.findAll({
+            attributes: { exclude: ['id'] },
+            raw: true,
+        });
+
+        let customSwapTable = await CustomSwapModel.findAll({
+            attributes: { exclude: ['id'] },
+            raw: true,
+        })
+        let openOrderData = await openOrderModel.findAll({
+            attributes: { exclude: ['id'] },
+            raw: true,
+        })
+        let historyOrderData = await historyOrderModel.findAll({
+            attributes: { exclude: ['id'] },
+            raw: true,
+        })
+
+        console.log(historyOrderData,"historyOrderData-------------------------------------");
+
         let swapInfo = await CustomSwapModel.findAll({ raw: true });
         if (filteredInfo != null) {
             let openOrderFromInfo = [];
@@ -662,36 +699,13 @@ const fetchAllOpenTrade = async (req, res, next) => {//open postions data goes h
             let startdateTo = filteredInfo.startdateTo;
             // let enddateTo = filteredInfo.enddateTo;
             let enddateTo = (filteredInfo.enddateTo == null || filteredInfo.enddateTo == '') ? new Date() : filteredInfo.enddateTo;
-
-
             let newRecord = accountInfo.filter(rec => rec.id == fromAccountId);
             let newToRecord = accountInfo.filter(rec => rec.id == toAccountId);
             let newFromSwapRecord = swapInfo.filter(rec => rec.account_id == fromAccountId);
             let newToSwapRecord = swapInfo.filter(rec => rec.account_id == toAccountId);
 
-            // let CustomSwapModelData = swapInfo.filter(rec => rec.account_id == toAccountId);
-
-            // let CustomSwapModel1 = await CustomSwapModel.findAll({
-            // attributes: ['open_value'],
-
-            // where: { account_id: toAccountId },
-            // raw: true
-            // })
-            // console.log(CustomSwapModel1, "CustomSwapModel1===================================");
-
-            // console.log(CustomSwapModelData, 'CustomSwapModelData=============================================');
-
-            // if (CustomSwapModelData.length > 0) {
-
-            // filteredInfo.toAccountHistoryInfo = historyOrderInfonew;
-
-            // }
-
-
             filteredInfo.accountFromInfo = newRecord;
             filteredInfo.accountToInfo = newToRecord;
-
-
             filteredInfo.swapFrominfo = newFromSwapRecord;
             filteredInfo.swapToinfo = newToSwapRecord;
             // let combineSymbols = fromsymbols.concat(tosymbols);
@@ -733,17 +747,12 @@ const fetchAllOpenTrade = async (req, res, next) => {//open postions data goes h
                     })
 
                     if (openOrderInfos[0].swap !== null && foundRec.length > 0 && foundRec[0].open_value !== 0 && foundRec[0].open_value !== undefined) {
-
                         let objectINfo = openOrderInfos[0]
-
                         Object.keys(objectINfo).forEach((key) => { objectINfo[key] !== null ? objectINfo[key] : objectINfo[key] = 0 })
                         let value = foundRec && foundRec.length > 0 ? foundRec[0].close_value : 0
                         openOrderInfos[0].swap = openOrderInfos[0].swap + value
                         openOrderInfos[0].total = openOrderInfos[0].total + value
-
-
                     }
-
                     openOrderFromInfo = openOrderInfos;
                 }
             }
@@ -778,28 +787,67 @@ const fetchAllOpenTrade = async (req, res, next) => {//open postions data goes h
 
                     if (openOrderInfos[0].swap !== null && foundRec.length > 0 && foundRec[0].open_value !== 0 && foundRec[0].open_value !== undefined) {
                         let objectINfo = openOrderInfos[0]
-
                         Object.keys(objectINfo).forEach((key) => { objectINfo[key] !== null ? objectINfo[key] : objectINfo[key] = 0 })
                         let value = foundRec && foundRec.length > 0 ? foundRec[0].close_value : 0
                         openOrderInfos[0].swap = openOrderInfos[0].swap + value
                         openOrderInfos[0].total = openOrderInfos[0].total + value
 
-
                     }
                     openOrderToInfo = openOrderInfos;
                 }
+
             }
+
+
+
             return res.status(200).json({
                 rows: filteredInfo,
                 fromOpenOrderInfo: openOrderFromInfo,
                 toOpenOrderInfo: openOrderToInfo,
+                accountTableDetails: accountTableDetails,
+                customDepositeTable: customDepositeTable,
+                customSwapTable: customSwapTable,
+                openOrderData:openOrderData,
+                historyOrderData:historyOrderData
+
             });
         }
-        return res.status(200).json({ rows: [], fromOpenOrderInfo: [], toOpenOrderInfo: [] });
+        return res.status(200).json({ rows: [], OpenOrder: [], fromOpenOrderInfo: [], toOpenOrderInfo: [] });
     } catch (err) {
         return res.status(err.status || 500).json(err);
     };
 }
+
+
+
+
+const RelatableData = async (req, res, next) =>{
+
+    try {
+
+        let OpenOrder = await openOrderModel.findAll({
+            attributes: { exclude: ['id'] },
+            raw: true
+
+        });
+
+        let customDepositeTable = await CustomSwapModel.findAll({
+            attributes: { exclude: ['id'] },
+            raw: true,
+        });
+
+        // let table11 = 
+        console.log(customDepositeTable,"-----------------------customDeposite");
+
+        return res.status(203).json({
+            customDepositeTable: customDepositeTable,
+        });
+
+    } catch (err) {
+        return res.status(err.status || 500).json(err);
+    };
+}
+
 
 const fetchLastUpdatedTime = async (req, res, next) => {
     try {
@@ -884,7 +932,7 @@ const fetchLastUpdatedTime = async (req, res, next) => {
 //                 history_info = eval((historyOrderInfo[0].profit)) - equity
 
 //             } else {
-//                 let customDeposite = await custom_deposite.findAll({
+//                 let customDeposite = await CustomDeposite.findAll({
 //                     where: { account_id: ml },
 //                     raw: true
 //                 })
@@ -1016,6 +1064,11 @@ const fetchAllHistoryTrade = async (req, res, next) => { // close position data 
             where: { order_type: 6, account_id: ml },
             raw: true
         })
+        let customSwapTable = await CustomSwapModel.findAll({
+            attributes: { exclude: ['id'] },
+            raw: true,
+        });
+        console.log(customSwapTable, 'customSwapTable----111111----------------------------');
 
 
         if (filteredInfo != null) {
@@ -1049,7 +1102,6 @@ const fetchAllHistoryTrade = async (req, res, next) => { // close position data 
 
             // let history = historyOrderInfo.map((data) => {
             // return data.profit
-
             // })
 
             let history_info = 0
@@ -1058,7 +1110,7 @@ const fetchAllHistoryTrade = async (req, res, next) => { // close position data 
                 history_info = eval((historyOrderInfo[0].profit)) - equity
 
             } else {
-                let customDeposite = await custom_deposite.findAll({
+                let customDeposite = await CustomDeposite.findAll({
                     where: { account_id: ml },
                     raw: true
                 })
@@ -1074,8 +1126,6 @@ const fetchAllHistoryTrade = async (req, res, next) => { // close position data 
             filteredInfo.accountToInfo = newToRecord;
             filteredInfo.history_info = history_info;
             filteredInfo.accountCommissionInfo = newCommissionRecord;
-
-
 
             let CustomSwap = await CustomSwapModel.findAll({
                 attributes: ['account_id', 'close_value'],
@@ -1104,7 +1154,7 @@ const fetchAllHistoryTrade = async (req, res, next) => { // close position data 
                     },
                     raw: true
                 });
-          
+
 
             }
 
@@ -1198,7 +1248,7 @@ const fetchAllHistoryTrade = async (req, res, next) => { // close position data 
                         })
 
                         if (openOrderInfos[0].swap !== null && foundRec.length > 0 && foundRec[0].close_value !== 0 && foundRec[0].close_value !== undefined) {
-                            let objectINfo = openOrderInfos[0]
+                            let objectINfo = openOrdehistoryOrderDatarInfos[0]
                             Object.keys(objectINfo).forEach((key) => { objectINfo[key] !== null ? objectINfo[key] : objectINfo[key] = 0 })
                             let value = foundRec && foundRec.length > 0 ? foundRec[0].close_value : 0
                             openOrderInfos[0].swap = openOrderInfos[0].swap + value
@@ -1221,6 +1271,7 @@ const fetchAllHistoryTrade = async (req, res, next) => { // close position data 
                 rows: filteredInfo,
                 fromHistoryOrderInfo: openOrderFromInfo,
                 toHistoryOrderInfo: openOrderToInfo,
+                customSwapTable: customSwapTable
             });
         }
         return res.status(200).json({ rows: [], fromHistoryOrderInfo: [], toHistoryOrderInfo: [], commissionHistoryOrderInfo: [] });
@@ -1238,5 +1289,6 @@ module.exports = {
     fetchAllOpenTrade,
     fetchAllHistoryTrade,
     fetchAllSymbolByAccount,
-    fetchLastUpdatedTime
+    fetchLastUpdatedTime,
+    RelatableData,
 };
