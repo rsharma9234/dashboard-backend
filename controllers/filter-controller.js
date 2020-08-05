@@ -12,7 +12,6 @@ const customTable = models.custom_deposite
 
 
 const addFilterData = async (req, res, next) => {
-  console.log(req.body,"req.body ------------->>")
   try {
     // let Data = {
     //   profile_name: req.body.profile_name, 
@@ -29,7 +28,6 @@ const addFilterData = async (req, res, next) => {
     return res.status(200).json({ rows: 'Save' });
 
   } catch (err) {
-    console.log(err, 'err')
     return res.status(err.status || 500).json(err);
   };
 }
@@ -238,12 +236,13 @@ const deleteFilter = async (req, res, next) => {
 
 const updateFilterDataFull = async (req, res, next) => {
   try {
-    let { id, profile_name, from_account_id, to_account_id, commission_acount_id,startdateFrom, enddateFrom, startdateTo, enddateTo, from_symbols, to_symbols } = req.body;
+    let { id, profile_name, from_account_id, to_account_id, startdateFrom, enddateFrom, startdateTo, enddateTo, from_symbols, to_symbols,commission_acount_id,auto_close, from_magic_number,to_magic_number,from_include_exclude_status,to_include_exclude_status} = req.body;
     let filterUpdate = await filterModel.findOne({
       where: {
         id
       }
     });
+    // console.log(filterUpdate,"filterUpdate---------------------------------");
     if (filterUpdate) {
       await filterModel.update({
         profile_name: profile_name,
@@ -256,6 +255,11 @@ const updateFilterDataFull = async (req, res, next) => {
         enddateTo: enddateTo,
         from_symbols: from_symbols,
         to_symbols: to_symbols,
+        auto_close:auto_close,
+        from_magic_number:from_magic_number,
+        to_magic_number:to_magic_number,
+        from_include_exclude_status:from_include_exclude_status,
+        to_include_exclude_status:to_include_exclude_status,
       }, { where: { id } });
       return res.status(200).json({ rows: "Updated" });
     }
