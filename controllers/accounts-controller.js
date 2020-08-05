@@ -498,34 +498,33 @@ const fetchAllOpenTrade = async (req, res, next) => {//open postions data goes h
         let filteredInfo = await filteredProfileModel.findOne({
             where: { status: 1 },
             raw: true
-
         });
         let accountInfo = await accountModel.findAll({
             attributes: ['login', 'id', 'alias'],
             include: [accountsDetailModel]
         });
-        let accountTableDetails = await accountsDetailModel.findAll({
-            attributes: { exclude: ['id'] },
-            raw: true
-        });
+        // let accountTableDetails = await accountsDetailModel.findAll({
+        //     attributes: { exclude: ['id'] },
+        //     raw: true
+        // });
 
-        let customDepositeTable = await CustomDeposite.findAll({
-            attributes: { exclude: ['id'] },
-            raw: true,
-        });
+        // let customDepositeTable = await CustomDeposite.findAll({
+        //     attributes: { exclude: ['id'] },
+        //     raw: true,
+        // });
 
-        let customSwapTable = await CustomSwapModel.findAll({
-            attributes: { exclude: ['id'] },
-            raw: true,
-        })
-        let openOrderData = await openOrderModel.findAll({
-            attributes: { exclude: ['id'] },
-            raw: true,
-        })
-        let historyOrderData = await historyOrderModel.findAll({
-            attributes: { exclude: ['id'] },
-            raw: true,
-        })
+        // let customSwapTable = await CustomSwapModel.findAll({
+        //     attributes: { exclude: ['id'] },
+        //     raw: true,
+        // })
+        // let openOrderData = await openOrderModel.findAll({
+        //     attributes: { exclude: ['id'] },
+        //     raw: true,
+        // })
+        // let historyOrderData = await historyOrderModel.findAll({
+        //     attributes: { exclude: ['id'] },
+        //     raw: true,
+        // })
 
         // console.log(historyOrderData,"historyOrderData-------------------------------------");
 
@@ -539,8 +538,10 @@ const fetchAllOpenTrade = async (req, res, next) => {//open postions data goes h
             let startdateFrom = filteredInfo.startdateFrom;
             // let enddateFrom = filteredInfo.enddateFrom;
             let enddateFrom = (filteredInfo.enddateFrom == null || filteredInfo.enddateFrom == '') ? new Date() : filteredInfo.enddateFrom;
-            let tomagicAccount = JSON.parse(filteredInfo.to_magic_number)
-            let frommagicAccount = JSON.parse(filteredInfo.from_magic_number)
+
+            let tomagicAccount = (filteredInfo.to_magic_number!='' && filteredInfo.to_magic_number!=null) && JSON.parse(filteredInfo.to_magic_number)
+            let frommagicAccount = (filteredInfo.from_magic_number!='' && filteredInfo.from_magic_number!=null )&& JSON.parse(filteredInfo.from_magic_number)
+
             let toAccountId = filteredInfo.to_account_id;
             let tosymbols = JSON.parse(filteredInfo.to_symbols);
             let startdateTo = filteredInfo.startdateTo;
@@ -548,7 +549,6 @@ const fetchAllOpenTrade = async (req, res, next) => {//open postions data goes h
             let enddateTo = (filteredInfo.enddateTo == null || filteredInfo.enddateTo == '') ? new Date() : filteredInfo.enddateTo;
             let to_include_exclude = filteredInfo.to_include_exclude_status
             let from_include_exclude = filteredInfo.from_include_exclude_status
-
             let newRecord = accountInfo.filter(rec => rec.id == fromAccountId);
             let newToRecord = accountInfo.filter(rec => rec.id == toAccountId);
             let newFromSwapRecord = swapInfo.filter(rec => rec.account_id == fromAccountId);
@@ -1024,8 +1024,11 @@ const fetchAllHistoryTrade = async (req, res, next) => { // close position data 
             let openOrderToInfo = [];
             let fromAccountId = filteredInfo.from_account_id;
             let fromsymbols = JSON.parse(filteredInfo.from_symbols);
-            let tomagicAccount = JSON.parse(filteredInfo.to_magic_number)
-            let frommagicAccount = JSON.parse(filteredInfo.from_magic_number)
+            // let tomagicAccount = JSON.parse(filteredInfo.to_magic_number)
+            // let frommagicAccount = JSON.parse(filteredInfo.from_magic_number)
+
+            let tomagicAccount = (filteredInfo.to_magic_number!='' && filteredInfo.to_magic_number!=null) && JSON.parse(filteredInfo.to_magic_number)
+            let frommagicAccount = (filteredInfo.from_magic_number!='' && filteredInfo.from_magic_number!=null )&& JSON.parse(filteredInfo.from_magic_number)
             let startdateFrom = filteredInfo.startdateFrom;
             // let enddateFrom = filteredInfo.enddateFrom;
             let enddateFrom = (filteredInfo.enddateFrom == null || filteredInfo.enddateFrom == '') ? new Date() : filteredInfo.enddateFrom;
