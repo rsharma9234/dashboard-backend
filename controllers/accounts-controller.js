@@ -568,12 +568,14 @@ const fetchAllOpenTrade = async (req, res, next) => {//open postions data goes h
             // console.log(toAccountId, fromAccountId, fromsymbols, '-------------------------------->')
 
             let assuemIncludeOrExcludev = [];
+            let assuemIncludeOrExcludeSymbol = [];
+            let assuemIncludeOrExcludeToSymbol = [];
             let assuemIncludeOrExcludevTo = [];
             let AllWhereConditions = {};
             if (from_include_exclude != 0) {
                 if (from_include_exclude === 2) {
                     let numb = await openOrderModel.findAll({
-                        attributes: [[Sequelize.literal('DISTINCT(magic_number)'), 'magic_number']],
+                        attributes: [[Sequelize.literal('DISTINCT(magic_number)'), 'magic_number'], 'symbol'],
                         where: {
                             account_id: fromAccountId,
                             symbol: {
@@ -589,13 +591,18 @@ const fetchAllOpenTrade = async (req, res, next) => {//open postions data goes h
                     })
                     numb.forEach((data) => {
                         assuemIncludeOrExcludev.push(data.magic_number)
+                        assuemIncludeOrExcludeSymbol.push(data.symbol)
                     })
                     frommagicAccount = frommagicAccount.map(x => +x)
                     assuemIncludeOrExcludev = assuemIncludeOrExcludev.filter(item => !frommagicAccount.includes(item))
+                    assuemIncludeOrExcludeSymbol = assuemIncludeOrExcludeSymbol.filter(item => fromsymbols.includes(item))
                     AllWhereConditions = {
                         account_id: fromAccountId,
                         magic_number: {
                             [Op.in]: assuemIncludeOrExcludev
+                        },
+                        symbol: {
+                            [Op.in]: assuemIncludeOrExcludeSymbol
                         },
                         open_time: {
                             [Op.gte]: startdateFrom,
@@ -743,7 +750,7 @@ const fetchAllOpenTrade = async (req, res, next) => {//open postions data goes h
 
                 if (to_include_exclude === 2) {
                     let numb = await openOrderModel.findAll({
-                        attributes: [[Sequelize.literal('DISTINCT(magic_number)'), 'magic_number']],
+                        attributes: [[Sequelize.literal('DISTINCT(magic_number)'), 'magic_number'], 'symbol'],
                         where: {
                             account_id: toAccountId,
                             symbol: {
@@ -759,16 +766,23 @@ const fetchAllOpenTrade = async (req, res, next) => {//open postions data goes h
                     })
                     numb.forEach((data) => {
                         assuemIncludeOrExcludevTo.push(data.magic_number)
+                        assuemIncludeOrExcludeToSymbol.push(data.symbol)
                     })
                     // console.log(tomagicAccount, 'frommagicAccount before')
                     tomagicAccount = tomagicAccount.map(x => +x)
                     // console.log(frommagicAccount, 'frommagicAccount after ')
                     // frommagicAccount = parseInt(frommagicAccount)
                     assuemIncludeOrExcludevTo = assuemIncludeOrExcludevTo.filter(item => !tomagicAccount.includes(item))
+                    assuemIncludeOrExcludeToSymbol = assuemIncludeOrExcludeToSymbol.filter(item => tosymbols.includes(item))
+
+                    
                     AllWhereConditions = {
                         account_id: toAccountId,
                         magic_number: {
                             [Op.in]: assuemIncludeOrExcludevTo
+                        },
+                        symbol: {
+                            [Op.in]: assuemIncludeOrExcludeToSymbol
                         },
                         open_time: {
                             [Op.gte]: startdateTo,
@@ -1076,11 +1090,12 @@ const fetchAllHistoryTrade = async (req, res, next) => { // close position data 
             let assuemIncludeOrExcludev = [];
             let assuemIncludeOrExcludevTo = [];
             let AllWhereConditions = {};
+            let assuemIncludeOrExcludeSymbol = [];
 
             if (from_include_exclude !== 0) {
                 if (from_include_exclude === 2) {
                     let numb = await historyOrderModel.findAll({
-                        attributes: [[Sequelize.literal('DISTINCT(magic_number)'), 'magic_number']],
+                        attributes: [[Sequelize.literal('DISTINCT(magic_number)'), 'magic_number'], 'symbol'],
                         where: {
                             account_id: fromAccountId,
                             symbol: {
@@ -1096,14 +1111,20 @@ const fetchAllHistoryTrade = async (req, res, next) => { // close position data 
                     })
                     numb.forEach((data) => {
                         assuemIncludeOrExcludev.push(data.magic_number)
+                        assuemIncludeOrExcludeSymbol.push(data.symbol)
                     })
                     frommagicAccount = frommagicAccount.map(x => +x)
                     assuemIncludeOrExcludev = assuemIncludeOrExcludev.filter(item => !frommagicAccount.includes(item))
+                    assuemIncludeOrExcludeSymbol = assuemIncludeOrExcludeSymbol.filter(item => fromsymbols.includes(item))
+
 
                     AllWhereConditions = {
                         account_id: fromAccountId,
                         magic_number: {
                             [Op.in]: assuemIncludeOrExcludev
+                        },
+                        symbol: {
+                            [Op.in]: assuemIncludeOrExcludeSymbol
                         },
                         open_time: {
                             [Op.gte]: startdateFrom,
@@ -1250,10 +1271,11 @@ const fetchAllHistoryTrade = async (req, res, next) => { // close position data 
             }
 
             if (to_include_exclude !== 0) {
-
+                
                 if (to_include_exclude === 2) {
+                    let assuemIncludeOrExcludeToSymbol = [];
                     let numb = await historyOrderModel.findAll({
-                        attributes: [[Sequelize.literal('DISTINCT(magic_number)'), 'magic_number']],
+                        attributes: [[Sequelize.literal('DISTINCT(magic_number)'), 'magic_number'], 'symbol'],
                         where: {
                             account_id: toAccountId,
                             symbol: {
@@ -1270,17 +1292,24 @@ const fetchAllHistoryTrade = async (req, res, next) => { // close position data 
                     })
                     numb.forEach((data) => {
                         assuemIncludeOrExcludevTo.push(data.magic_number)
+                        assuemIncludeOrExcludeToSymbol.push(data.symbol)
+
                     })
                     // console.log(tomagicAccount, 'frommagicAccount before')
                     tomagicAccount = tomagicAccount.map(x => +x)
                     // console.log(tomagicAccount, 'frommagicAccount after ')
                     // frommagicAccount = parseInt(frommagicAccount)
                     assuemIncludeOrExcludevTo = assuemIncludeOrExcludevTo.filter(item => !tomagicAccount.includes(item))
+                    assuemIncludeOrExcludeToSymbol = assuemIncludeOrExcludeToSymbol.filter(item => tosymbols.includes(item))
+
 
                     AllWhereConditions = {
                         account_id: toAccountId,
                         magic_number: {
                             [Op.in]: assuemIncludeOrExcludevTo
+                        },
+                        symbol: {
+                            [Op.in]: assuemIncludeOrExcludeToSymbol
                         },
                         open_time: {
                             [Op.gte]: startdateTo,
