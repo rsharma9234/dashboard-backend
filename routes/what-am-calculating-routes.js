@@ -12,4 +12,8 @@ router.get('/calculatingOpenTrade', [
     whatAmCalculatingController.calculatingHistoryTrade
   ]);
 
+  router.get('/calculatingCommission', [
+    whatAmCalculatingController.calculatingCommission
+  ]);
+
   module.exports = router;

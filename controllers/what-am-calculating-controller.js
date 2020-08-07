@@ -472,7 +472,7 @@ const calculatingOpenTrade = async (req, res, next) => {//open postions data goe
 const calculatingHistoryTrade = async (req, res, next) => { // close position data goes here
     try {
         let filteredInfo = await filteredProfileModel.findOne({
-            // where: { status: 1 },
+            where: { status: 1 },
             raw: true
         });
         let accountInfo = await accountModel.findAll({
@@ -914,7 +914,44 @@ const calculatingHistoryTrade = async (req, res, next) => { // close position da
     };
 }
 
+
+const calculatingCommission = async (req, res, next) => {
+    try {
+        let filteredInfo = await filteredProfileModel.findOne({
+            where: { status: 1 },
+            raw: true
+        });
+        let commission_acount_id = filteredInfo.commission_acount_id
+        let historyOrderData = await historyOrderModel.findAll({
+            where: { account_id : commission_acount_id, order_type : 6 },
+            attributes: { exclude: ['id'] },
+            raw: true,
+        })
+        let accountTableDetails = await accountsDetailModel.findAll({
+            where: { account_id : commission_acount_id },
+            attributes: { exclude: ['id'] },
+            raw: true
+        });
+        let totalProfit = 0
+        let profit = historyOrderData.map(data =>  data.profit)
+        totalProfit = profit.reduce((a, b) => a + b, 0)
+        let equity = accountTableDetails.map(data => data.equity)
+        let commission = totalProfit - equity
+        return res.status(200).json({
+            commission_acount_id:commission_acount_id,
+            equity: equity,
+            totalProfit: totalProfit,
+            commission : commission
+        })
+    }
+    catch(err){
+        return res.status(err.status || 500).json(err);
+    }
+}
+
+
 module.exports = {
     calculatingOpenTrade,
     calculatingHistoryTrade,
+    calculatingCommission,
 };
