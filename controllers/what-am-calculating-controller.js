@@ -21,10 +21,13 @@ const calculatingOpenTrade = async (req, res, next) => {//open postions data goe
             where: { status: 1 },
             raw: true
         });
+        console.log(filteredInfo,'filterProfile..');
         let accountInfo = await accountModel.findAll({
             attributes: ['login', 'id', 'alias'],
-            include: [accountsDetailModel]
+            include: [accountsDetailModel],
+            raw: true
         });
+        console.log(accountInfo, 'accountInfo');
         // let accountTableDetails = await accountsDetailModel.findAll({
         //     attributes: { exclude: ['id'] },
         //     raw: true
@@ -55,6 +58,8 @@ const calculatingOpenTrade = async (req, res, next) => {//open postions data goe
         if (filteredInfo != null) {
             let openOrderFromInfo = [];
             let openOrderToInfo = [];
+            let totalOfFromOpenOrder = 0;
+            let totalOfToOpenOrder = 0;
             let fromAccountId = filteredInfo.from_account_id;
             let fromsymbols = JSON.parse(filteredInfo.from_symbols);
             let startdateFrom = filteredInfo.startdateFrom;
@@ -206,6 +211,7 @@ const calculatingOpenTrade = async (req, res, next) => {//open postions data goe
                     where: AllWhereConditions,
                     raw: true
                 });
+                
                 if (openOrderInfos && openOrderInfos.length > 0) {
                     // openOrderInfos.map(nt => nt.toJSON());
 
@@ -222,11 +228,14 @@ const calculatingOpenTrade = async (req, res, next) => {//open postions data goe
                     //     // openOrderInfos[0].total = openOrderInfos[0].total + value
 
                     // }
+                    for (let openOrderItem of openOrderInfos) {
+                        totalOfFromOpenOrder += (openOrderItem.commission + openOrderItem.taxes + openOrderItem.swap + openOrderItem.profit);
+                    }
                     openOrderFromInfo = openOrderInfos;
                 }
 
             } else if (fromsymbols && fromsymbols.length > 0) {
-
+                 
                 let openOrderInfos = await openOrderModel.findAll({
                     // attributes: [
                     //     'order_type',
@@ -250,7 +259,6 @@ const calculatingOpenTrade = async (req, res, next) => {//open postions data goe
                     raw: true
                 });
 
-
                 if (openOrderInfos && openOrderInfos.length > 0) {
                     // let foundRec = CustomSwap.filter(data => {
                     //     return (data.account_id === fromAccountId)
@@ -263,6 +271,9 @@ const calculatingOpenTrade = async (req, res, next) => {//open postions data goe
                     //     openOrderInfos[0].swap = openOrderInfos[0].swap + value
                     //     // openOrderInfos[0].total = openOrderInfos[0].total + value
                     // }
+                    for (let openOrderItem of openOrderInfos) {
+                        totalOfFromOpenOrder += (openOrderItem.commission + openOrderItem.taxes + openOrderItem.swap + openOrderItem.profit);
+                    }
                     openOrderFromInfo = openOrderInfos;
                 }
             }
@@ -400,6 +411,9 @@ const calculatingOpenTrade = async (req, res, next) => {//open postions data goe
                     //     // openOrderInfos[0].total = openOrderInfos[0].total + value
                     // }
                     // openOrderFromInfo = openOrderInfos;
+                    for (let openOrderItem of openOrderInfos) {
+                        totalOfToOpenOrder += (openOrderItem.commission + openOrderItem.taxes + openOrderItem.swap + openOrderItem.profit);
+                    }
                     openOrderToInfo = openOrderInfos;
                 }
 
@@ -441,6 +455,9 @@ const calculatingOpenTrade = async (req, res, next) => {//open postions data goe
                     //     openOrderInfos[0].swap = openOrderInfos[0].swap + value
                     //     // openOrderInfos[0].total = openOrderInfos[0].total + value
                     // }
+                    for (let openOrderItem of openOrderInfos) {
+                        totalOfToOpenOrder += (openOrderItem.commission + openOrderItem.taxes + openOrderItem.swap + openOrderItem.profit);
+                    }
                     openOrderToInfo = openOrderInfos;
                 }
 
@@ -452,6 +469,7 @@ const calculatingOpenTrade = async (req, res, next) => {//open postions data goe
                 rows: filteredInfo,
                 fromOpenOrderInfo: openOrderFromInfo,
                 toOpenOrderInfo: openOrderToInfo,
+                totalOfOpenOrder: totalOfFromOpenOrder + totalOfToOpenOrder
                 // accountTableDetails: accountTableDetails,
                 // customDepositeTable: customDepositeTable,
                 // customSwapTable: customSwapTable,
@@ -500,6 +518,8 @@ const calculatingHistoryTrade = async (req, res, next) => { // close position da
         if (filteredInfo != null) {
             let openOrderFromInfo = [];
             let openOrderToInfo = [];
+            let totalOfFromHistoryOrder = 0;
+            let totalOfToHistoryOrder = 0;
             let fromAccountId = filteredInfo.from_account_id;
             let fromsymbols = JSON.parse(filteredInfo.from_symbols);
             // let tomagicAccount = JSON.parse(filteredInfo.to_magic_number)
@@ -674,7 +694,9 @@ const calculatingHistoryTrade = async (req, res, next) => { // close position da
 
                     // }
 
-
+                    for (let openOrderItem of openOrderInfos) {
+                        totalOfFromHistoryOrder += (openOrderItem.commission + openOrderItem.taxes + openOrderItem.swap + openOrderItem.profit);
+                    }
                     openOrderFromInfo = openOrderInfos;
                 }
 
@@ -713,7 +735,9 @@ const calculatingHistoryTrade = async (req, res, next) => { // close position da
 
                     // }
 
-
+                    for (let openOrderItem of openOrderInfos) {
+                        totalOfFromHistoryOrder += (openOrderItem.commission + openOrderItem.taxes + openOrderItem.swap + openOrderItem.profit);
+                    }
                     openOrderFromInfo = openOrderInfos;
                 }
             }
@@ -861,9 +885,10 @@ const calculatingHistoryTrade = async (req, res, next) => { // close position da
 
                     // }
 
-
+                    for (let openOrderItem of openOrderInfos) {
+                        totalOfToHistoryOrder += (openOrderItem.commission + openOrderItem.taxes + openOrderItem.swap + openOrderItem.profit);
+                    }
                     openOrderToInfo = openOrderInfos;
-                    // openOrderFromInfo = openOrderInfos;
                 }
 
             }
@@ -895,9 +920,12 @@ const calculatingHistoryTrade = async (req, res, next) => { // close position da
                     //         Object.keys(objectINfo).forEach((key) => { objectINfo[key] !== null ? objectINfo[key] : objectINfo[key] = 0 })
                     //         let value = foundRec && foundRec.length > 0 ? foundRec[0].close_value : 0
                     //         openOrderInfos[0].swap = openOrderInfos[0].swap + value
-                    //         // openOrderInfos[0].total = openOrderInfos[0].total + value
+                    //         openOrderInfos[0].total = openOrderInfos[0].total + value
                     //     }
                     // }
+                    for (let openOrderItem of openOrderInfos) {
+                        totalOfToHistoryOrder += (openOrderItem.commission + openOrderItem.taxes + openOrderItem.swap + openOrderItem.profit);
+                    }
                     openOrderToInfo = openOrderInfos;
                 }
             }
@@ -905,7 +933,8 @@ const calculatingHistoryTrade = async (req, res, next) => { // close position da
                 rows: filteredInfo,
                 fromHistoryOrderInfo: openOrderFromInfo,
                 toHistoryOrderInfo: openOrderToInfo,
-                customSwapTable: customSwapTable
+                customSwapTable: customSwapTable,
+                totalOfHistoryOrder: totalOfFromHistoryOrder + totalOfToHistoryOrder
             });
         }
         return res.status(200).json({ rows: [], fromHistoryOrderInfo: [], toHistoryOrderInfo: [], commissionHistoryOrderInfo: [] });
