@@ -1483,6 +1483,36 @@ const fetchAllHistoryTrade = async (req, res, next) => { // close position data 
     };
 }
 
+// const explosureData = async (req, res, next) => {
+//     try {
+//         let filteredInfo = await filteredProfileModel.findOne({
+//             where: { status: 1 },
+//             raw: true
+//         });
+//         let accountInfo = await accountModel.findAll({
+//             attributes: ['login', 'id', 'alias'],
+//             include: [accountsDetailModel]
+//         });
+        
+//         let contractSize = await SymbolTable.findAll({
+//             attributes: ['contract_size'],
+//             // where: {
+//             //     name: fromsymbols
+//             // },
+//             // raw: true
+//         });
+//         console.log(contractSize, "contractSize------------------------------");
+//         console.log(filteredInfo,"filteredInfo-----------------------------");
+//         console.log(accountInfo,"accountInfo-----------------------------");
+//         return res.status(200).json({
+            
+//         });
+//     }
+//     catch (err) {
+//         return res.status(err.status || 500).json(err);
+//     }
+// }
+
 module.exports = {
     fetchAllAccounts,
     fetchAllSymbol,
@@ -1493,4 +1523,5 @@ module.exports = {
     fetchAllSymbolByAccount,
     fetchLastUpdatedTime,
     RelatableData,
+    // explosureData,
 };

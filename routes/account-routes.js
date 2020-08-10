@@ -34,9 +34,8 @@ router.get('/fetchAllHistoryTrade', [
 router.get('/fetchLastUpdatedTime',[
   accountsController.fetchLastUpdatedTime
 ])
-router.get('/RelatableData',[
-  accountsController.RelatableData
-])
 
-
+// router.get('/explosureData',[
+//   accountsController.explosureData
+// ])
 module.exports = router;
