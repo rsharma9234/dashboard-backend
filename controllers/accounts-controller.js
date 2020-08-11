@@ -36,7 +36,10 @@ const fetchAllAccounts = async (req, res, next) => {
 
 const fetchAllSymbol = async (req, res, next) => {
     try {
-        let symbolInfo = await symbolModel.findAll({ raw: true });
+        // let symbolInfo = await symbolModel.findAll({ raw: true });
+        let symbolInfo = await symbolModel.findAll({
+            attributes: [[Sequelize.fn('DISTINCT', Sequelize.col('name')), 'name']]
+        });
         return res.status(200).json({ rows: symbolInfo });
     }
     catch (err) {
@@ -1499,36 +1502,58 @@ const fetchStatusData = async (req, res, next) => {
         let fromAccountInfo = await accountModel.findOne({
             where: { id: filterInfo.from_account_id },
             attributes: ['login', 'id', 'alias'],
-            include: [accountsDetailModel],
+            // include: [accountsDetailModel],
         });
-        let fromAccounts = fromAccountInfo
 
         let toAccountInfo = await accountModel.findOne({
             where: { id: filterInfo.to_account_id },
             attributes: ['login', 'id', 'alias'],
-            include: [accountsDetailModel],
+            // include: [accountsDetailModel],
 
         });
-        let toAccounts = toAccountInfo
 
         let fromSymbolInfo = await symbolModel.findAll({
-            where: { name: frSymbol[0], login: fromAccounts.login },
+            where: { name: frSymbol[0], login: fromAccountInfo.login },
             raw: true
+            
         });
-        let frSymbolInfo = fromSymbolInfo
-
         let toSymbolInfo = await symbolModel.findAll({
-            where: { name: toSymbol[0], login: toAccounts.login },
+            where: { name: toSymbol[0], login: toAccountInfo.login },
             raw: true
         });
 
+        let fromOpenOrderInfos = await openOrderModel.findAll({
+            attributes: [
+                'order_type',
+                [Sequelize.literal('SUM(lots)'), 'lots']
+            ],
+            where: {
+                account_id: fromAccountInfo.id,
+                symbol: frSymbol[0]
+            },
+            raw: true
+        });
+
+        let toOpenOrderInfos = await openOrderModel.findAll({
+            attributes: [
+                'order_type',
+                [Sequelize.literal('SUM(lots)'), 'lots']
+            ],
+            where: {
+                account_id: toAccountInfo.id,
+                symbol: toSymbol[0]
+            },
+            raw: true
+        });
 
         return res.status(200).json({
             rows: filterInfo,
-            fromAccounts: fromAccounts,
-            fromSymbol: frSymbolInfo,
-            toAccounts: toAccounts,
-            toSymbol: toSymbolInfo,
+            fromAccounts: fromAccountInfo,
+            fromSymbol: fromSymbolInfo.length > 0 ? fromSymbolInfo[0] : {},
+            toAccounts: toAccountInfo,
+            toSymbol: toSymbolInfo.length > 0 ? toSymbolInfo[0] : {},
+            fromOpenOrderInfos: fromOpenOrderInfos,
+            toOpenOrderInfos: toOpenOrderInfos
         });
     }
     catch (err) {
