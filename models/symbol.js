@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   symbol.init({
+    login: DataTypes.INTEGER,
     name: DataTypes.STRING(50),
     digits: DataTypes.INTEGER,
     stops_level: DataTypes.DOUBLE,
