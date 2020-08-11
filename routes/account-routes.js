@@ -37,6 +37,8 @@ router.get('/fetchLastUpdatedTime',[
 router.get('/RelatableData',[
   accountsController.RelatableData
 ])
-
+router.get('/fetchStatusData',[
+  accountsController.fetchStatusData
+])
 
 module.exports = router;
