@@ -506,30 +506,7 @@ const fetchAllOpenTrade = async (req, res, next) => {//open postions data goes h
             attributes: ['login', 'id', 'alias'],
             include: [accountsDetailModel]
         });
-        // let accountTableDetails = await accountsDetailModel.findAll({
-        //     attributes: { exclude: ['id'] },
-        //     raw: true
-        // });
-
-        // let customDepositeTable = await CustomDeposite.findAll({
-        //     attributes: { exclude: ['id'] },
-        //     raw: true,
-        // });
-
-        // let customSwapTable = await CustomSwapModel.findAll({
-        //     attributes: { exclude: ['id'] },
-        //     raw: true,
-        // })
-        // let openOrderData = await openOrderModel.findAll({
-        //     attributes: { exclude: ['id'] },
-        //     raw: true,
-        // })
-        // let historyOrderData = await historyOrderModel.findAll({
-        //     attributes: { exclude: ['id'] },
-        //     raw: true,
-        // })
-
-        // console.log(historyOrderData,"historyOrderData-------------------------------------");
+       
 
 
         let swapInfo = await CustomSwapModel.findAll({ raw: true });
@@ -561,14 +538,11 @@ const fetchAllOpenTrade = async (req, res, next) => {//open postions data goes h
             filteredInfo.accountToInfo = newToRecord;
             filteredInfo.swapFrominfo = newFromSwapRecord;
             filteredInfo.swapToinfo = newToSwapRecord;
-            // let combineSymbols = fromsymbols.concat(tosymbols);
-            // let uniqueSymbols = combineSymbols.filter((item, i, ar) => ar.indexOf(item) === i);
             let CustomSwap = await CustomSwapModel.findAll({
                 attributes: ['account_id', 'open_value'],
                 where: { account_id: { [Op.in]: [toAccountId, fromAccountId] } },
                 raw: true
             })
-            // console.log(toAccountId, fromAccountId, fromsymbols, '-------------------------------->')
 
             let assuemIncludeOrExcludev = [];
             let assuemIncludeOrExcludeSymbol = [];
@@ -589,7 +563,6 @@ const fetchAllOpenTrade = async (req, res, next) => {//open postions data goes h
                                 [Op.lt]: enddateFrom,
                             }
                         },
-                        // symbol: { fromsymbols},
                         raw: true
                     })
                     numb.forEach((data) => {
@@ -688,7 +661,6 @@ const fetchAllOpenTrade = async (req, res, next) => {//open postions data goes h
                     raw: true
                 });
                 if (openOrderInfos && openOrderInfos.length > 0) {
-                    // openOrderInfos.map(nt => nt.toJSON());
 
                     let foundRec = CustomSwap.filter(data => {
                         return (data.account_id === fromAccountId)
