@@ -506,7 +506,7 @@ const fetchAllOpenTrade = async (req, res, next) => {//open postions data goes h
             attributes: ['login', 'id', 'alias'],
             include: [accountsDetailModel]
         });
-       
+
 
 
         let swapInfo = await CustomSwapModel.findAll({ raw: true });
@@ -968,7 +968,8 @@ const fetchLastUpdatedTime = async (req, res, next) => {
                 raw: true
             })
             let moments = lastUpdated.map(data => moment(data.last_seen))
-            let maxDate = moment.max(moments)
+            // let maxDate = moment.max(moments)
+            let maxDate = moment.min(moments)
             let date = moment(maxDate).utc().format('DD-MM-YYYY  HH:mm:ss')
 
 
@@ -1459,64 +1460,321 @@ const fetchAllHistoryTrade = async (req, res, next) => { // close position data 
 }
 
 
+
 const fetchStatusData = async (req, res, next) => {
     try {
         let filteredInfo = await filteredProfileModel.findOne({
             where: { status: 1 },
             raw: true
         });
-        let filterInfo = filteredInfo
-        let frSymJson = filterInfo.from_symbols
-        let frSymbol = JSON.parse(frSymJson)
-        let toSymJson = filterInfo.to_symbols
-        let toSymbol = JSON.parse(toSymJson)
+        let filterInfo = filteredInfo;
 
         let fromAccountInfo = await accountModel.findOne({
             where: { id: filterInfo.from_account_id },
-            attributes: ['login', 'id', 'alias'],
-            // include: [accountsDetailModel],
+            attributes: ['login', 'id', 'alias']
         });
-
+        
+        
         let toAccountInfo = await accountModel.findOne({
             where: { id: filterInfo.to_account_id },
-            attributes: ['login', 'id', 'alias'],
-            // include: [accountsDetailModel],
-
+            attributes: ['login', 'id', 'alias']
         });
 
-        let fromSymbolInfo = await symbolModel.findAll({
-            where: { name: frSymbol[0], login: fromAccountInfo.login },
-            raw: true
-            
-        });
-        let toSymbolInfo = await symbolModel.findAll({
-            where: { name: toSymbol[0], login: toAccountInfo.login },
-            raw: true
-        });
+        let frSymJson = filterInfo.from_symbols;
+        let fromsymbols = JSON.parse(frSymJson);
+        let toSymJson = filterInfo.to_symbols;
+        let toAccountId = filteredInfo.to_account_id;
+        let fromAccountId = filteredInfo.from_account_id;
+        let tosymbols = JSON.parse(toSymJson);
+        let tomagicAccount = (filterInfo.to_magic_number != '' && filterInfo.to_magic_number != null) && JSON.parse(filterInfo.to_magic_number)
+        let frommagicAccount = (filterInfo.from_magic_number != '' && filterInfo.from_magic_number != null) && JSON.parse(filterInfo.from_magic_number);
+        let to_include_exclude = filterInfo.to_include_exclude_status
+        let from_include_exclude = filterInfo.from_include_exclude_status;
+        let startdateFrom = filterInfo.startdateFrom;
+        let enddateFrom = (filterInfo.enddateFrom == null || filterInfo.enddateFrom == '') ? new Date() : filterInfo.enddateFrom;
+        let startdateTo = filterInfo.startdateTo;
+        let enddateTo = (filterInfo.enddateTo == null || filterInfo.enddateTo == '') ? new Date() : filterInfo.enddateTo;
+        // let fromSymbolInfo = await symbolModel.findAll({
+        //     where: { name: frSymbol[0], login: fromAccountInfo.login },
+        //     raw: true
 
-        let fromOpenOrderInfos = await openOrderModel.findAll({
-            attributes: [
-                'order_type',
-                [Sequelize.literal('SUM(lots)'), 'lots']
-            ],
-            where: {
-                account_id: fromAccountInfo.id,
-                symbol: frSymbol[0]
-            },
-            raw: true
-        });
+        // });
+        // let toSymbolInfo = await symbolModel.findAll({
+        //     where: { name: toSymbol[0], login: toAccountInfo.login },
+        //     raw: true
+        // });
+        let fromSymbolInfo = [];
+        let toSymbolInfo = [];
+        let fromOpenOrderInfos=[];
+        let toOpenOrderInfos=[];
+        if (filterInfo != null) {
+            // console.log(from_include_exclude, startdateFrom,enddateFrom ,fromsymbols,fromAccountId, 'from_include_exclude')
+            if (from_include_exclude != 0) {
+                let assuemIncludeOrExcludeSymbol = []
+                let assuemIncludeOrExcludev = []
+                if (from_include_exclude == 2) {
 
-        let toOpenOrderInfos = await openOrderModel.findAll({
-            attributes: [
-                'order_type',
-                [Sequelize.literal('SUM(lots)'), 'lots']
-            ],
-            where: {
-                account_id: toAccountInfo.id,
-                symbol: toSymbol[0]
-            },
-            raw: true
-        });
+                    let numb = await openOrderModel.findAll({
+                        attributes: [[Sequelize.literal('DISTINCT(magic_number)'), 'magic_number'], 'symbol'],
+                        where: {
+                            account_id: fromAccountId,
+                            symbol: {
+                                [Op.in]: fromsymbols
+                            },
+                            open_time: {
+                                [Op.gte]: startdateFrom,
+                                [Op.lt]: enddateFrom,
+                            }
+                        },
+                        raw: true
+                    })
+                    numb.forEach((data) => {
+                        assuemIncludeOrExcludev.push(data.magic_number)
+                        assuemIncludeOrExcludeSymbol.push(data.symbol)
+                    })
+                    frommagicAccount = frommagicAccount.map(x => +x)
+                    assuemIncludeOrExcludev = assuemIncludeOrExcludev.filter(item => !frommagicAccount.includes(item))
+                    assuemIncludeOrExcludeSymbol = assuemIncludeOrExcludeSymbol.filter(item => fromsymbols.includes(item))
+
+                    fromSymbolInfo = await symbolModel.findAll({
+                        where: { name: assuemIncludeOrExcludeSymbol[0], login: fromAccountInfo.login },
+                        raw: true
+                    });
+                    fromOpenOrderInfos = await openOrderModel.findAll({
+                        attributes: [
+                            'order_type',
+                            [Sequelize.literal('SUM(lots)'), 'lots']
+                        ],
+                        where: {
+                            account_id: fromAccountInfo.id,
+                            symbol: assuemIncludeOrExcludeSymbol[0],
+                            open_time: {
+                                [Op.gte]: startdateFrom,
+                                [Op.lt]: enddateFrom,
+                            }
+                        },
+                        raw: true
+                    });
+                } else {
+
+                    let numb = await openOrderModel.findAll({
+                        attributes: [[Sequelize.literal('DISTINCT(magic_number)'), 'magic_number'], 'symbol'],
+                        where: {
+                            account_id: fromAccountId,
+                            symbol: {
+                                [Op.in]: fromsymbols
+                            },
+                            open_time: {
+                                [Op.gte]: startdateFrom,
+                                [Op.lt]: enddateFrom,
+                            }
+                        },
+                        raw: true
+                    })
+
+                    frommagicAccount = frommagicAccount.map(x => +x)
+                    let allRecdd = numb.filter(item => frommagicAccount.includes(item.magic_number))
+                    if (allRecdd && allRecdd.length != 0) {
+                        let numb = await openOrderModel.findAll({
+                            attributes: [[Sequelize.literal('DISTINCT(magic_number)'), 'magic_number'], 'symbol'],
+                            where: {
+                                account_id: fromAccountId,
+                                symbol: {
+                                    [Op.in]: fromsymbols
+                                },
+                                open_time: {
+                                    [Op.gte]: startdateFrom,
+                                    [Op.lt]: enddateFrom,
+                                }
+                            },
+                            raw: true
+                        })
+                        numb.forEach((data) => {
+                            assuemIncludeOrExcludev.push(data.magic_number)
+                            assuemIncludeOrExcludeSymbol.push(data.symbol)
+                        })
+                        frommagicAccount = frommagicAccount.map(x => +x)
+                        assuemIncludeOrExcludev = assuemIncludeOrExcludev.filter(item => frommagicAccount.includes(item))
+                        assuemIncludeOrExcludeSymbol = assuemIncludeOrExcludeSymbol.filter(item => fromsymbols.includes(item))
+                        toSymbolInfo = await symbolModel.findAll({
+                            where: { name: assuemIncludeOrExcludeSymbol[0], login: fromAccountInfo.login },
+                            raw: true
+                        });
+                        fromOpenOrderInfos = await openOrderModel.findAll({
+                            attributes: [
+                                'order_type',
+                                [Sequelize.literal('SUM(lots)'), 'lots']
+                            ],
+                            where: {
+                                account_id: fromAccountInfo.id,
+                                symbol: assuemIncludeOrExcludeSymbol[0],
+                                open_time: {
+                                    [Op.gte]: startdateFrom,
+                                    [Op.lt]: enddateFrom,
+                                }
+                            },
+                            raw: true
+                        });
+                    }
+
+                }
+            }else{
+
+                toOpenOrderInfos = await openOrderModel.findAll({
+                    attributes: [
+                        'order_type',
+                        [Sequelize.literal('SUM(lots)'), 'lots']
+                    ],
+                    where: {
+                        account_id: fromAccountInfo.id,
+                        symbol: fromsymbols[0],
+                        open_time: {
+                            [Op.gte]: startdateTo,
+                            [Op.lt]: enddateTo,
+                        }
+                    },
+                    raw: true
+                });
+                fromSymbolInfo = await symbolModel.findAll({
+                    where: { name: fromsymbols[0], login: fromAccountInfo.login },
+                    raw: true
+                });
+            }
+
+            console.log(to_include_exclude, 'to_include_exclude------------------------------------------------')
+            if (to_include_exclude != 0) {
+                let assuemIncludeOrExcludeSymbol = []
+                let assuemIncludeOrExcludev = []
+                if (to_include_exclude == 2) {
+
+                    let numb = await openOrderModel.findAll({
+                        attributes: [[Sequelize.literal('DISTINCT(magic_number)'), 'magic_number'], 'symbol'],
+                        where: {
+                            account_id: toAccountId,
+                            symbol: {
+                                [Op.in]: tosymbols
+                            },
+                            open_time: {
+                                [Op.gte]: startdateTo,
+                                [Op.lt]: enddateTo,
+                            }
+                        },
+                        raw: true
+                    })
+                    numb.forEach((data) => {
+                        assuemIncludeOrExcludev.push(data.magic_number)
+                        assuemIncludeOrExcludeSymbol.push(data.symbol)
+                    })
+                    tomagicAccount = tomagicAccount.map(x => +x)
+
+                    console.log(assuemIncludeOrExcludev, 'assuemIncludeOrExcludev')
+                    console.log(assuemIncludeOrExcludeSymbol, 'assuemIncludeOrExcludeSymbol')
+                    assuemIncludeOrExcludev = assuemIncludeOrExcludev.filter(item => !tomagicAccount.includes(item))
+                    assuemIncludeOrExcludeSymbol = assuemIncludeOrExcludeSymbol.filter(item => tosymbols.includes(item))
+
+                    toSymbolInfo = await symbolModel.findAll({
+                        where: { name: assuemIncludeOrExcludeSymbol[0], login: toAccountInfo.login },
+                        raw: true
+                    });
+
+                    toOpenOrderInfos = await openOrderModel.findAll({
+                        attributes: [
+                            'order_type',
+                            [Sequelize.literal('SUM(lots)'), 'lots']
+                        ],
+                        where: {
+                            account_id: toAccountInfo.id,
+                            symbol: assuemIncludeOrExcludeSymbol[0],
+                            open_time: {
+                                [Op.gte]: startdateTo,
+                                [Op.lt]: enddateTo,
+                            }
+                        },
+                        raw: true
+                    });
+                } else {
+
+                    let numb = await openOrderModel.findAll({
+                        attributes: [[Sequelize.literal('DISTINCT(magic_number)'), 'magic_number'], 'symbol'],
+                        where: {
+                            account_id: toAccountId,
+                            symbol: {
+                                [Op.in]: tosymbols
+                            },
+                            open_time: {
+                                [Op.gte]: startdateTo,
+                                [Op.lt]: enddateTo,
+                            }
+                        },
+                        raw: true
+                    })
+
+                    tomagicAccount = tomagicAccount.map(x => +x)
+                    let allRecdd = numb.filter(item => tomagicAccount.includes(item.magic_number))
+                    if (allRecdd && allRecdd.length != 0) {
+                        let numb = await openOrderModel.findAll({
+                            attributes: [[Sequelize.literal('DISTINCT(magic_number)'), 'magic_number'], 'symbol'],
+                            where: {
+                                account_id: toAccountId,
+                                symbol: {
+                                    [Op.in]: tosymbols
+                                }
+                            },
+                            raw: true
+                        })
+                        numb.forEach((data) => {
+                            assuemIncludeOrExcludev.push(data.magic_number)
+                            assuemIncludeOrExcludeSymbol.push(data.symbol)
+                        })
+                        tomagicAccount = tomagicAccount.map(x => +x)
+                        assuemIncludeOrExcludev = assuemIncludeOrExcludev.filter(item => tomagicAccount.includes(item))
+                        assuemIncludeOrExcludeSymbol = assuemIncludeOrExcludeSymbol.filter(item => tosymbols.includes(item))
+                        toSymbolInfo = await symbolModel.findAll({
+                            where: { name: assuemIncludeOrExcludeSymbol[0], login: toAccountInfo.login },
+                            raw: true
+                        });
+                        toOpenOrderInfos = await openOrderModel.findAll({
+                            attributes: [
+                                'order_type',
+                                [Sequelize.literal('SUM(lots)'), 'lots']
+                            ],
+                            where: {
+                                account_id: toAccountInfo.id,
+                                symbol: assuemIncludeOrExcludeSymbol[0],
+                                open_time: {
+                                    [Op.gte]: startdateTo,
+                                    [Op.lt]: enddateTo,
+                                }
+                            },
+                            raw: true
+                        });
+
+                    }
+                }
+            }else{
+
+                toOpenOrderInfos = await openOrderModel.findAll({
+                    attributes: [
+                        'order_type',
+                        [Sequelize.literal('SUM(lots)'), 'lots']
+                    ],
+                    where: {
+                        account_id: toAccountInfo.id,
+                        symbol: tosymbols[0],
+                        open_time: {
+                            [Op.gte]: startdateTo,
+                            [Op.lt]: enddateTo,
+                        }
+                    },
+                    raw: true
+                });
+                toSymbolInfo = await symbolModel.findAll({
+                    where: { name: tosymbols[0], login: toAccountInfo.login },
+                    raw: true
+                });
+            }
+        }
+
 
         return res.status(200).json({
             rows: filterInfo,
@@ -1532,6 +1790,7 @@ const fetchStatusData = async (req, res, next) => {
         return res.status(err.status || 500).json(err);
     };
 }
+
 
 module.exports = {
     fetchAllAccounts,
