@@ -650,6 +650,7 @@ const fetchAllOpenTrade = async (req, res, next) => {//open postions data goes h
 
                 let openOrderInfos = await openOrderModel.findAll({
                     attributes: [
+                        'order_type',
                         [Sequelize.literal('SUM(swap)'), 'swap'],
                         [Sequelize.literal('SUM(taxes)'), 'taxes'],
                         [Sequelize.literal('SUM(commission)'), 'commission'],
@@ -826,6 +827,7 @@ const fetchAllOpenTrade = async (req, res, next) => {//open postions data goes h
 
                 let openOrderInfos = await openOrderModel.findAll({
                     attributes: [
+                        'order_type',
                         [Sequelize.literal('SUM(swap)'), 'swap'],
                         [Sequelize.literal('SUM(taxes)'), 'taxes'],
                         [Sequelize.literal('SUM(commission)'), 'commission'],
@@ -1615,6 +1617,7 @@ const fetchStatusData = async (req, res, next) => {
                             },
                             raw: true
                         });
+                        console.log(fromOpenOrderInfos,"fromOpenOrderInfos--------------------------------77");
                     }
 
                 }
@@ -1639,6 +1642,7 @@ const fetchStatusData = async (req, res, next) => {
                     where: { name: fromsymbols[0], login: fromAccountInfo.login },
                     raw: true
                 });
+                //  console.log(fromSymbolInfo,"fromSymbolInfo---------------------------");
             }
 
             console.log(to_include_exclude, 'to_include_exclude------------------------------------------------')
