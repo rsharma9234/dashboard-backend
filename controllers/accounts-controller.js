@@ -1475,8 +1475,8 @@ const fetchStatusData = async (req, res, next) => {
             where: { id: filterInfo.from_account_id },
             attributes: ['login', 'id', 'alias']
         });
-        
-        
+
+
         let toAccountInfo = await accountModel.findOne({
             where: { id: filterInfo.to_account_id },
             attributes: ['login', 'id', 'alias']
@@ -1507,10 +1507,10 @@ const fetchStatusData = async (req, res, next) => {
         // });
         let fromSymbolInfo = [];
         let toSymbolInfo = [];
-        let fromOpenOrderInfos=[];
-        let toOpenOrderInfos=[];
+        let fromOpenOrderInfos = [];
+        let toOpenOrderInfos = [];
         if (filterInfo != null) {
-            // console.log(from_include_exclude, startdateFrom,enddateFrom ,fromsymbols,fromAccountId, 'from_include_exclude')
+          
             if (from_include_exclude != 0) {
                 let assuemIncludeOrExcludeSymbol = []
                 let assuemIncludeOrExcludev = []
@@ -1617,13 +1617,13 @@ const fetchStatusData = async (req, res, next) => {
                             },
                             raw: true
                         });
-                        console.log(fromOpenOrderInfos,"fromOpenOrderInfos--------------------------------77");
+                  
                     }
 
                 }
-            }else{
+            } else {
 
-                toOpenOrderInfos = await openOrderModel.findAll({
+                fromOpenOrderInfos = await openOrderModel.findAll({
                     attributes: [
                         'order_type',
                         [Sequelize.literal('SUM(lots)'), 'lots']
@@ -1638,14 +1638,15 @@ const fetchStatusData = async (req, res, next) => {
                     },
                     raw: true
                 });
+                
                 fromSymbolInfo = await symbolModel.findAll({
                     where: { name: fromsymbols[0], login: fromAccountInfo.login },
                     raw: true
                 });
-                //  console.log(fromSymbolInfo,"fromSymbolInfo---------------------------");
+             
             }
 
-            console.log(to_include_exclude, 'to_include_exclude------------------------------------------------')
+        
             if (to_include_exclude != 0) {
                 let assuemIncludeOrExcludeSymbol = []
                 let assuemIncludeOrExcludev = []
@@ -1755,7 +1756,7 @@ const fetchStatusData = async (req, res, next) => {
 
                     }
                 }
-            }else{
+            } else {
 
                 toOpenOrderInfos = await openOrderModel.findAll({
                     attributes: [
@@ -1778,7 +1779,7 @@ const fetchStatusData = async (req, res, next) => {
                 });
             }
         }
-
+       
 
         return res.status(200).json({
             rows: filterInfo,
