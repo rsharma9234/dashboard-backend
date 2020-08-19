@@ -5,60 +5,33 @@ const Op = Sequelize.Op;
 const models = require("../models");
 const accountModel = models.account;
 const accountsDetailModel = models.accounts_detail;
-const symbolModel = models.symbol;
+const openOrderModel = models.open_order;
 const historyOrderModel = models.history_order;
 ``;
 const filteredProfileModel = models.filtered_profile;
 const CustomSwapModel = models.custom_swap;
 const CustomDeposite = models.custom_deposite;
-const moment = require("moment");
 const common = require("./commonData");
 
-const fetchAllAccounts = async (req, res, next) => {
+const calculatingOpenTrade = async (req, res, next) => {
+  //open postions data goes here
   try {
-    let accountInfo = await accountModel.findAll({
-      attributes: ["id", "login"],
-      include: [accountsDetailModel],
-    });
-
-    if (accountInfo && accountInfo.length > 0) {
-      accountInfo.map((data) => data.toJSON());
-      return res.status(200).json({ rows: accountInfo });
-    }
-    return res.status(200).json({ rows: [] });
-  } catch (err) {
-    return res.status(err.status || 500).json(err);
-  }
-};
-
-const fetchAllSymbol = async (req, res, next) => {
-  try {
-    let symbolInfo = await symbolModel.findAll({
-      attributes: [[Sequelize.fn("DISTINCT", Sequelize.col("name")), "name"]],
-    });
-    return res.status(200).json({ rows: symbolInfo });
-  } catch (err) {
-    return res.status(err.status || 500).json(err);
-  }
-};
-
-//open postions data goes here
-const fetchAllOpenTrade = async (req, res, next) => {
-  try {
-    // Get Filter Profile Data Using Status 1
     let filteredInfo = await filteredProfileModel.findOne({
       where: { status: 1 },
       raw: true,
     });
-
-    // Get Account Detail
     let accountInfo = await accountModel.findAll({
       attributes: ["login", "id", "alias"],
       include: [accountsDetailModel],
+      raw: true,
     });
 
     if (filteredInfo != null) {
-      //Account "From" Detail
+      let openOrderFromInfo = [];
+      let openOrderToInfo = [];
+      let totalOfFromOpenOrder = 0;
+      let totalOfToOpenOrder = 0;
+
       let fromAccountId = filteredInfo.from_account_id;
       let fromsymbols = JSON.parse(filteredInfo.from_symbols);
       let startdateFrom = filteredInfo.startdateFrom;
@@ -67,13 +40,15 @@ const fetchAllOpenTrade = async (req, res, next) => {
           ? new Date()
           : filteredInfo.enddateFrom;
 
+      let tomagicAccount =
+        filteredInfo.to_magic_number != "" &&
+        filteredInfo.to_magic_number != null &&
+        JSON.parse(filteredInfo.to_magic_number);
       let frommagicAccount =
         filteredInfo.from_magic_number != "" &&
         filteredInfo.from_magic_number != null &&
         JSON.parse(filteredInfo.from_magic_number);
-      let from_include_exclude = filteredInfo.from_include_exclude_status;
 
-      //Account "To" Detail
       let toAccountId = filteredInfo.to_account_id;
       let tosymbols = JSON.parse(filteredInfo.to_symbols);
       let startdateTo = filteredInfo.startdateTo;
@@ -81,13 +56,8 @@ const fetchAllOpenTrade = async (req, res, next) => {
         filteredInfo.enddateTo == null || filteredInfo.enddateTo == ""
           ? new Date()
           : filteredInfo.enddateTo;
-
-      let tomagicAccount =
-        filteredInfo.to_magic_number != "" &&
-        filteredInfo.to_magic_number != null &&
-        JSON.parse(filteredInfo.to_magic_number);
       let to_include_exclude = filteredInfo.to_include_exclude_status;
-
+      let from_include_exclude = filteredInfo.from_include_exclude_status;
       let newRecord = accountInfo.filter((rec) => rec.id == fromAccountId);
       let newToRecord = accountInfo.filter((rec) => rec.id == toAccountId);
 
@@ -117,8 +87,12 @@ const fetchAllOpenTrade = async (req, res, next) => {
             enddateTo,
             tomagicAccount,
             to_include_exclude,
+            totalOfFromOpenOrder,
+            totalOfToOpenOrder,
+            openOrderFromInfo,
+            openOrderToInfo,
           },
-          "account"
+          "whatAmCalculating"
         )
         .then((res) => {
           commonData = res;
@@ -127,13 +101,14 @@ const fetchAllOpenTrade = async (req, res, next) => {
           console.log(err);
         });
 
-      //Send Api Response
       return res.status(200).json({
         rows: filteredInfo,
         fromOpenOrderInfo:
           commonData !== undefined ? commonData.openOrderFromInfo : [],
         toOpenOrderInfo:
           commonData !== undefined ? commonData.openOrderToInfo : [],
+        totalOfOpenOrder:
+          commonData !== undefined ? commonData.totalOfOpenOrder : {},
       });
     }
     return res.status(200).json({
@@ -147,95 +122,54 @@ const fetchAllOpenTrade = async (req, res, next) => {
   }
 };
 
-const fetchLastUpdatedTime = async (req, res, next) => {
+const calculatingHistoryTrade = async (req, res, next) => {
+  // close position data goes here
   try {
-    // Get Filter Profile Data Using Status 1
     let filteredInfo = await filteredProfileModel.findOne({
       where: { status: 1 },
       raw: true,
     });
-
-    // Get Last Seen From Account Detail Model
-    if (filteredInfo != null) {
-      let fromAccountId = filteredInfo.from_account_id;
-      let toAccountId = filteredInfo.to_account_id;
-
-      let lastUpdated = await accountsDetailModel.findAll({
-        attributes: ["last_seen"],
-        where: { account_id: { [Op.in]: [toAccountId, fromAccountId] } },
-        raw: true,
-      });
-
-      let moments = lastUpdated.map((data) => moment(data.last_seen));
-      let maxDate = moment.min(moments);
-      let date = moment(maxDate).utc().format("DD-MM-YYYY  HH:mm:ss");
-
-      return res.status(200).json({ filteredInfoTime: date });
-    }
-  } catch (err) {
-    return res.status(err.status || 500).json(err);
-  }
-};
-// close position data goes here
-const fetchAllHistoryTrade = async (req, res, next) => {
-  try {
-    // Get Filter Profile Data Using Status 1
-    let filteredInfo = await filteredProfileModel.findOne({
-      where: { status: 1 },
-      raw: true,
-    });
-
-    // Get Account Detail
     let accountInfo = await accountModel.findAll({
       attributes: ["login", "id", "alias"],
       include: [accountsDetailModel],
     });
 
-    let commission_acount_id = filteredInfo.commission_acount_id;
+    let ml = filteredInfo.commission_acount_id;
 
-    // Calculate Profit According To Order Type
     let historyOrderInfo = await historyOrderModel.findAll({
       attributes: [
         [Sequelize.literal("SUM(profit)"), "profit"], // coming null
       ],
-      where: { order_type: 6, account_id: commission_acount_id },
+      where: { order_type: 6, account_id: ml },
       raw: true,
     });
-
     let customSwapTable = await CustomSwapModel.findAll({
       attributes: { exclude: ["id"] },
       raw: true,
     });
-
     if (filteredInfo != null) {
-      let history_info = 0;
-
-      //Account "From" Detail
+      let openOrderFromInfo = [];
+      let openOrderToInfo = [];
+      let totalOfFromHistoryOrder = 0;
+      let totalOfToHistoryOrder = 0;
       let fromAccountId = filteredInfo.from_account_id;
       let fromsymbols = JSON.parse(filteredInfo.from_symbols);
-
-      let frommagicAccount =
-        filteredInfo.from_magic_number != "" &&
-        filteredInfo.from_magic_number != null &&
-        JSON.parse(filteredInfo.from_magic_number);
-      let from_include_exclude = filteredInfo.from_include_exclude_status;
-
-      let startdateFrom = filteredInfo.startdateFrom;
-      let enddateFrom =
-        filteredInfo.enddateFrom == null || filteredInfo.enddateFrom == ""
-          ? new Date()
-          : filteredInfo.enddateFrom;
-
-      //Account "To" Detail
-      let toAccountId = filteredInfo.to_account_id;
-      let tosymbols = JSON.parse(filteredInfo.to_symbols);
 
       let tomagicAccount =
         filteredInfo.to_magic_number != "" &&
         filteredInfo.to_magic_number != null &&
         JSON.parse(filteredInfo.to_magic_number);
-      let to_include_exclude = filteredInfo.to_include_exclude_status;
-
+      let frommagicAccount =
+        filteredInfo.from_magic_number != "" &&
+        filteredInfo.from_magic_number != null &&
+        JSON.parse(filteredInfo.from_magic_number);
+      let startdateFrom = filteredInfo.startdateFrom;
+      let enddateFrom =
+        filteredInfo.enddateFrom == null || filteredInfo.enddateFrom == ""
+          ? new Date()
+          : filteredInfo.enddateFrom;
+      let toAccountId = filteredInfo.to_account_id;
+      let tosymbols = JSON.parse(filteredInfo.to_symbols);
       let startdateTo = filteredInfo.startdateTo;
       let enddateTo =
         filteredInfo.enddateTo == null || filteredInfo.enddateTo == ""
@@ -244,23 +178,23 @@ const fetchAllHistoryTrade = async (req, res, next) => {
 
       let newRecord = accountInfo.filter((rec) => rec.id == fromAccountId);
       let newToRecord = accountInfo.filter((rec) => rec.id == toAccountId);
-
-      let newCommissionRecord = accountInfo.filter(
-        (rec) => rec.id == commission_acount_id
-      );
-
+      let newCommissionRecord = accountInfo.filter((rec) => rec.id == ml);
+      let to_include_exclude = filteredInfo.to_include_exclude_status;
+      let from_include_exclude = filteredInfo.from_include_exclude_status;
       let equity =
         newCommissionRecord && newCommissionRecord.length > 0
           ? newCommissionRecord[0].accounts_details[0].equity
           : 0;
 
+      let history_info = 0;
       if (historyOrderInfo[0].profit !== null) {
         history_info = eval(historyOrderInfo[0].profit) - equity;
       } else {
         let customDeposite = await CustomDeposite.findAll({
-          where: { account_id: commission_acount_id },
+          where: { account_id: ml },
           raw: true,
         });
+
         if (customDeposite.length) {
           history_info = equity - customDeposite[0].value;
         }
@@ -284,35 +218,41 @@ const fetchAllHistoryTrade = async (req, res, next) => {
           {
             fromAccountId,
             fromsymbols,
-            startdateFrom,
-            enddateFrom,
             frommagicAccount,
             from_include_exclude,
-            CustomSwap,
+            startdateFrom,
+            enddateFrom,
             toAccountId,
             tosymbols,
-            startdateTo,
-            enddateTo,
             tomagicAccount,
             to_include_exclude,
+            startdateTo,
+            enddateTo,
+            CustomSwap,
+            openOrderFromInfo,
+            openOrderToInfo,
+            totalOfFromHistoryOrder,
+            totalOfToHistoryOrder,
           },
-          "account"
+          "whatAmCalculating"
         )
         .then((res) => {
+          console.log("----", res);
           commonData = res;
         })
         .catch((err) => {
           console.log(err);
         });
 
-      //Send Api Response
       return res.status(200).json({
         rows: filteredInfo,
+        customSwapTable: customSwapTable,
         fromHistoryOrderInfo:
           commonData !== undefined ? commonData.openOrderFromInfo : [],
         toHistoryOrderInfo:
           commonData !== undefined ? commonData.openOrderToInfo : [],
-        customSwapTable: customSwapTable,
+        totalOfHistoryOrder:
+          commonData !== undefined ? commonData.totalOfHistoryOrder : {},
       });
     }
     return res.status(200).json({
@@ -326,122 +266,41 @@ const fetchAllHistoryTrade = async (req, res, next) => {
   }
 };
 
-const fetchStatusData = async (req, res, next) => {
+const calculatingCommission = async (req, res, next) => {
   try {
     let filteredInfo = await filteredProfileModel.findOne({
       where: { status: 1 },
       raw: true,
     });
-    let filterInfo = filteredInfo;
-
-    let fromAccountInfo = await accountModel.findOne({
-      where: { id: filterInfo.from_account_id },
-      attributes: ["login", "id", "alias"],
+    let commission_acount_id = filteredInfo.commission_acount_id;
+    let historyOrderData = await historyOrderModel.findAll({
+      where: { account_id: commission_acount_id, order_type: 6 },
+      attributes: { exclude: ["id"] },
+      raw: true,
     });
-
-    let toAccountInfo = await accountModel.findOne({
-      where: { id: filterInfo.to_account_id },
-      attributes: ["login", "id", "alias"],
+    let accountTableDetails = await accountsDetailModel.findAll({
+      where: { account_id: commission_acount_id },
+      attributes: { exclude: ["id"] },
+      raw: true,
     });
-
-    let frSymJson = filterInfo.from_symbols;
-    let fromsymbols = JSON.parse(frSymJson);
-    let toSymJson = filterInfo.to_symbols;
-    let toAccountId = filteredInfo.to_account_id;
-    let fromAccountId = filteredInfo.from_account_id;
-    let tosymbols = JSON.parse(toSymJson);
-    let tomagicAccount =
-      filterInfo.to_magic_number != "" &&
-      filterInfo.to_magic_number != null &&
-      JSON.parse(filterInfo.to_magic_number);
-    let frommagicAccount =
-      filterInfo.from_magic_number != "" &&
-      filterInfo.from_magic_number != null &&
-      JSON.parse(filterInfo.from_magic_number);
-    let to_include_exclude = filterInfo.to_include_exclude_status;
-    let from_include_exclude = filterInfo.from_include_exclude_status;
-    let startdateFrom = filterInfo.startdateFrom;
-    let enddateFrom =
-      filterInfo.enddateFrom == null || filterInfo.enddateFrom == ""
-        ? new Date()
-        : filterInfo.enddateFrom;
-    let startdateTo = filterInfo.startdateTo;
-    let enddateTo =
-      filterInfo.enddateTo == null || filterInfo.enddateTo == ""
-        ? new Date()
-        : filterInfo.enddateTo;
-
-    let fromSymbolInfo = [];
-    let toSymbolInfo = [];
-    let fromOpenOrderInfos = [];
-    let toOpenOrderInfos = [];
-    if (filterInfo != null) {
-      //Function from commonData file
-      let commonData;
-      await common
-        .statusData({
-          fromSymbolInfo,
-          toSymbolInfo,
-          fromOpenOrderInfos,
-          toOpenOrderInfos,
-          fromAccountInfo,
-          toAccountInfo,
-          fromsymbols,
-          toAccountId,
-          fromAccountId,
-          tosymbols,
-          tomagicAccount,
-          frommagicAccount,
-          to_include_exclude,
-          from_include_exclude,
-          startdateFrom,
-          enddateFrom,
-          startdateTo,
-          enddateTo,
-        })
-        .then((data) => {
-          commonData = data;
-          // console.log(commonData,'commonData.....');
-          //Send Api Response
-          return res.status(200).json({
-            rows: filterInfo,
-            fromAccounts:
-              commonData !== undefined ? commonData.fromAccountInfo : [],
-            fromSymbol:
-              commonData !== undefined ? commonData.fromSymbolInfo : [],
-            toAccounts:
-              commonData !== undefined ? commonData.toAccountInfo : [],
-            toSymbol: commonData !== undefined ? commonData.toSymbolInfo : [],
-            fromOpenOrderInfos:
-              commonData !== undefined ? commonData.fromOpenOrderInfos : [],
-            toOpenOrderInfos:
-              commonData !== undefined ? commonData.toOpenOrderInfos : [],
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-
-    // return res.status(200).json({
-    //   rows: [],
-    //   fromAccounts: [],
-    //   fromSymbol: [],
-    //   toAccounts: [],
-    //   toSymbol: [],
-    //   fromOpenOrderInfos: [],
-    //   toOpenOrderInfos: [],
-    // });
+    let totalProfit = 0;
+    let profit = historyOrderData.map((data) => data.profit);
+    totalProfit = profit.reduce((a, b) => a + b, 0);
+    let equity = accountTableDetails.map((data) => data.equity);
+    let commission = totalProfit - equity;
+    return res.status(200).json({
+      commission_acount_id: commission_acount_id,
+      equity: equity,
+      totalProfit: totalProfit,
+      commission: commission,
+    });
   } catch (err) {
     return res.status(err.status || 500).json(err);
   }
 };
 
 module.exports = {
-  fetchAllAccounts,
-  fetchAllSymbol,
-  fetchAllOpenTrade,
-  fetchAllHistoryTrade,
-  fetchLastUpdatedTime,
-  fetchStatusData,
+  calculatingOpenTrade,
+  calculatingHistoryTrade,
+  calculatingCommission,
 };
