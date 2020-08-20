@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "build": "rm -rf build && cd ../dashboard && rm -rf build && npm run build && mv build ../dashboard-backend/build",
-    "build:clean": "rm -rf build && cd ../dashboard && rm -rf build && rm -rf node_modules && rm -rf package-lock.json && npm install && npm run build && mv build ../dashboard-backend/build",
+    "build": "rm -rf build && cd ../dashboard && sudo npm run build && mv build ../dashboard-backend/build",
+    "build:clean": "rm -rf build && cd ../dashboard && rm -rf node_modules && rm -rf package-lock.json && sudo npm install && sudo npm run build && mv build ../dashboard-backend/build",
     "dev": "NODE_ENV=development nodemon ./bin/www"
   },
   "dependencies": {
