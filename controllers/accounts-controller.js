@@ -1510,7 +1510,7 @@ const fetchStatusData = async (req, res, next) => {
         let fromOpenOrderInfos = [];
         let toOpenOrderInfos = [];
         if (filterInfo != null) {
-          
+
             if (from_include_exclude != 0) {
                 let assuemIncludeOrExcludeSymbol = []
                 let assuemIncludeOrExcludev = []
@@ -1530,35 +1530,44 @@ const fetchStatusData = async (req, res, next) => {
                         },
                         raw: true
                     })
-                    numb.forEach((data) => {
-                        assuemIncludeOrExcludev.push(data.magic_number)
-                        assuemIncludeOrExcludeSymbol.push(data.symbol)
-                    })
-                    frommagicAccount = frommagicAccount.map(x => +x)
-                    assuemIncludeOrExcludev = assuemIncludeOrExcludev.filter(item => !frommagicAccount.includes(item))
-                    assuemIncludeOrExcludeSymbol = assuemIncludeOrExcludeSymbol.filter(item => fromsymbols.includes(item))
+                    console.log(numb, 'numb -------------------->')
+                    // if (numb.length > 0) {
 
-                    fromSymbolInfo = await symbolModel.findAll({
-                        where: { name: assuemIncludeOrExcludeSymbol[0], login: fromAccountInfo.login },
+                        numb.forEach((data) => {
+                            assuemIncludeOrExcludev.push(data.magic_number)
+                            assuemIncludeOrExcludeSymbol.push(data.symbol)
+                        })
+                        frommagicAccount = frommagicAccount.map(x => +x)
+                        assuemIncludeOrExcludev = assuemIncludeOrExcludev.filter(item => !frommagicAccount.includes(item))
+                        assuemIncludeOrExcludeSymbol = assuemIncludeOrExcludeSymbol.filter(item => fromsymbols.includes(item))
+                        
+                        fromSymbolInfo = await symbolModel.findAll({
+                            where: { name: assuemIncludeOrExcludeSymbol[0], login: fromAccountInfo.login },
+                            raw: true
+                        });
+                        console.log(fromSymbolInfo, "fromSymbolInfo --------------------->")
+                        fromOpenOrderInfos = await openOrderModel.findAll({
+                            attributes: [
+                                'order_type',
+                                [Sequelize.literal('SUM(lots)'), 'lots']
+                            ],
+                            where: {
+                                account_id: fromAccountInfo.id,
+                                symbol: assuemIncludeOrExcludeSymbol[0],
+                                open_time: {
+                                    [Op.gte]: startdateFrom,
+                                    [Op.lt]: enddateFrom,
+                                }
+                            },
                         raw: true
                     });
-                    fromOpenOrderInfos = await openOrderModel.findAll({
-                        attributes: [
-                            'order_type',
-                            [Sequelize.literal('SUM(lots)'), 'lots']
-                        ],
-                        where: {
-                            account_id: fromAccountInfo.id,
-                            symbol: assuemIncludeOrExcludeSymbol[0],
-                            open_time: {
-                                [Op.gte]: startdateFrom,
-                                [Op.lt]: enddateFrom,
-                            }
-                        },
-                        raw: true
-                    });
+                // }
+                // else{
+                //     // fromOpenOrderInfos = [] 
+                // }
+                    console.log(fromOpenOrderInfos, "fromOpenOrderInfos 0------------------------->")
                 } else {
-
+                    
                     let numb = await openOrderModel.findAll({
                         attributes: [[Sequelize.literal('DISTINCT(magic_number)'), 'magic_number'], 'symbol'],
                         where: {
@@ -1617,7 +1626,7 @@ const fetchStatusData = async (req, res, next) => {
                             },
                             raw: true
                         });
-                  
+
                     }
 
                 }
@@ -1638,15 +1647,15 @@ const fetchStatusData = async (req, res, next) => {
                     },
                     raw: true
                 });
-                
+
                 fromSymbolInfo = await symbolModel.findAll({
                     where: { name: fromsymbols[0], login: fromAccountInfo.login },
                     raw: true
                 });
-             
+
             }
 
-        
+
             if (to_include_exclude != 0) {
                 let assuemIncludeOrExcludeSymbol = []
                 let assuemIncludeOrExcludev = []
@@ -1779,7 +1788,7 @@ const fetchStatusData = async (req, res, next) => {
                 });
             }
         }
-       
+
 
         return res.status(200).json({
             rows: filterInfo,
