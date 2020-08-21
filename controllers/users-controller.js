@@ -5,8 +5,7 @@ const accountModel = models.account;
 const mainLoginModel = models.main_login;
 
 const fetchAllAccounts = async (req, res, next) => {
-
-  let limit = 5; // number of records per page
+  let limit = 10; // number of records per page
   let offset = 0;
   await accountModel
     .findAndCountAll()
@@ -23,11 +22,11 @@ const fetchAllAccounts = async (req, res, next) => {
           raw: true,
         })
         .then((accountInfo) => {
-            return res.status(200).json({
-                rows: accountInfo,
-                count: data.count,
-                pages: pages,
-              });
+          return res.status(200).json({
+            rows: accountInfo,
+            count: data.count,
+            pages: pages,
+          });
         });
     })
     .catch(function (error) {

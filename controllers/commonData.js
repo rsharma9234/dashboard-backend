@@ -78,6 +78,7 @@ const openTrade = async (
     } else if (fromRequest == "whatAmCalculating") {
       openOrderInfos = await openOrderModel.findAll({
         where: AllWhereConditions,
+        order: [["open_time", "DESC"]],
         raw: true,
       });
     }
@@ -113,6 +114,17 @@ const openTrade = async (
             openOrderItem.profit;
         }
         openOrderFromInfo = openOrderInfos;
+        let symbol = openOrderFromInfo.map((item) => item.symbol);
+
+        let symbolInfo = await symbolModel.findAll({
+          where: { name: symbol },
+          raw: true,
+        });
+        openOrderFromInfo.map((item) => {
+          item.contract_size = symbolInfo[0].contract_size;
+          item.margin_currency = symbolInfo[0].margin_currency;
+          return item;
+        });
       }
     }
   } else if (fromsymbols && fromsymbols.length > 0) {
@@ -153,6 +165,7 @@ const openTrade = async (
             [Op.lt]: enddateFrom,
           },
         },
+        order: [["open_time", "DESC"]],
         raw: true,
       });
     }
@@ -188,6 +201,17 @@ const openTrade = async (
             openOrderItem.profit;
         }
         openOrderFromInfo = openOrderInfos;
+        let symbol = openOrderFromInfo.map((item) => item.symbol);
+
+        let symbolInfo = await symbolModel.findAll({
+          where: { name: symbol },
+          raw: true,
+        });
+        openOrderFromInfo.map((item) => {
+          item.contract_size = symbolInfo[0].contract_size;
+          item.margin_currency = symbolInfo[0].margin_currency;
+          return item;
+        });
       }
     }
   }
@@ -243,15 +267,13 @@ const openTrade = async (
     } else if (fromRequest == "whatAmCalculating") {
       openOrderInfos = await openOrderModel.findAll({
         where: AllWhereConditions,
+        order: [["open_time", "DESC"]],
         raw: true,
       });
     }
     if (openOrderInfos && openOrderInfos.length > 0) {
       let foundRec = CustomSwap.filter((data) => {
-        return (
-          data.account_id === toAccountId,
-          console.log("--------", data.accountid)
-        );
+        return data.account_id === toAccountId;
       });
 
       if (
@@ -281,7 +303,17 @@ const openTrade = async (
             openOrderItem.profit;
         }
         openOrderToInfo = openOrderInfos;
-        console.log("------------------===", openOrderToInfo, "-------------");
+        let symbolTo = openOrderToInfo.map((item) => item.symbol);
+
+        let symbolINfoTo = await symbolModel.findAll({
+          where: { name: symbolTo },
+          raw: true,
+        });
+        openOrderToInfo.map((item) => {
+          item.contract_size = symbolINfoTo[0].contract_size;
+          item.margin_currency = symbolINfoTo[0].margin_currency;
+          return item;
+        });
       }
     }
   } else if (tosymbols && tosymbols.length > 0) {
@@ -321,6 +353,7 @@ const openTrade = async (
             [Op.lt]: enddateTo,
           },
         },
+        order: [["open_time", "DESC"]],
         raw: true,
       });
     }
@@ -357,6 +390,17 @@ const openTrade = async (
             openOrderItem.profit;
         }
         openOrderToInfo = openOrderInfos;
+        let symbolTo = openOrderToInfo.map((item) => item.symbol);
+
+        let symbolINfoTo = await symbolModel.findAll({
+          where: { name: symbolTo },
+          raw: true,
+        });
+        openOrderToInfo.map((item) => {
+          item.contract_size = symbolINfoTo[0].contract_size;
+          item.margin_currency = symbolINfoTo[0].margin_currency;
+          return item;
+        });
       }
     }
   }
@@ -445,6 +489,7 @@ const commonHistory = async (
     } else if (fromRequest == "whatAmCalculating") {
       openOrderInfos = await historyOrderModel.findAll({
         where: AllWhereConditions,
+        order: [["open_time", "DESC"]],
         raw: true,
       });
     }
@@ -481,6 +526,16 @@ const commonHistory = async (
             openOrderItem.profit;
         }
         openOrderFromInfo = openOrderInfos;
+        let symbol = openOrderFromInfo.map((item) => item.symbol);
+        let symbolInfo = await symbolModel.findAll({
+          where: { name: symbol },
+          raw: true,
+        });
+        openOrderFromInfo.map((item) => {
+          item.contract_size = symbolInfo[0].contract_size;
+          item.margin_currency = symbolInfo[0].margin_currency;
+          return item;
+        });
       }
     }
   } else if (fromsymbols && fromsymbols.length > 0) {
@@ -521,6 +576,7 @@ const commonHistory = async (
             [Op.lt]: enddateFrom,
           },
         },
+        order: [["open_time", "DESC"]],
         raw: true,
       });
     }
@@ -556,6 +612,16 @@ const commonHistory = async (
             openOrderItem.profit;
         }
         openOrderFromInfo = openOrderInfos;
+        let symbol = openOrderFromInfo.map((item) => item.symbol);
+        let symbolInfo = await symbolModel.findAll({
+          where: { name: symbol },
+          raw: true,
+        });
+        openOrderFromInfo.map((item) => {
+          item.contract_size = symbolInfo[0].contract_size;
+          item.margin_currency = symbolInfo[0].margin_currency;
+          return item;
+        });
       }
     }
   }
@@ -611,6 +677,7 @@ const commonHistory = async (
     } else if (fromRequest == "whatAmCalculating") {
       openOrderInfos = await historyOrderModel.findAll({
         where: AllWhereConditions,
+        order: [["open_time", "DESC"]],
         raw: true,
       });
     }
@@ -646,6 +713,16 @@ const commonHistory = async (
             openOrderItem.profit;
         }
         openOrderToInfo = openOrderInfos;
+        let symbolTo = openOrderToInfo.map((item) => item.symbol);
+        let symbolINfoTo = await symbolModel.findAll({
+          where: { name: symbolTo },
+          raw: true,
+        });
+        openOrderToInfo.map((item) => {
+          item.contract_size = symbolINfoTo[0].contract_size;
+          item.margin_currency = symbolINfoTo[0].margin_currency;
+          return item;
+        });
       }
     }
   } else if (tosymbols && tosymbols.length > 0) {
@@ -685,6 +762,7 @@ const commonHistory = async (
             [Op.lt]: enddateTo,
           },
         },
+        order: [["open_time", "DESC"]],
         raw: true,
       });
     }
@@ -722,6 +800,16 @@ const commonHistory = async (
             openOrderItem.profit;
         }
         openOrderToInfo = openOrderInfos;
+        let symbolTo = openOrderToInfo.map((item) => item.symbol);
+        let symbolINfoTo = await symbolModel.findAll({
+          where: { name: symbolTo },
+          raw: true,
+        });
+        openOrderToInfo.map((item) => {
+          item.contract_size = symbolINfoTo[0].contract_size;
+          item.margin_currency = symbolINfoTo[0].margin_currency;
+          return item;
+        });
       }
     }
   }
@@ -775,7 +863,8 @@ const statusData = async ({
     }
     fromNumb = await openOrderModel.findAll({
       attributes: [
-        "order_type", [Sequelize.literal("SUM(lots)"), "lots"],
+        "order_type",
+        [Sequelize.literal("SUM(lots)"), "lots"],
         "symbol",
       ],
       where: {
@@ -789,11 +878,11 @@ const statusData = async ({
           [Op.lt]: enddateFrom,
         },
       },
-      group: 'symbol',
+      group: "symbol",
       limit: 1,
       raw: true,
     });
-    
+
     fromSymbolInfo = await symbolModel.findAll({
       where: {
         name: fromNumb[0].symbol,
@@ -801,7 +890,6 @@ const statusData = async ({
       },
       raw: true,
     });
-
   } else {
     toOpenOrderInfos = await openOrderModel.findAll({
       attributes: ["order_type", [Sequelize.literal("SUM(lots)"), "lots"]],
@@ -823,7 +911,7 @@ const statusData = async ({
   //Check Include Exclude Status And Symbols For Account "To"
   if (to_include_exclude != 0) {
     let forIncludeExclude;
-   
+
     if (to_include_exclude == 2) {
       forIncludeExclude = {
         [Op.notIn]: tomagicAccount,
@@ -833,9 +921,10 @@ const statusData = async ({
         [Op.in]: tomagicAccount,
       };
     }
-     toNumb = await openOrderModel.findAll({
+    toNumb = await openOrderModel.findAll({
       attributes: [
-        "order_type", [Sequelize.literal("SUM(lots)"), "lots"],
+        "order_type",
+        [Sequelize.literal("SUM(lots)"), "lots"],
         "symbol",
       ],
       where: {
@@ -849,12 +938,10 @@ const statusData = async ({
           [Op.lt]: enddateTo,
         },
       },
-      group: 'symbol',
+      group: "symbol",
       limit: 1,
       raw: true,
     });
-
-   
     toSymbolInfo = await symbolModel.findAll({
       where: {
         name: toNumb[0].symbol,
@@ -862,8 +949,6 @@ const statusData = async ({
       },
       raw: true,
     });
-
-   
   } else {
     toOpenOrderInfos = await openOrderModel.findAll({
       attributes: ["order_type", [Sequelize.literal("SUM(lots)"), "lots"]],
@@ -887,8 +972,9 @@ const statusData = async ({
     fromSymbolInfo: fromSymbolInfo.length > 0 ? fromSymbolInfo[0] : {},
     toAccountInfo: toAccountInfo,
     toSymbolInfo: toSymbolInfo.length > 0 ? toSymbolInfo[0] : {},
-    fromOpenOrderInfos: fromNumb.length > 0 ? fromNumb : [],
-    toOpenOrderInfos: toNumb.length > 0 ? toNumb : [],
+    fromOpenOrderInfos:
+      fromNumb !== undefined && fromNumb.length > 0 ? fromNumb : [],
+    toOpenOrderInfos: toNumb !== undefined && toNumb.length > 0 ? toNumb : [],
   });
 };
 

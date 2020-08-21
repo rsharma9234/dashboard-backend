@@ -237,7 +237,6 @@ const calculatingHistoryTrade = async (req, res, next) => {
           "whatAmCalculating"
         )
         .then((res) => {
-          console.log("----", res);
           commonData = res;
         })
         .catch((err) => {

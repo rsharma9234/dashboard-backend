@@ -401,7 +401,6 @@ const fetchStatusData = async (req, res, next) => {
         })
         .then((data) => {
           commonData = data;
-          // console.log(commonData,'commonData.....');
           //Send Api Response
           return res.status(200).json({
             rows: filterInfo,
@@ -422,16 +421,6 @@ const fetchStatusData = async (req, res, next) => {
           console.log(err);
         });
     }
-
-    // return res.status(200).json({
-    //   rows: [],
-    //   fromAccounts: [],
-    //   fromSymbol: [],
-    //   toAccounts: [],
-    //   toSymbol: [],
-    //   fromOpenOrderInfos: [],
-    //   toOpenOrderInfos: [],
-    // });
   } catch (err) {
     return res.status(err.status || 500).json(err);
   }
