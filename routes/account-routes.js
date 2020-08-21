@@ -12,18 +12,6 @@ router.get('/fetchAllSymbol', [
     accountsController.fetchAllSymbol
 ]);
 
-router.get('/fetchAllSymbolByAccount/:account_id', [
-  accountsController.fetchAllSymbolByAccount
-]);
-
-router.post('/fetchAllBySymbolOpen', [
-    accountsController.fetchAllAccountsBySymbolOpen
-]);
-
-router.post('/fetchAllBySymbolHistory', [
-    accountsController.fetchAllAccountsBySymbolHistory
-]);
-
 router.get('/fetchAllOpenTrade', [
   accountsController.fetchAllOpenTrade
 ]);
@@ -31,17 +19,13 @@ router.get('/fetchAllOpenTrade', [
 router.get('/fetchAllHistoryTrade', [
   accountsController.fetchAllHistoryTrade
 ])
+
 router.get('/fetchLastUpdatedTime',[
   accountsController.fetchLastUpdatedTime
 ])
-router.get('/RelatableData',[
-  accountsController.RelatableData
-])
+
 router.get('/fetchStatusData',[
   accountsController.fetchStatusData
 ])
 
-// router.get('/explosureData',[
-//   accountsController.explosureData
-// ])
 module.exports = router;

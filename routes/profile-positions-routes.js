@@ -2,18 +2,18 @@
 
 var express = require('express');
 var router = express.Router();
-var whatAmCalculatingController = require("../controllers").whatAmCalculatingController;
+var profilePositionsController = require("../controllers").profilePositionsController;
 
 router.get('/calculatingOpenTrade', [
-    whatAmCalculatingController.calculatingOpenTrade
+    profilePositionsController.calculatingOpenTrade
   ]);
   
   router.get('/calculatingHistoryTrade', [
-    whatAmCalculatingController.calculatingHistoryTrade
+    profilePositionsController.calculatingHistoryTrade
   ]);
 
   router.get('/calculatingCommission', [
-    whatAmCalculatingController.calculatingCommission
+    profilePositionsController.calculatingCommission
   ]);
 
   module.exports = router;

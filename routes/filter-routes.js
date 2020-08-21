@@ -8,6 +8,7 @@ var filterController = require('../controllers').filterController;
 router.post('/addfilterdata', [
   filterController.addFilterData
 ]);
+
 router.get('/fetchfilterdata', [
   filterController.fetchFilterData
 ]);
@@ -15,9 +16,6 @@ router.get('/fetchfilterdata', [
 router.get('/fetchActivefilterdata', [
   filterController.fetchActivefilterdata
 ]);
-// router.get('/updateCustomDeposite/:account_id', [
-//   filterController.getData
-// ]);
 
 router.post('/updatefilterdata', [
   filterController.updateFilterData
