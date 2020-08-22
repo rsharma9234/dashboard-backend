@@ -4,6 +4,8 @@ const models = require("../models");
 const symbolModel = models.symbol;
 const openOrderModel = models.open_order;
 const historyOrderModel = models.history_order;
+const accountsDetailModel = models.accounts_detail;
+
 
 const openTrade = async (
   {
@@ -114,17 +116,31 @@ const openTrade = async (
             openOrderItem.profit;
         }
         openOrderFromInfo = openOrderInfos;
-        let symbol = openOrderFromInfo.map((item) => item.symbol);
 
+        let symbol = openOrderFromInfo.map((item) => item.symbol);
+        
         let symbolInfo = await symbolModel.findAll({
           where: { name: symbol },
           raw: true,
         });
         openOrderFromInfo.map((item) => {
           item.contract_size = symbolInfo[0].contract_size;
-          item.margin_currency = symbolInfo[0].margin_currency;
+          
           return item;
         });
+        //
+        let currency = openOrderFromInfo.map((item) => item.account_id);
+        let currencyInfo = await accountsDetailModel.findAll({
+          where: { account_id: currency },
+          raw: true,
+        });
+        console.log(currencyInfo, " --------------------->")
+        openOrderFromInfo.map((item) => {
+          item.margin_currency = currencyInfo[0].currency;
+
+          return item;
+        });
+
       }
     }
   } else if (fromsymbols && fromsymbols.length > 0) {
@@ -209,7 +225,18 @@ const openTrade = async (
         });
         openOrderFromInfo.map((item) => {
           item.contract_size = symbolInfo[0].contract_size;
-          item.margin_currency = symbolInfo[0].margin_currency;
+          return item;
+        });
+
+        // let currency = openOrderFromInfo.map((item) => item.account_id);
+        let currencyInfo = await accountsDetailModel.findAll({
+          where: { account_id: currency },
+          raw: true,
+        });
+        console.log(currencyInfo, " --------------------->")
+        openOrderFromInfo.map((item) => {
+          item.margin_currency = currencyInfo[0].currency;
+
           return item;
         });
       }
@@ -311,7 +338,19 @@ const openTrade = async (
         });
         openOrderToInfo.map((item) => {
           item.contract_size = symbolINfoTo[0].contract_size;
-          item.margin_currency = symbolINfoTo[0].margin_currency;
+      
+          return item;
+        });
+
+        //
+        let currency = openOrderToInfo.map((item) => item.account_id);
+        let currencyInfo = await accountsDetailModel.findAll({
+          where: { account_id: currency },
+          raw: true,
+        });
+        openOrderToInfo.map((item) => {
+          item.margin_currency = currencyInfo[0].currency;
+
           return item;
         });
       }
@@ -401,6 +440,18 @@ const openTrade = async (
           item.margin_currency = symbolINfoTo[0].margin_currency;
           return item;
         });
+        //
+        let currency = openOrderToInfo.map((item) => item.account_id);
+        let currencyInfo = await accountsDetailModel.findAll({
+          where: { account_id: currency },
+          raw: true,
+        });
+        openOrderToInfo.map((item) => {
+          item.margin_currency = currencyInfo[0].currency;
+
+          return item;
+        });
+        
       }
     }
   }
@@ -533,7 +584,18 @@ const commonHistory = async (
         });
         openOrderFromInfo.map((item) => {
           item.contract_size = symbolInfo[0].contract_size;
-          item.margin_currency = symbolInfo[0].margin_currency;
+          return item;
+        });
+
+        //
+        let currency = openOrderFromInfo.map((item) => item.account_id);
+        let currencyInfo = await accountsDetailModel.findAll({
+          where: { account_id: currency },
+          raw: true,
+        });
+        openOrderFromInfo.map((item) => {
+          item.margin_currency = currencyInfo[0].currency;
+
           return item;
         });
       }
@@ -619,7 +681,17 @@ const commonHistory = async (
         });
         openOrderFromInfo.map((item) => {
           item.contract_size = symbolInfo[0].contract_size;
-          item.margin_currency = symbolInfo[0].margin_currency;
+          return item;
+        });
+
+        let currency = openOrderFromInfo.map((item) => item.account_id);
+        let currencyInfo = await accountsDetailModel.findAll({
+          where: { account_id: currency },
+          raw: true,
+        });
+        openOrderFromInfo.map((item) => {
+          item.margin_currency = currencyInfo[0].currency;
+
           return item;
         });
       }
@@ -720,7 +792,17 @@ const commonHistory = async (
         });
         openOrderToInfo.map((item) => {
           item.contract_size = symbolINfoTo[0].contract_size;
-          item.margin_currency = symbolINfoTo[0].margin_currency;
+          return item;
+        });
+        //
+        let currency = openOrderToInfo.map((item) => item.account_id);
+        let currencyInfo = await accountsDetailModel.findAll({
+          where: { account_id: currency },
+          raw: true,
+        });
+        openOrderToInfo.map((item) => {
+          item.margin_currency = currencyInfo[0].currency;
+
           return item;
         });
       }
@@ -810,6 +892,17 @@ const commonHistory = async (
           item.margin_currency = symbolINfoTo[0].margin_currency;
           return item;
         });
+      //
+      let currency = openOrderToInfo.map((item) => item.account_id);
+      let currencyInfo = await accountsDetailModel.findAll({
+        where: { account_id: currency },
+        raw: true,
+      });
+      openOrderToInfo.map((item) => {
+        item.margin_currency = currencyInfo[0].currency;
+
+        return item;
+      });
       }
     }
   }
