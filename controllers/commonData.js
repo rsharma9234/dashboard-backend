@@ -939,137 +939,135 @@ const statusData = async ({
   enddateFrom,
   startdateTo,
   enddateTo,
-}) => {
+  }) => {
   //Check Include Exclude Status And Symbols For Account "From"
-  let fromNumb;
-  let toNumb;
   if (from_include_exclude != 0) {
-    let forIncludeExclude;
-    if (from_include_exclude == 2) {
-      forIncludeExclude = {
-        [Op.notIn]: frommagicAccount,
-      };
-    } else {
-      forIncludeExclude = {
-        [Op.in]: frommagicAccount,
-      };
-    }
-    fromNumb = await openOrderModel.findAll({
-      attributes: [
-        "order_type",
-        [Sequelize.literal("SUM(lots)"), "lots"],
-        "symbol",
-      ],
-      where: {
-        account_id: fromAccountId,
-        magic_number: forIncludeExclude,
-        symbol: {
-          [Op.in]: fromsymbols,
-        },
-        open_time: {
-          [Op.gte]: startdateFrom,
-          [Op.lt]: enddateFrom,
-        },
-      },
-      group: "symbol",
-      limit: 1,
-      raw: true,
-    });
-
-    fromSymbolInfo = await symbolModel.findAll({
-      where: {
-        name: fromNumb[0].symbol,
-        login: fromAccountInfo.login,
-      },
-      raw: true,
-    });
+  let forIncludeExclude;
+  if (from_include_exclude == 2) {
+  forIncludeExclude = {
+  [Op.notIn]: frommagicAccount,
+  };
   } else {
-    toOpenOrderInfos = await openOrderModel.findAll({
-      attributes: ["order_type", [Sequelize.literal("SUM(lots)"), "lots"]],
-      where: {
-        account_id: fromAccountInfo.id,
-        symbol: fromsymbols[0],
-        open_time: {
-          [Op.gte]: startdateTo,
-          [Op.lt]: enddateTo,
-        },
-      },
-      raw: true,
-    });
-    fromSymbolInfo = await symbolModel.findAll({
-      where: { name: fromsymbols[0], login: fromAccountInfo.login },
-      raw: true,
-    });
+  forIncludeExclude = {
+  [Op.in]: frommagicAccount,
+  };
+  }
+  fromOpenOrderInfos = await openOrderModel.findAll({
+  attributes: [
+  "order_type",
+  [Sequelize.literal("SUM(lots)"), "lots"],
+  "symbol",
+  ],
+  where: {
+  account_id: fromAccountId,
+  magic_number: forIncludeExclude,
+  symbol: {
+  [Op.in]: fromsymbols,
+  },
+  open_time: {
+  [Op.gte]: startdateFrom,
+  [Op.lt]: enddateFrom,
+  },
+  },
+  group: "symbol",
+  limit: 1,
+  raw: true,
+  });
+  
+  fromSymbolInfo = await symbolModel.findAll({
+  where: {
+  name: fromOpenOrderInfos[0].symbol,
+  login: fromAccountInfo.login,
+  },
+  raw: true,
+  });
+  } else {
+  fromOpenOrderInfos = await openOrderModel.findAll({
+  attributes: ["order_type", [Sequelize.literal("SUM(lots)"), "lots"]],
+  where: {
+  account_id: fromAccountInfo.id,
+  symbol: fromsymbols[0],
+  open_time: {
+  [Op.gte]: startdateTo,
+  [Op.lt]: enddateTo,
+  },
+  },
+  raw: true,
+  });
+  fromSymbolInfo = await symbolModel.findAll({
+  where: { name: fromsymbols[0], login: fromAccountInfo.login },
+  raw: true,
+  });
   }
   //Check Include Exclude Status And Symbols For Account "To"
   if (to_include_exclude != 0) {
-    let forIncludeExclude;
-
-    if (to_include_exclude == 2) {
-      forIncludeExclude = {
-        [Op.notIn]: tomagicAccount,
-      };
-    } else {
-      forIncludeExclude = {
-        [Op.in]: tomagicAccount,
-      };
-    }
-    toNumb = await openOrderModel.findAll({
-      attributes: [
-        "order_type",
-        [Sequelize.literal("SUM(lots)"), "lots"],
-        "symbol",
-      ],
-      where: {
-        account_id: toAccountId,
-        magic_number: forIncludeExclude,
-        symbol: {
-          [Op.in]: tosymbols,
-        },
-        open_time: {
-          [Op.gte]: startdateTo,
-          [Op.lt]: enddateTo,
-        },
-      },
-      group: "symbol",
-      limit: 1,
-      raw: true,
-    });
-    toSymbolInfo = await symbolModel.findAll({
-      where: {
-        name: toNumb[0].symbol,
-        login: toAccountInfo.login,
-      },
-      raw: true,
-    });
+  let forIncludeExclude;
+  
+  if (to_include_exclude == 2) {
+  forIncludeExclude = {
+  [Op.notIn]: tomagicAccount,
+  };
   } else {
-    toOpenOrderInfos = await openOrderModel.findAll({
-      attributes: ["order_type", [Sequelize.literal("SUM(lots)"), "lots"]],
-      where: {
-        account_id: toAccountInfo.id,
-        symbol: tosymbols[0],
-        open_time: {
-          [Op.gte]: startdateTo,
-          [Op.lt]: enddateTo,
-        },
-      },
-      raw: true,
-    });
-    toSymbolInfo = await symbolModel.findAll({
-      where: { name: tosymbols[0], login: toAccountInfo.login },
-      raw: true,
-    });
+  forIncludeExclude = {
+  [Op.in]: tomagicAccount,
+  };
+  }
+  toOpenOrderInfos = await openOrderModel.findAll({
+  attributes: [
+  "order_type",
+  [Sequelize.literal("SUM(lots)"), "lots"],
+  "symbol",
+  ],
+  where: {
+  account_id: toAccountId,
+  magic_number: forIncludeExclude,
+  symbol: {
+  [Op.in]: tosymbols,
+  },
+  open_time: {
+  [Op.gte]: startdateTo,
+  [Op.lt]: enddateTo,
+  },
+  },
+  group: "symbol",
+  limit: 1,
+  raw: true,
+  });
+  toSymbolInfo = await symbolModel.findAll({
+  where: {
+  name: toOpenOrderInfos[0].symbol,
+  login: toAccountInfo.login,
+  },
+  raw: true,
+  });
+  } else {
+  toOpenOrderInfos = await openOrderModel.findAll({
+  attributes: ["order_type", [Sequelize.literal("SUM(lots)"), "lots"]],
+  where: {
+  account_id: toAccountInfo.id,
+  symbol: tosymbols[0],
+  open_time: {
+  [Op.gte]: startdateTo,
+  [Op.lt]: enddateTo,
+  },
+  },
+  raw: true,
+  });
+  toSymbolInfo = await symbolModel.findAll({
+  where: { name: tosymbols[0], login: toAccountInfo.login },
+  raw: true,
+  });
   }
   return (response = {
-    fromAccountInfo: fromAccountInfo,
-    fromSymbolInfo: fromSymbolInfo.length > 0 ? fromSymbolInfo[0] : {},
-    toAccountInfo: toAccountInfo,
-    toSymbolInfo: toSymbolInfo.length > 0 ? toSymbolInfo[0] : {},
-    fromOpenOrderInfos:
-      fromNumb !== undefined && fromNumb.length > 0 ? fromNumb : [],
-    toOpenOrderInfos: toNumb !== undefined && toNumb.length > 0 ? toNumb : [],
+  fromAccountInfo: fromAccountInfo,
+  fromSymbolInfo: fromSymbolInfo.length > 0 ? fromSymbolInfo[0] : {},
+  toAccountInfo: toAccountInfo,
+  toSymbolInfo: toSymbolInfo.length > 0 ? toSymbolInfo[0] : {},
+  fromOpenOrderInfos:
+  fromOpenOrderInfos !== undefined && fromOpenOrderInfos.length > 0 ? fromOpenOrderInfos : [],
+  toOpenOrderInfos: toOpenOrderInfos !== undefined && toOpenOrderInfos.length > 0 ? toOpenOrderInfos : [],
   });
-};
+  };
 
 module.exports = {
   openTrade,
