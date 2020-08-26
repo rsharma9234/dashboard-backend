@@ -121,6 +121,7 @@ const openTrade = async (
 
         let symbolInfo = await symbolModel.findAll({
           where: { name: symbol },
+          limit:1,
           raw: true,
         });
         openOrderFromInfo.map((item) => {
@@ -221,6 +222,7 @@ const openTrade = async (
 
         let symbolInfo = await symbolModel.findAll({
           where: { name: symbol },
+          limit:1,
           raw: true,
         });
         openOrderFromInfo.map((item) => {
@@ -334,6 +336,7 @@ const openTrade = async (
 
         let symbolINfoTo = await symbolModel.findAll({
           where: { name: symbolTo },
+          limit:1,
           raw: true,
         });
         openOrderToInfo.map((item) => {
@@ -433,6 +436,7 @@ const openTrade = async (
 
         let symbolINfoTo = await symbolModel.findAll({
           where: { name: symbolTo },
+          limit:1,
           raw: true,
         });
         openOrderToInfo.map((item) => {
@@ -580,6 +584,7 @@ const commonHistory = async (
         let symbol = openOrderFromInfo.map((item) => item.symbol);
         let symbolInfo = await symbolModel.findAll({
           where: { name: symbol },
+          limit:1,
           raw: true,
         });
         openOrderFromInfo.map((item) => {
@@ -677,6 +682,7 @@ const commonHistory = async (
         let symbol = openOrderFromInfo.map((item) => item.symbol);
         let symbolInfo = await symbolModel.findAll({
           where: { name: symbol },
+          limit:1,
           raw: true,
         });
         openOrderFromInfo.map((item) => {
@@ -788,6 +794,7 @@ const commonHistory = async (
         let symbolTo = openOrderToInfo.map((item) => item.symbol);
         let symbolINfoTo = await symbolModel.findAll({
           where: { name: symbolTo },
+          limit:1,
           raw: true,
         });
         openOrderToInfo.map((item) => {
@@ -885,6 +892,7 @@ const commonHistory = async (
         let symbolTo = openOrderToInfo.map((item) => item.symbol);
         let symbolINfoTo = await symbolModel.findAll({
           where: { name: symbolTo },
+          limit:1,
           raw: true,
         });
         openOrderToInfo.map((item) => {
