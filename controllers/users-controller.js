@@ -43,6 +43,12 @@ const addUser = async (req, res, next) => {
       },
       raw: true,
     });
+    // if(accountModel.comparePassword(req.body.password, accountOneInfo.password)){
+    //   return true
+    // }
+    // if(req.body.password === accountOneInfo.password){
+    //   return true
+    // }
     if (accountOneInfo) {
       if (accountOneInfo.status === 0) {
         return res.status(200).json({ status: true });
