@@ -982,7 +982,10 @@ const statusData = async ({
       limit: 1,
       raw: true,
     });
+    console.log(fromOpenOrderInfos, '11==========>');
+
 console.log(new Date(), 'fs1----------->')
+if(fromOpenOrderInfos.length > 0){
     fromSymbolInfo = await symbolModel.findAll({
       where: {
         name: fromOpenOrderInfos[0].symbol,
@@ -990,7 +993,7 @@ console.log(new Date(), 'fs1----------->')
       },
       limit:1,
       raw: true,
-    });
+    });}
     console.log(new Date(), 'fs2----------->')
   } else {
     console.log(new Date(), '2----------->')
@@ -1006,12 +1009,15 @@ console.log(new Date(), 'fs1----------->')
       },
       raw: true,
     });
+    console.log(fromOpenOrderInfos, '22==========>');
+
     console.log(new Date(), 'fs3----------->')
+    if(fromOpenOrderInfos.length > 0){
     fromSymbolInfo = await symbolModel.findAll({
       where: { name: fromsymbols[0], login: fromAccountInfo.login },
       limit:1,
       raw: true,
-    });
+    });}
     console.log(new Date(), 'fs4----------->')
   }
   //Check Include Exclude Status And Symbols For Account "To"
@@ -1049,7 +1055,9 @@ console.log(new Date(), 'fs1----------->')
       limit: 1,
       raw: true,
     });
+    console.log(toOpenOrderInfos, '33==========>');
     console.log(new Date(), 'ts1----------->')
+    if(toOpenOrderInfos.length > 0){
     toSymbolInfo = await symbolModel.findAll({
       where: {
         name: toOpenOrderInfos[0].symbol,
@@ -1057,7 +1065,7 @@ console.log(new Date(), 'fs1----------->')
       },
       limit:1,
       raw: true,
-    });
+    });}
     console.log(new Date(), 'ts2----------->')
   } else {
     console.log(new Date(), '4----------->')
@@ -1073,12 +1081,14 @@ console.log(new Date(), 'fs1----------->')
       },
       raw: true,
     });
+    console.log(toOpenOrderInfos, '44==========>');
     console.log(new Date(), 'ts3----------->')
+    if(toOpenOrderInfos.length > 0){
     toSymbolInfo = await symbolModel.findAll({
       where: { name: tosymbols[0], login: toAccountInfo.login },
       limit:1,
       raw: true,
-    });
+    });}
     console.log(new Date(), 'ts4----------->')
   }
   return (response = {
