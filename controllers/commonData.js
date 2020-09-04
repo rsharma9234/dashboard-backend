@@ -230,7 +230,7 @@ const openTrade = async (
           return item;
         });
 
-        // let currency = openOrderFromInfo.map((item) => item.account_id);
+        let currency = openOrderFromInfo.map((item) => item.account_id);
         let currencyInfo = await accountsDetailModel.findAll({
           where: { account_id: currency },
           raw: true,
