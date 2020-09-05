@@ -45,12 +45,12 @@ const addUser = async (req, res, next) => {
     });
     
     if (accountOneInfo) {
-      if(accountModel.comparePassword(req.body.password, accountOneInfo.password)){
-        return res.status(200).json({ message: "already exists", status: "500" });
-      }
-      if(req.body.password === accountOneInfo.password){
-        return res.status(200).json({ message: "already exists", status: "500" });
-      }
+      // if(accountModel.comparePassword(req.body.password, accountOneInfo.password)){
+      //   return res.status(200).json({ message: "already exists", status: "500" });
+      // }
+      // if(req.body.password === accountOneInfo.password){
+      //   return res.status(200).json({ message: "already exists", status: "500" });
+      // }
       if (accountOneInfo.status === 0) {
         return res.status(200).json({ status: true });
       }
