@@ -5,6 +5,7 @@ const filterModel = models.filtered_profile;
 const accountModel = models.account;
 const accountsDetailModel = models.accounts_detail;
 const CustomSwapModel = models.custom_swap;
+const dailySwapModel = models.daily_swap;
 
 const addFilterData = async (req, res, next) => {
   try {
@@ -237,6 +238,20 @@ const updateFilterDataFull = async (req, res, next) => {
   }
 };
 
+const fetchDailySwaps = async (req, res, next) => {
+  try {
+    let dailySwaps = await dailySwapModel.findAll({
+      raw: true,
+    });
+    if (dailySwaps) {
+      return res.status(200).json({ rows: dailySwaps });
+    }
+    return res.status(200).json({ rows: [] });
+  } catch (err) {
+    return res.status(err.status || 500).json(err);
+  }
+};
+
 module.exports = {
   addFilterData,
   fetchFilterData,
@@ -244,4 +259,5 @@ module.exports = {
   deleteFilter,
   updateFilterDataFull,
   fetchActivefilterdata,
+  fetchDailySwaps
 };
