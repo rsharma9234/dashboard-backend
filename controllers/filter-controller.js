@@ -241,6 +241,7 @@ const updateFilterDataFull = async (req, res, next) => {
 const fetchDailySwaps = async (req, res, next) => {
   try {
     let dailySwaps = await dailySwapModel.findAll({
+      order: [['date', 'desc']],
       raw: true,
     });
     if (dailySwaps) {

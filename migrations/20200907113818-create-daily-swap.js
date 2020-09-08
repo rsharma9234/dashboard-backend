@@ -21,10 +21,10 @@ module.exports = {
         type: Sequelize.STRING
       },
       swap_long: {
-        type: Sequelize.INTEGER
+        type: Sequelize.DOUBLE
       },
       swap_short: {
-        type: Sequelize.INTEGER
+        type: Sequelize.DOUBLE
       },
       // createdAt: {
       //   allowNull: false,

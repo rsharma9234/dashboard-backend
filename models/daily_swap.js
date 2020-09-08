@@ -18,8 +18,8 @@ module.exports = (sequelize, DataTypes) => {
     account_login: DataTypes.STRING,
     profile_id: DataTypes.INTEGER,
     symbol: DataTypes.STRING,
-    swap_long: DataTypes.INTEGER,
-    swap_short: DataTypes.INTEGER
+    swap_long: DataTypes.DOUBLE,
+    swap_short: DataTypes.DOUBLE
   }, {
     createdAt: false,
     updatedAt: false,
