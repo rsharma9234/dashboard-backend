@@ -26,6 +26,9 @@ router.post('/deletefilter', [
 router.post('/updatefilterdatafull', [
   filterController.updateFilterDataFull
 ]);
+router.get('/fetchdailyswaps', [
+  filterController.fetchDailySwaps
+]);
 
 
 

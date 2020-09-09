@@ -5,7 +5,8 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var compression = require('compression')
 var indexRouter = require('./routes/index');
-
+var cron = require('node-cron');
+var {cronSwapValues} = require('./cron_job')
 var app = express();
 
 // view engine setup
@@ -53,6 +54,10 @@ app.use(function (err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
+});
+
+cron.schedule('0 16 */1 */1 *', function () {
+  cronSwapValues()
 });
 
 module.exports = app;
