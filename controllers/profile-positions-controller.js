@@ -34,11 +34,11 @@ const calculatingOpenTrade = async (req, res, next) => {
 
       let fromAccountId = filteredInfo.from_account_id;
       let fromsymbols = JSON.parse(filteredInfo.from_symbols);
-      let startdateFrom = filteredInfo.startdateFrom;
-      let enddateFrom =
-        filteredInfo.enddateFrom == null || filteredInfo.enddateFrom == ""
-          ? new Date()
-          : filteredInfo.enddateFrom;
+      // let startdateFrom = filteredInfo.startdateFrom;
+      // let enddateFrom =
+      //   filteredInfo.enddateFrom == null || filteredInfo.enddateFrom == ""
+      //     ? new Date()
+      //     : filteredInfo.enddateFrom;
 
       let tomagicAccount =
         filteredInfo.to_magic_number != "" &&
@@ -51,11 +51,11 @@ const calculatingOpenTrade = async (req, res, next) => {
 
       let toAccountId = filteredInfo.to_account_id;
       let tosymbols = JSON.parse(filteredInfo.to_symbols);
-      let startdateTo = filteredInfo.startdateTo;
-      let enddateTo =
-        filteredInfo.enddateTo == null || filteredInfo.enddateTo == ""
-          ? new Date()
-          : filteredInfo.enddateTo;
+      // let startdateTo = filteredInfo.startdateTo;
+      // let enddateTo =
+      //   filteredInfo.enddateTo == null || filteredInfo.enddateTo == ""
+      //     ? new Date()
+      //     : filteredInfo.enddateTo;
       let to_include_exclude = filteredInfo.to_include_exclude_status;
       let from_include_exclude = filteredInfo.from_include_exclude_status;
       let newRecord = accountInfo.filter((rec) => rec.id == fromAccountId);
@@ -76,15 +76,15 @@ const calculatingOpenTrade = async (req, res, next) => {
           {
             fromAccountId,
             fromsymbols,
-            startdateFrom,
-            enddateFrom,
+            // startdateFrom,
+            // enddateFrom,
             frommagicAccount,
             from_include_exclude,
             CustomSwap,
             toAccountId,
             tosymbols,
-            startdateTo,
-            enddateTo,
+            // startdateTo,
+            // enddateTo,
             tomagicAccount,
             to_include_exclude,
             totalOfFromOpenOrder,
