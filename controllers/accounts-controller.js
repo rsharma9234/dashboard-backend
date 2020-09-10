@@ -61,11 +61,11 @@ const fetchAllOpenTrade = async (req, res, next) => {
       //Account "From" Detail
       let fromAccountId = filteredInfo.from_account_id;
       let fromsymbols = JSON.parse(filteredInfo.from_symbols);
-      let startdateFrom = filteredInfo.startdateFrom;
-      let enddateFrom =
-        filteredInfo.enddateFrom == null || filteredInfo.enddateFrom == ""
-          ? new Date()
-          : filteredInfo.enddateFrom;
+      // let startdateFrom = filteredInfo.startdateFrom;
+      // let enddateFrom =
+      //   filteredInfo.enddateFrom == null || filteredInfo.enddateFrom == ""
+      //     ? new Date()
+      //     : filteredInfo.enddateFrom;
 
       let frommagicAccount =
         filteredInfo.from_magic_number != "" &&
@@ -76,11 +76,11 @@ const fetchAllOpenTrade = async (req, res, next) => {
       //Account "To" Detail
       let toAccountId = filteredInfo.to_account_id;
       let tosymbols = JSON.parse(filteredInfo.to_symbols);
-      let startdateTo = filteredInfo.startdateTo;
-      let enddateTo =
-        filteredInfo.enddateTo == null || filteredInfo.enddateTo == ""
-          ? new Date()
-          : filteredInfo.enddateTo;
+      // let startdateTo = filteredInfo.startdateTo;
+      // let enddateTo =
+      //   filteredInfo.enddateTo == null || filteredInfo.enddateTo == ""
+      //     ? new Date()
+      //     : filteredInfo.enddateTo;
 
       let tomagicAccount =
         filteredInfo.to_magic_number != "" &&
@@ -106,15 +106,15 @@ const fetchAllOpenTrade = async (req, res, next) => {
           {
             fromAccountId,
             fromsymbols,
-            startdateFrom,
-            enddateFrom,
+            // startdateFrom,
+            // enddateFrom,
             frommagicAccount,
             from_include_exclude,
             CustomSwap,
             toAccountId,
             tosymbols,
-            startdateTo,
-            enddateTo,
+            // startdateTo,
+            // enddateTo,
             tomagicAccount,
             to_include_exclude,
           },

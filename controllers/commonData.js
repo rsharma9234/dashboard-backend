@@ -11,15 +11,15 @@ const openTrade = async (
   {
     fromAccountId,
     fromsymbols,
-    startdateFrom,
-    enddateFrom,
+    // startdateFrom,
+    // enddateFrom,
     frommagicAccount,
     from_include_exclude,
     CustomSwap,
     toAccountId,
     tosymbols,
-    startdateTo,
-    enddateTo,
+    // startdateTo,
+    // enddateTo,
     tomagicAccount,
     to_include_exclude,
     totalOfFromOpenOrder,
@@ -42,10 +42,10 @@ const openTrade = async (
         symbol: {
           [Op.in]: fromsymbols,
         },
-        open_time: {
-          [Op.gte]: startdateFrom,
-          [Op.lt]: enddateFrom,
-        },
+        // open_time: {
+        //   [Op.gte]: startdateFrom,
+        //   [Op.lt]: enddateFrom,
+        // },
       };
     } else {
       AllWhereConditions = {
@@ -56,10 +56,10 @@ const openTrade = async (
         symbol: {
           [Op.in]: fromsymbols,
         },
-        open_time: {
-          [Op.gte]: startdateFrom,
-          [Op.lt]: enddateFrom,
-        },
+        // open_time: {
+        //   [Op.gte]: startdateFrom,
+        //   [Op.lt]: enddateFrom,
+        // },
       };
     }
     let openOrderInfos;
@@ -163,10 +163,10 @@ const openTrade = async (
           symbol: {
             [Op.in]: fromsymbols,
           },
-          open_time: {
-            [Op.gte]: startdateFrom,
-            [Op.lt]: enddateFrom,
-          },
+          // open_time: {
+          //   [Op.gte]: startdateFrom,
+          //   [Op.lt]: enddateFrom,
+          // },
         },
         raw: true,
       });
@@ -177,10 +177,10 @@ const openTrade = async (
           symbol: {
             [Op.in]: fromsymbols,
           },
-          open_time: {
-            [Op.gte]: startdateFrom,
-            [Op.lt]: enddateFrom,
-          },
+          // open_time: {
+          //   [Op.gte]: startdateFrom,
+          //   [Op.lt]: enddateFrom,
+          // },
         },
         order: [["open_time", "DESC"]],
         raw: true,
@@ -258,10 +258,10 @@ const openTrade = async (
         symbol: {
           [Op.in]: tosymbols,
         },
-        open_time: {
-          [Op.gte]: startdateTo,
-          [Op.lt]: enddateTo,
-        },
+        // open_time: {
+        //   [Op.gte]: startdateTo,
+        //   [Op.lt]: enddateTo,
+        // },
       };
     } else {
       AllWhereConditions = {
@@ -272,10 +272,10 @@ const openTrade = async (
         symbol: {
           [Op.in]: tosymbols,
         },
-        open_time: {
-          [Op.gte]: startdateTo,
-          [Op.lt]: enddateTo,
-        },
+        // open_time: {
+        //   [Op.gte]: startdateTo,
+        //   [Op.lt]: enddateTo,
+        // },
       };
     }
     let openOrderInfos;
@@ -376,10 +376,10 @@ const openTrade = async (
           symbol: {
             [Op.in]: tosymbols,
           },
-          open_time: {
-            [Op.gte]: startdateTo,
-            [Op.lt]: enddateTo,
-          },
+          // open_time: {
+          //   [Op.gte]: startdateTo,
+          //   [Op.lt]: enddateTo,
+          // },
         },
         raw: true,
       });
@@ -390,10 +390,10 @@ const openTrade = async (
           symbol: {
             [Op.in]: tosymbols,
           },
-          open_time: {
-            [Op.gte]: startdateTo,
-            [Op.lt]: enddateTo,
-          },
+          // open_time: {
+          //   [Op.gte]: startdateTo,
+          //   [Op.lt]: enddateTo,
+          // },
         },
         order: [["open_time", "DESC"]],
         raw: true,
