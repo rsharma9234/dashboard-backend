@@ -158,7 +158,7 @@ const updateFilterData = async (req, res, next) => {
 
         return data;
       });
-
+console.log(newInfo,'----------====>');
       return res.status(200).json({ rows: newInfo });
     }
   } catch (err) {
@@ -201,6 +201,8 @@ const updateFilterDataFull = async (req, res, next) => {
       auto_close,
       from_magic_number,
       to_magic_number,
+      from_ticket,
+      to_ticket,
       from_include_exclude_status,
       to_include_exclude_status,
     } = req.body;
@@ -224,6 +226,8 @@ const updateFilterDataFull = async (req, res, next) => {
           from_symbols: from_symbols,
           to_symbols: to_symbols,
           auto_close: auto_close,
+          from_ticket:from_ticket,
+          to_ticket: to_ticket,
           from_magic_number: from_magic_number,
           to_magic_number: to_magic_number,
           from_include_exclude_status: from_include_exclude_status,

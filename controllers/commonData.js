@@ -22,6 +22,8 @@ const openTrade = async (
     enddateTo,
     tomagicAccount,
     to_include_exclude,
+    fromticket,
+    toticket,
     totalOfFromOpenOrder,
     totalOfToOpenOrder,
     openOrderFromInfo,
@@ -38,6 +40,9 @@ const openTrade = async (
         account_id: fromAccountId,
         magic_number: {
           [Op.notIn]: frommagicAccount,
+        },
+        ticket: {
+          [Op.notIn]: fromticket,
         },
         symbol: {
           [Op.in]: fromsymbols,
@@ -255,6 +260,9 @@ const openTrade = async (
         magic_number: {
           [Op.notIn]: tomagicAccount,
         },
+        ticket: {
+          [Op.notIn]: toticket,
+        },
         symbol: {
           [Op.in]: tosymbols,
         },
@@ -350,6 +358,8 @@ const openTrade = async (
         let currencyInfo = await accountsDetailModel.findAll({
           where: { account_id: currency },
           raw: true,
+          fromticket,
+          toticket,
         });
         openOrderToInfo.map((item) => {
           item.margin_currency = currencyInfo[0].currency;
@@ -492,6 +502,8 @@ const commonHistory = async (
     openOrderToInfo,
     totalOfFromHistoryOrder,
     totalOfToHistoryOrder,
+    fromticket,
+    toticket,
   },
   fromRequest
 ) => {
@@ -503,6 +515,9 @@ const commonHistory = async (
         account_id: fromAccountId,
         magic_number: {
           [Op.notIn]: frommagicAccount,
+        },
+        ticket: {
+          [Op.notIn]: fromticket,
         },
         symbol: {
           [Op.in]: fromsymbols,
@@ -714,6 +729,9 @@ const commonHistory = async (
         magic_number: {
           [Op.in]: tomagicAccount,
         },
+        ticket: {
+          [Op.notIn]: toticket,
+        },
         symbol: {
           [Op.in]: tosymbols,
         },
@@ -749,7 +767,9 @@ const commonHistory = async (
           [Sequelize.literal("SUM(profit)"), "profit"],
           [Sequelize.literal("SUM(profit+commission+taxes+swap)"), "total"],
         ],
-        where: AllWhereConditions,
+        where: AllWhereConditions, ticket: {
+          [Op.notIn]: toticket,
+        },
         raw: true,
       });
     } else if (fromRequest == "whatAmCalculating") {
@@ -947,14 +967,21 @@ const statusData = async ({
   enddateFrom,
   startdateTo,
   enddateTo,
+  fromticket,
+  toticket,
 }) => {
   //Check Include Exclude Status And Symbols For Account "From"
   if (from_include_exclude != 0) {
     let forIncludeExclude;
-    if (from_include_exclude == 2) {
+    let forIncludeExcludeticket;
+      if (from_include_exclude == 2) {
+         forIncludeExcludeticket = {
+          [Op.notIn]: fromticket
+      };
       forIncludeExclude = {
         [Op.notIn]: frommagicAccount,
       };
+      
     } else {
       forIncludeExclude = {
         [Op.in]: frommagicAccount,
@@ -970,6 +997,7 @@ const statusData = async ({
       where: {
         account_id: fromAccountId,
         magic_number: forIncludeExclude,
+        ticket: forIncludeExcludeticket,
         symbol: {
           [Op.in]: fromsymbols,
         },
@@ -985,7 +1013,7 @@ const statusData = async ({
     console.log(fromOpenOrderInfos, '11==========>');
 
 console.log(new Date(), 'fs1----------->')
-if(fromOpenOrderInfos.length > 0){
+if(fromOpenOrderInfos  && fromOpenOrderInfos.length > 0){
     fromSymbolInfo = await symbolModel.findAll({
       where: {
         name: fromOpenOrderInfos[0].symbol,
@@ -1012,7 +1040,7 @@ if(fromOpenOrderInfos.length > 0){
     console.log(fromOpenOrderInfos, '22==========>');
 
     console.log(new Date(), 'fs3----------->')
-    if(fromOpenOrderInfos.length > 0){
+    if(fromOpenOrderInfos && fromOpenOrderInfos.length > 0){
     fromSymbolInfo = await symbolModel.findAll({
       where: { name: fromsymbols[0], login: fromAccountInfo.login },
       limit:1,
@@ -1023,8 +1051,11 @@ if(fromOpenOrderInfos.length > 0){
   //Check Include Exclude Status And Symbols For Account "To"
   if (to_include_exclude != 0) {
     let forIncludeExclude;
-
+let forIncludeExcludeticket;
     if (to_include_exclude == 2) {
+      forIncludeExcludeticket = {
+        [Op.notIn]: toticket
+    };
       forIncludeExclude = {
         [Op.notIn]: tomagicAccount,
       };
@@ -1057,7 +1088,7 @@ if(fromOpenOrderInfos.length > 0){
     });
     console.log(toOpenOrderInfos, '33==========>');
     console.log(new Date(), 'ts1----------->')
-    if(toOpenOrderInfos.length > 0){
+    if(toOpenOrderInfos && toOpenOrderInfos.length > 0){
     toSymbolInfo = await symbolModel.findAll({
       where: {
         name: toOpenOrderInfos[0].symbol,
@@ -1083,7 +1114,7 @@ if(fromOpenOrderInfos.length > 0){
     });
     console.log(toOpenOrderInfos, '44==========>');
     console.log(new Date(), 'ts3----------->')
-    if(toOpenOrderInfos.length > 0){
+    if(toOpenOrderInfos && toOpenOrderInfos.length > 0){
     toSymbolInfo = await symbolModel.findAll({
       where: { name: tosymbols[0], login: toAccountInfo.login },
       limit:1,

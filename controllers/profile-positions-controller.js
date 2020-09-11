@@ -48,6 +48,14 @@ const calculatingOpenTrade = async (req, res, next) => {
         filteredInfo.from_magic_number != "" &&
         filteredInfo.from_magic_number != null &&
         JSON.parse(filteredInfo.from_magic_number);
+        let toticket =
+        filteredInfo.to_ticket != "" &&
+        filteredInfo.to_ticket != null &&
+        JSON.parse(filteredInfo.to_ticket);
+        let fromticket =
+        filteredInfo.from_ticket != "" &&
+        filteredInfo.from_ticket != null &&
+        JSON.parse(filteredInfo.from_ticket);
 
       let toAccountId = filteredInfo.to_account_id;
       let tosymbols = JSON.parse(filteredInfo.to_symbols);
@@ -91,6 +99,8 @@ const calculatingOpenTrade = async (req, res, next) => {
             totalOfToOpenOrder,
             openOrderFromInfo,
             openOrderToInfo,
+            fromticket,
+            toticket,
           },
           "whatAmCalculating"
         )
@@ -163,6 +173,14 @@ const calculatingHistoryTrade = async (req, res, next) => {
         filteredInfo.from_magic_number != "" &&
         filteredInfo.from_magic_number != null &&
         JSON.parse(filteredInfo.from_magic_number);
+        let toticket =
+        filteredInfo.to_ticket != "" &&
+        filteredInfo.to_ticket != null &&
+        JSON.parse(filteredInfo.to_ticket);
+        let fromticket =
+        filteredInfo.from_ticket != "" &&
+        filteredInfo.from_ticket != null &&
+        JSON.parse(filteredInfo.from_ticket);
       let startdateFrom = filteredInfo.startdateFrom;
       let enddateFrom =
         filteredInfo.enddateFrom == null || filteredInfo.enddateFrom == ""
@@ -233,6 +251,8 @@ const calculatingHistoryTrade = async (req, res, next) => {
             openOrderToInfo,
             totalOfFromHistoryOrder,
             totalOfToHistoryOrder,
+            fromticket,
+            toticket,
           },
           "whatAmCalculating"
         )

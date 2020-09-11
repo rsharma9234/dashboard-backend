@@ -20,9 +20,11 @@ module.exports = (sequelize, DataTypes) => {
     commission_acount_id:DataTypes.INTEGER,
     from_magic_number : DataTypes.STRING,
     to_magic_number:DataTypes.STRING,
+    from_ticket : DataTypes.STRING,
+    to_ticket:DataTypes.STRING,
     from_include_exclude_status:DataTypes.INTEGER,
     to_include_exclude_status:DataTypes.INTEGER,
-   
+    
     startdateFrom: {
       type: DataTypes.DATE,
       default: new Date(),
