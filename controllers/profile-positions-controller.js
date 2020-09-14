@@ -48,6 +48,14 @@ const calculatingOpenTrade = async (req, res, next) => {
         filteredInfo.from_magic_number != "" &&
         filteredInfo.from_magic_number != null &&
         JSON.parse(filteredInfo.from_magic_number);
+      let toticket =
+        filteredInfo.to_ticket != "" &&
+        filteredInfo.to_ticket != null &&
+        JSON.parse(filteredInfo.to_ticket);
+      let fromticket =
+        filteredInfo.from_ticket != "" &&
+        filteredInfo.from_ticket != null &&
+        JSON.parse(filteredInfo.from_ticket);
 
       let toAccountId = filteredInfo.to_account_id;
       let tosymbols = JSON.parse(filteredInfo.to_symbols);
@@ -58,6 +66,10 @@ const calculatingOpenTrade = async (req, res, next) => {
       //     : filteredInfo.enddateTo;
       let to_include_exclude = filteredInfo.to_include_exclude_status;
       let from_include_exclude = filteredInfo.from_include_exclude_status;
+      let to_include_exclude_ticket =
+        filteredInfo.to_include_exclude_status_ticket;
+      let from_include_exclude_ticket =
+        filteredInfo.from_include_exclude_status_ticket;
       let newRecord = accountInfo.filter((rec) => rec.id == fromAccountId);
       let newToRecord = accountInfo.filter((rec) => rec.id == toAccountId);
 
@@ -91,6 +103,10 @@ const calculatingOpenTrade = async (req, res, next) => {
             totalOfToOpenOrder,
             openOrderFromInfo,
             openOrderToInfo,
+            fromticket,
+            toticket,
+            from_include_exclude_ticket,
+            to_include_exclude_ticket,
           },
           "whatAmCalculating"
         )
@@ -163,6 +179,14 @@ const calculatingHistoryTrade = async (req, res, next) => {
         filteredInfo.from_magic_number != "" &&
         filteredInfo.from_magic_number != null &&
         JSON.parse(filteredInfo.from_magic_number);
+      let toticket =
+        filteredInfo.to_ticket != "" &&
+        filteredInfo.to_ticket != null &&
+        JSON.parse(filteredInfo.to_ticket);
+      let fromticket =
+        filteredInfo.from_ticket != "" &&
+        filteredInfo.from_ticket != null &&
+        JSON.parse(filteredInfo.from_ticket);
       let startdateFrom = filteredInfo.startdateFrom;
       let enddateFrom =
         filteredInfo.enddateFrom == null || filteredInfo.enddateFrom == ""
@@ -181,6 +205,10 @@ const calculatingHistoryTrade = async (req, res, next) => {
       let newCommissionRecord = accountInfo.filter((rec) => rec.id == ml);
       let to_include_exclude = filteredInfo.to_include_exclude_status;
       let from_include_exclude = filteredInfo.from_include_exclude_status;
+      let to_include_exclude_ticket =
+        filteredInfo.to_include_exclude_status_ticket;
+      let from_include_exclude_ticket =
+        filteredInfo.from_include_exclude_status_ticket;
       let equity =
         newCommissionRecord && newCommissionRecord.length > 0
           ? newCommissionRecord[0].accounts_details[0].equity
@@ -233,6 +261,10 @@ const calculatingHistoryTrade = async (req, res, next) => {
             openOrderToInfo,
             totalOfFromHistoryOrder,
             totalOfToHistoryOrder,
+            fromticket,
+            toticket,
+            from_include_exclude_ticket,
+            to_include_exclude_ticket,
           },
           "whatAmCalculating"
         )

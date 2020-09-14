@@ -72,6 +72,12 @@ const fetchAllOpenTrade = async (req, res, next) => {
         filteredInfo.from_magic_number != null &&
         JSON.parse(filteredInfo.from_magic_number);
       let from_include_exclude = filteredInfo.from_include_exclude_status;
+      let fromticket =
+        filteredInfo.from_ticket != "" &&
+        filteredInfo.from_ticket != null &&
+        JSON.parse(filteredInfo.from_ticket);
+      let from_include_exclude_ticket =
+        filteredInfo.from_include_exclude_status_ticket;
 
       //Account "To" Detail
       let toAccountId = filteredInfo.to_account_id;
@@ -87,6 +93,12 @@ const fetchAllOpenTrade = async (req, res, next) => {
         filteredInfo.to_magic_number != null &&
         JSON.parse(filteredInfo.to_magic_number);
       let to_include_exclude = filteredInfo.to_include_exclude_status;
+      let toticket =
+        filteredInfo.to_ticket != "" &&
+        filteredInfo.to_ticket != null &&
+        JSON.parse(filteredInfo.to_ticket);
+      let to_include_exclude_ticket =
+        filteredInfo.to_include_exclude_status_ticket;
 
       let newRecord = accountInfo.filter((rec) => rec.id == fromAccountId);
       let newToRecord = accountInfo.filter((rec) => rec.id == toAccountId);
@@ -117,6 +129,10 @@ const fetchAllOpenTrade = async (req, res, next) => {
             // enddateTo,
             tomagicAccount,
             to_include_exclude,
+            fromticket,
+            toticket,
+            from_include_exclude_ticket,
+            to_include_exclude_ticket,
           },
           "account"
         )
@@ -218,7 +234,13 @@ const fetchAllHistoryTrade = async (req, res, next) => {
         filteredInfo.from_magic_number != "" &&
         filteredInfo.from_magic_number != null &&
         JSON.parse(filteredInfo.from_magic_number);
+      let fromticket =
+        filteredInfo.from_ticket != "" &&
+        filteredInfo.from_ticket != null &&
+        JSON.parse(filteredInfo.from_ticket);
       let from_include_exclude = filteredInfo.from_include_exclude_status;
+      let from_include_exclude_ticket =
+        filteredInfo.from_include_exclude_status_ticket;
 
       let startdateFrom = filteredInfo.startdateFrom;
       let enddateFrom =
@@ -234,7 +256,13 @@ const fetchAllHistoryTrade = async (req, res, next) => {
         filteredInfo.to_magic_number != "" &&
         filteredInfo.to_magic_number != null &&
         JSON.parse(filteredInfo.to_magic_number);
+      let toticket =
+        filteredInfo.to_ticket != "" &&
+        filteredInfo.to_ticket != null &&
+        JSON.parse(filteredInfo.to_ticket);
       let to_include_exclude = filteredInfo.to_include_exclude_status;
+      let to_include_exclude_ticket =
+        filteredInfo.to_include_exclude_status_ticket;
 
       let startdateTo = filteredInfo.startdateTo;
       let enddateTo =
@@ -295,6 +323,10 @@ const fetchAllHistoryTrade = async (req, res, next) => {
             enddateTo,
             tomagicAccount,
             to_include_exclude,
+            fromticket,
+            toticket,
+            from_include_exclude_ticket,
+            to_include_exclude_ticket,
           },
           "account"
         )
@@ -358,8 +390,19 @@ const fetchStatusData = async (req, res, next) => {
       filterInfo.from_magic_number != "" &&
       filterInfo.from_magic_number != null &&
       JSON.parse(filterInfo.from_magic_number);
+    let toticket =
+      filteredInfo.to_ticket != "" &&
+      filteredInfo.to_ticket != null &&
+      JSON.parse(filteredInfo.to_ticket);
+    let fromticket =
+      filteredInfo.from_ticket != "" &&
+      filteredInfo.from_ticket != null &&
+      JSON.parse(filteredInfo.from_ticket);
     let to_include_exclude = filterInfo.to_include_exclude_status;
     let from_include_exclude = filterInfo.from_include_exclude_status;
+    let to_include_exclude_ticket = filterInfo.to_include_exclude_status_ticket;
+    let from_include_exclude_ticket =
+      filterInfo.from_include_exclude_status_ticket;
     let startdateFrom = filterInfo.startdateFrom;
     let enddateFrom =
       filterInfo.enddateFrom == null || filterInfo.enddateFrom == ""
@@ -398,6 +441,10 @@ const fetchStatusData = async (req, res, next) => {
           enddateFrom,
           startdateTo,
           enddateTo,
+          fromticket,
+          toticket,
+          from_include_exclude_ticket,
+          to_include_exclude_ticket,
         })
         .then((data) => {
           commonData = data;
