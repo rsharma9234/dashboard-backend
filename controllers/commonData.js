@@ -52,10 +52,10 @@ const openTrade = async (
         symbol: {
           [Op.in]: fromsymbols,
         },
-        open_time: {
-          [Op.gte]: startdateFrom,
-          [Op.lt]: enddateFrom,
-        },
+        // open_time: {
+        //   [Op.gte]: startdateFrom,
+        //   [Op.lt]: enddateFrom,
+        // },
       };
     } else if (
       from_include_exclude !== 2 &&
@@ -72,10 +72,10 @@ const openTrade = async (
         symbol: {
           [Op.in]: fromsymbols,
         },
-        open_time: {
-          [Op.gte]: startdateFrom,
-          [Op.lt]: enddateFrom,
-        },
+        // open_time: {
+        //   [Op.gte]: startdateFrom,
+        //   [Op.lt]: enddateFrom,
+        // },
       };
     } else if (
       from_include_exclude === 2 &&
@@ -317,10 +317,10 @@ const openTrade = async (
         symbol: {
           [Op.in]: tosymbols,
         },
-        open_time: {
-          [Op.gte]: startdateTo,
-          [Op.lt]: enddateTo,
-        },
+        // open_time: {
+        //   [Op.gte]: startdateTo,
+        //   [Op.lt]: enddateTo,
+        // },
       };
     } else if (to_include_exclude !== 2 && to_include_exclude_ticket === 2) {
       AllWhereConditions = {
@@ -334,10 +334,10 @@ const openTrade = async (
         symbol: {
           [Op.in]: tosymbols,
         },
-        open_time: {
-          [Op.gte]: startdateTo,
-          [Op.lt]: enddateTo,
-        },
+        // open_time: {
+        //   [Op.gte]: startdateTo,
+        //   [Op.lt]: enddateTo,
+        // },
       };
     } else if (to_include_exclude === 2 && to_include_exclude_ticket !== 2) {
       AllWhereConditions = {
