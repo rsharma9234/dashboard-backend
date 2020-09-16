@@ -32,63 +32,18 @@ const openTrade = async (
   },
   fromRequest
 ) => {
+  let AllWhereConditions = {};
   //Check Include Exclude Status And Symbols For Account "From"
-  if (
-    (from_include_exclude !== 0 && from_include_exclude_ticket !== 0) ||
-    (from_include_exclude !== 0 && from_include_exclude_ticket === 0) ||
-    (from_include_exclude === 0 && from_include_exclude_ticket !== 0)
-  ) {
-    let AllWhereConditions = {};
-
-    if (from_include_exclude === 2 && from_include_exclude_ticket === 2) {
+  if (from_include_exclude !== 0) {
+    if (from_include_exclude === 2) {
       AllWhereConditions = {
         account_id: fromAccountId,
         magic_number: {
           [Op.notIn]: frommagicAccount,
         },
-        ticket: {
-          [Op.notIn]: fromticket,
-        },
-        symbol: {
-          [Op.in]: fromsymbols,
-        },
-        // open_time: {
-        //   [Op.gte]: startdateFrom,
-        //   [Op.lt]: enddateFrom,
+        // ticket: {
+        //   [Op.notIn]: fromticket,
         // },
-      };
-    } else if (
-      from_include_exclude !== 2 &&
-      from_include_exclude_ticket === 2
-    ) {
-      AllWhereConditions = {
-        account_id: fromAccountId,
-        magic_number: {
-          [Op.in]: frommagicAccount,
-        },
-        ticket: {
-          [Op.notIn]: fromticket,
-        },
-        symbol: {
-          [Op.in]: fromsymbols,
-        },
-        // open_time: {
-        //   [Op.gte]: startdateFrom,
-        //   [Op.lt]: enddateFrom,
-        // },
-      };
-    } else if (
-      from_include_exclude === 2 &&
-      from_include_exclude_ticket !== 2
-    ) {
-      AllWhereConditions = {
-        account_id: fromAccountId,
-        ticket: {
-          [Op.in]: fromticket,
-        },
-        magic_number: {
-          [Op.notIn]: frommagicAccount,
-        },
         symbol: {
           [Op.in]: fromsymbols,
         },
@@ -103,9 +58,9 @@ const openTrade = async (
         magic_number: {
           [Op.in]: frommagicAccount,
         },
-        ticket: {
-          [Op.in]: fromticket,
-        },
+        // ticket: {
+        //   [Op.in]: fromticket,
+        // },
         symbol: {
           [Op.in]: fromsymbols,
         },
@@ -141,8 +96,19 @@ const openTrade = async (
       let foundRec = CustomSwap.filter((data) => {
         return data.account_id === fromAccountId;
       });
-
+      if (fromticket.length > 0) {
+        if (from_include_exclude_ticket === 2) {
+          openOrderInfos = await openOrderInfos.filter((data) => {
+            return !fromticket.includes(String(data.ticket));
+          });
+        } else if (from_include_exclude_ticket === 1) {
+          openOrderInfos = await openOrderInfos.filter((data) => {
+            return fromticket.includes(String(data.ticket));
+          });
+        }
+      }
       if (
+        openOrderInfos.length &&
         openOrderInfos[0].swap !== null &&
         foundRec.length > 0 &&
         foundRec[0].open_value !== 0 &&
@@ -188,7 +154,7 @@ const openTrade = async (
           where: { account_id: currency },
           raw: true,
         });
-        console.log(currencyInfo, " --------------------->");
+        // console.log(currencyInfo, " --------------------->");
         openOrderFromInfo.map((item) => {
           item.margin_currency = currencyInfo[0].currency;
 
@@ -245,6 +211,7 @@ const openTrade = async (
       });
 
       if (
+        openOrderInfos.length &&
         openOrderInfos[0].swap !== null &&
         foundRec.length > 0 &&
         foundRec[0].open_value !== 0 &&
@@ -287,7 +254,6 @@ const openTrade = async (
           where: { account_id: currency },
           raw: true,
         });
-        console.log(currencyInfo, " --------------------->");
         openOrderFromInfo.map((item) => {
           item.margin_currency = currencyInfo[0].currency;
 
@@ -298,56 +264,17 @@ const openTrade = async (
   }
 
   //Check Include Exclude Status And Symbols For Account "To"
-  if (
-    (to_include_exclude !== 0 && to_include_exclude_ticket !== 0) ||
-    (to_include_exclude !== 0 && to_include_exclude_ticket === 0) ||
-    (to_include_exclude === 0 && to_include_exclude_ticket !== 0)
-  ) {
-    let AllWhereConditions = {};
-
-    if (to_include_exclude === 2 && to_include_exclude_ticket === 2) {
+  // let AllWhereConditions = {};
+  if (to_include_exclude !== 0) {
+    if (to_include_exclude === 2) {
       AllWhereConditions = {
         account_id: toAccountId,
         magic_number: {
           [Op.notIn]: tomagicAccount,
         },
-        ticket: {
-          [Op.notIn]: toticket,
-        },
-        symbol: {
-          [Op.in]: tosymbols,
-        },
-        // open_time: {
-        //   [Op.gte]: startdateTo,
-        //   [Op.lt]: enddateTo,
+        // ticket: {
+        //   [Op.notIn]: toticket,
         // },
-      };
-    } else if (to_include_exclude !== 2 && to_include_exclude_ticket === 2) {
-      AllWhereConditions = {
-        account_id: toAccountId,
-        magic_number: {
-          [Op.in]: tomagicAccount,
-        },
-        ticket: {
-          [Op.notIn]: toticket,
-        },
-        symbol: {
-          [Op.in]: tosymbols,
-        },
-        // open_time: {
-        //   [Op.gte]: startdateTo,
-        //   [Op.lt]: enddateTo,
-        // },
-      };
-    } else if (to_include_exclude === 2 && to_include_exclude_ticket !== 2) {
-      AllWhereConditions = {
-        account_id: toAccountId,
-        ticket: {
-          [Op.in]: toticket,
-        },
-        magic_number: {
-          [Op.notIn]: tomagicAccount,
-        },
         symbol: {
           [Op.in]: tosymbols,
         },
@@ -362,9 +289,9 @@ const openTrade = async (
         magic_number: {
           [Op.in]: tomagicAccount,
         },
-        ticket: {
-          [Op.in]: toticket,
-        },
+        // ticket: {
+        //   [Op.in]: toticket,
+        // },
         symbol: {
           [Op.in]: tosymbols,
         },
@@ -400,8 +327,18 @@ const openTrade = async (
       let foundRec = CustomSwap.filter((data) => {
         return data.account_id === toAccountId;
       });
-
+      if (to_include_exclude_ticket === 2) {
+        openOrderInfos = await openOrderInfos.filter((data) => {
+          return !toticket.includes(String(data.ticket));
+        });
+      } else if (to_include_exclude_ticket === 1) {
+        openOrderInfos = await openOrderInfos.filter((data) => {
+          return toticket.includes(String(data.ticket));
+        });
+      }
+      // console.log(openOrderInfos, "gfhgdsjh..........");
       if (
+        openOrderInfos.length &&
         openOrderInfos[0].swap !== null &&
         foundRec.length > 0 &&
         foundRec[0].open_value !== 0 &&
@@ -504,6 +441,7 @@ const openTrade = async (
       });
 
       if (
+        openOrderInfos.length &&
         openOrderInfos[0].swap !== null &&
         foundRec.length > 0 &&
         foundRec[0].open_value !== 0 &&
@@ -556,10 +494,17 @@ const openTrade = async (
       }
     }
   }
+
   if (fromRequest == "account") {
+    // console.log(openOrderToInfo,openOrderFromInfo, '============================<<<<<<<<<<<<<<<<<<<<<<<<<<<<' );
+
     return (response = {
-      openOrderToInfo: openOrderToInfo.length > 0 ? openOrderToInfo : [],
-      openOrderFromInfo: openOrderFromInfo.length > 0 ? openOrderFromInfo : [],
+      openOrderToInfo:
+        openOrderToInfo && openOrderToInfo.length > 0 ? openOrderToInfo : [],
+      openOrderFromInfo:
+        openOrderFromInfo && openOrderFromInfo.length > 0
+          ? openOrderFromInfo
+          : [],
     });
   } else if (fromRequest == "whatAmCalculating") {
     return (response = {
@@ -596,62 +541,18 @@ const commonHistory = async (
   },
   fromRequest
 ) => {
+  let AllWhereConditions = {};
   //Check Include Exclude Status And Symbols For Account "From"
-  if (
-    (from_include_exclude !== 0 && from_include_exclude_ticket !== 0) ||
-    (from_include_exclude !== 0 && from_include_exclude_ticket === 0) ||
-    (from_include_exclude === 0 && from_include_exclude_ticket !== 0)
-  ) {
-    let AllWhereConditions = {};
-    if (from_include_exclude === 2 && from_include_exclude_ticket === 2) {
+  if (from_include_exclude !== 0) {
+    if (from_include_exclude === 2) {
       AllWhereConditions = {
         account_id: fromAccountId,
         magic_number: {
           [Op.notIn]: frommagicAccount,
         },
-        ticket: {
-          [Op.notIn]: fromticket,
-        },
-        symbol: {
-          [Op.in]: fromsymbols,
-        },
-        open_time: {
-          [Op.gte]: startdateFrom,
-          [Op.lt]: enddateFrom,
-        },
-      };
-    } else if (
-      from_include_exclude !== 2 &&
-      from_include_exclude_ticket === 2
-    ) {
-      AllWhereConditions = {
-        account_id: fromAccountId,
-        magic_number: {
-          [Op.in]: frommagicAccount,
-        },
-        ticket: {
-          [Op.notIn]: fromticket,
-        },
-        symbol: {
-          [Op.in]: fromsymbols,
-        },
-        open_time: {
-          [Op.gte]: startdateFrom,
-          [Op.lt]: enddateFrom,
-        },
-      };
-    } else if (
-      from_include_exclude === 2 &&
-      from_include_exclude_ticket !== 2
-    ) {
-      AllWhereConditions = {
-        account_id: fromAccountId,
-        ticket: {
-          [Op.in]: fromticket,
-        },
-        magic_number: {
-          [Op.notIn]: frommagicAccount,
-        },
+        // ticket: {
+        //   [Op.notIn]: fromticket,
+        // },
         symbol: {
           [Op.in]: fromsymbols,
         },
@@ -666,9 +567,9 @@ const commonHistory = async (
         magic_number: {
           [Op.in]: frommagicAccount,
         },
-        ticket: {
-          [Op.in]: fromticket,
-        },
+        // ticket: {
+        //   [Op.in]: fromticket,
+        // },
         symbol: {
           [Op.in]: fromsymbols,
         },
@@ -704,8 +605,19 @@ const commonHistory = async (
       let foundRec = CustomSwap.filter((data) => {
         return data.account_id === fromAccountId;
       });
-
+      if (fromticket.length > 0) {
+        if (from_include_exclude_ticket === 2) {
+          openOrderInfos = await openOrderInfos.filter((data) => {
+            return !fromticket.includes(String(data.ticket));
+          });
+        } else if (from_include_exclude_ticket === 1) {
+          openOrderInfos = await openOrderInfos.filter((data) => {
+            return fromticket.includes(String(data.ticket));
+          });
+        }
+      }
       if (
+        openOrderInfos.length &&
         openOrderInfos[0].swap !== null &&
         foundRec.length > 0 &&
         foundRec[0].close_value !== 0 &&
@@ -804,6 +716,7 @@ const commonHistory = async (
       });
 
       if (
+        openOrderInfos.length &&
         openOrderInfos[0].swap !== null &&
         foundRec.length > 0 &&
         foundRec[0].close_value !== 0 &&
@@ -856,56 +769,18 @@ const commonHistory = async (
   }
 
   //Check Include Exclude Status And Symbols For Account "To"
-  if (
-    (to_include_exclude !== 0 && to_include_exclude_ticket !== 0) ||
-    (to_include_exclude !== 0 && to_include_exclude_ticket === 0) ||
-    (to_include_exclude === 0 && to_include_exclude_ticket !== 0)
-  ) {
-    let AllWhereConditions = {};
+  if (to_include_exclude !== 0) {
+    // let AllWhereConditions = {};
 
-    if (to_include_exclude === 2 && to_include_exclude_ticket === 2) {
+    if (to_include_exclude === 2) {
       AllWhereConditions = {
         account_id: toAccountId,
         magic_number: {
           [Op.notIn]: tomagicAccount,
         },
-        ticket: {
-          [Op.notIn]: toticket,
-        },
-        symbol: {
-          [Op.in]: tosymbols,
-        },
-        open_time: {
-          [Op.gte]: startdateTo,
-          [Op.lt]: enddateTo,
-        },
-      };
-    } else if (to_include_exclude !== 2 && to_include_exclude_ticket === 2) {
-      AllWhereConditions = {
-        account_id: toAccountId,
-        magic_number: {
-          [Op.in]: tomagicAccount,
-        },
-        ticket: {
-          [Op.notIn]: toticket,
-        },
-        symbol: {
-          [Op.in]: tosymbols,
-        },
-        open_time: {
-          [Op.gte]: startdateTo,
-          [Op.lt]: enddateTo,
-        },
-      };
-    } else if (to_include_exclude === 2 && to_include_exclude_ticket !== 2) {
-      AllWhereConditions = {
-        account_id: toAccountId,
-        ticket: {
-          [Op.in]: toticket,
-        },
-        magic_number: {
-          [Op.notIn]: tomagicAccount,
-        },
+        // ticket: {
+        //   [Op.notIn]: toticket,
+        // },
         symbol: {
           [Op.in]: tosymbols,
         },
@@ -920,9 +795,9 @@ const commonHistory = async (
         magic_number: {
           [Op.in]: tomagicAccount,
         },
-        ticket: {
-          [Op.in]: toticket,
-        },
+        // ticket: {
+        //   [Op.in]: toticket,
+        // },
         symbol: {
           [Op.in]: tosymbols,
         },
@@ -958,8 +833,17 @@ const commonHistory = async (
       let foundRec = CustomSwap.filter((data) => {
         return data.account_id === toAccountId;
       });
-
+      if (to_include_exclude_ticket === 2) {
+        openOrderInfos = await openOrderInfos.filter((data) => {
+          return !toticket.includes(String(data.ticket));
+        });
+      } else if (to_include_exclude_ticket === 1) {
+        openOrderInfos = await openOrderInfos.filter((data) => {
+          return toticket.includes(String(data.ticket));
+        });
+      }
       if (
+        openOrderInfos.length &&
         openOrderInfos[0].swap !== null &&
         foundRec.length > 0 &&
         foundRec[0].close_value !== 0 &&
@@ -1058,6 +942,7 @@ const commonHistory = async (
         });
 
         if (
+          openOrderInfos.length &&
           openOrderInfos[0].swap !== null &&
           foundRec.length > 0 &&
           foundRec[0].close_value !== 0 &&
@@ -1110,9 +995,14 @@ const commonHistory = async (
     }
   }
   if (fromRequest == "account") {
+    // console.log(openOrderToInfo.length,openOrderFromInfo.length, '============================<<<<<<<<<<<<<<<<<<<<<<<<<<<<' );
     return (response = {
-      openOrderToInfo: openOrderToInfo.length > 0 ? openOrderToInfo : [],
-      openOrderFromInfo: openOrderFromInfo.length > 0 ? openOrderFromInfo : [],
+      openOrderToInfo:
+        openOrderToInfo && openOrderToInfo.length > 0 ? openOrderToInfo : [],
+      openOrderFromInfo:
+        openOrderFromInfo && openOrderFromInfo.length > 0
+          ? openOrderFromInfo
+          : [],
     });
   } else if (fromRequest == "whatAmCalculating") {
     return (response = {
@@ -1147,47 +1037,16 @@ const statusData = async ({
   from_include_exclude_ticket,
   to_include_exclude_ticket,
 }) => {
+  let forIncludeExclude;
   //Check Include Exclude Status And Symbols For Account "From"
-  if (
-    (from_include_exclude !== 0 && from_include_exclude_ticket !== 0) ||
-    (from_include_exclude !== 0 && from_include_exclude_ticket === 0) ||
-    (from_include_exclude === 0 && from_include_exclude_ticket !== 0)
-  ) {
-    let forIncludeExclude;
-    let forIncludeExcludeticket;
-    if (from_include_exclude === 2 && from_include_exclude_ticket === 2) {
-      forIncludeExcludeticket = {
-        [Op.notIn]: fromticket,
-      };
-      forIncludeExclude = {
-        [Op.notIn]: frommagicAccount,
-      };
-    } else if (
-      from_include_exclude !== 2 &&
-      from_include_exclude_ticket === 2
-    ) {
-      forIncludeExclude = {
-        [Op.in]: frommagicAccount,
-      };
-      forIncludeExcludeticket = {
-        [Op.notIn]: fromticket,
-      };
-    } else if (
-      from_include_exclude === 2 &&
-      from_include_exclude_ticket !== 2
-    ) {
-      forIncludeExcludeticket = {
-        [Op.in]: fromticket,
-      };
+  if (from_include_exclude !== 0) {
+    if (from_include_exclude === 2) {
       forIncludeExclude = {
         [Op.notIn]: frommagicAccount,
       };
     } else {
       forIncludeExclude = {
         [Op.in]: frommagicAccount,
-      };
-      forIncludeExcludeticket = {
-        [Op.in]: fromticket,
       };
     }
     console.log(new Date(), "1----------->");
@@ -1200,7 +1059,6 @@ const statusData = async ({
       where: {
         account_id: fromAccountId,
         magic_number: forIncludeExclude,
-        ticket: forIncludeExcludeticket,
         symbol: {
           [Op.in]: fromsymbols,
         },
@@ -1217,6 +1075,17 @@ const statusData = async ({
 
     console.log(new Date(), "fs1----------->");
     if (fromOpenOrderInfos && fromOpenOrderInfos.length > 0) {
+      if (fromticket.length > 0) {
+        if (from_include_exclude_ticket === 2) {
+          fromOpenOrderInfos = await fromOpenOrderInfos.filter((data) => {
+            return !fromticket.includes(String(data.ticket));
+          });
+        } else if (from_include_exclude_ticket === 1) {
+          fromOpenOrderInfos = await fromOpenOrderInfos.filter((data) => {
+            return fromticket.includes(String(data.ticket));
+          });
+        }
+      }
       fromSymbolInfo = await symbolModel.findAll({
         where: {
           name: fromOpenOrderInfos[0].symbol,
@@ -1254,42 +1123,16 @@ const statusData = async ({
     console.log(new Date(), "fs4----------->");
   }
   //Check Include Exclude Status And Symbols For Account "To"
-  if (
-    (to_include_exclude !== 0 && to_include_exclude_ticket !== 0) ||
-    (to_include_exclude !== 0 && to_include_exclude_ticket === 0) ||
-    (to_include_exclude === 0 && to_include_exclude_ticket !== 0)
-  ) {
-    let forIncludeExclude;
-    let forIncludeExcludeticket;
-    if (to_include_exclude === 2 && to_include_exclude_ticket === 2) {
-      forIncludeExcludeticket = {
-        [Op.notIn]: toticket,
-      };
-      forIncludeExclude = {
-        [Op.notIn]: tomagicAccount,
-      };
-    }
-    if (to_include_exclude !== 2 && to_include_exclude_ticket === 2) {
-      forIncludeExclude = {
-        [Op.in]: tomagicAccount,
-      };
-      forIncludeExcludeticket = {
-        [Op.notIn]: toticket,
-      };
-    }
-    if (to_include_exclude === 2 && to_include_exclude_ticket !== 2) {
-      forIncludeExcludeticket = {
-        [Op.in]: toticket,
-      };
+  if (to_include_exclude !== 0) {
+    // let forIncludeExclude;
+    // let forIncludeExcludeticket;
+    if (to_include_exclude === 2) {
       forIncludeExclude = {
         [Op.notIn]: tomagicAccount,
       };
     } else {
       forIncludeExclude = {
         [Op.in]: tomagicAccount,
-      };
-      forIncludeExcludeticket = {
-        [Op.in]: toticket,
       };
     }
     console.log(new Date(), "3----------->");
@@ -1302,7 +1145,6 @@ const statusData = async ({
       where: {
         account_id: toAccountId,
         magic_number: forIncludeExclude,
-        ticket: forIncludeExcludeticket,
         symbol: {
           [Op.in]: tosymbols,
         },
@@ -1318,6 +1160,17 @@ const statusData = async ({
     console.log(toOpenOrderInfos, "33==========>");
     console.log(new Date(), "ts1----------->");
     if (toOpenOrderInfos && toOpenOrderInfos.length > 0) {
+      if (toticket.length > 0) {
+        if (to_include_exclude_ticket === 2) {
+          toOpenOrderInfos = await toOpenOrderInfos.filter((data) => {
+            return !toticket.includes(String(data.ticket));
+          });
+        } else if (to_include_exclude_ticket === 1) {
+          toOpenOrderInfos = await toOpenOrderInfos.filter((data) => {
+            return toticket.includes(String(data.ticket));
+          });
+        }
+      }
       toSymbolInfo = await symbolModel.findAll({
         where: {
           name: toOpenOrderInfos[0].symbol,
