@@ -17,6 +17,7 @@ const common = require("./commonData");
 const fetchAllAccounts = async (req, res, next) => {
   try {
     let accountInfo = await accountModel.findAll({
+      where: { launched: 1 },
       attributes: ["id", "login"],
       include: [accountsDetailModel],
     });

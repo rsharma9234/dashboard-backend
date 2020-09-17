@@ -50,7 +50,7 @@ module.exports = (sequelize, DataTypes) => {
     status: DataTypes.INTEGER(1),
     active: DataTypes.INTEGER(1),
     launched: DataTypes.INTEGER(1),
-
+    is_server: DataTypes.TINYINT(1)
   }, {
     createdAt: false,
     updatedAt: false,

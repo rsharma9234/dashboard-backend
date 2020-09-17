@@ -209,7 +209,17 @@ const openTrade = async (
       let foundRec = CustomSwap.filter((data) => {
         return data.account_id === fromAccountId;
       });
-
+      if (fromticket.length > 0) {
+        if (from_include_exclude_ticket === 2) {
+          OpenOrderInfos = await OpenOrderInfos.filter((data) => {
+            return !fromticket.includes(String(data.ticket));
+          });
+        } else if (from_include_exclude_ticket === 1) {
+          OpenOrderInfos = await OpenOrderInfos.filter((data) => {
+            return fromticket.includes(String(data.ticket));
+          });
+        }
+      }
       if (
         openOrderInfos.length &&
         openOrderInfos[0].swap !== null &&
@@ -439,7 +449,17 @@ const openTrade = async (
       let foundRec = CustomSwap.filter((data) => {
         return data.account_id === toAccountId;
       });
-
+      if (toticket.length > 0) {
+        if (to_include_exclude_ticket === 2) {
+          OpenOrderInfos = await OpenOrderInfos.filter((data) => {
+            return !toticket.includes(String(data.ticket));
+          });
+        } else if (to_include_exclude_ticket === 1) {
+          OpenOrderInfos = await OpenOrderInfos.filter((data) => {
+            return toticket.includes(String(data.ticket));
+          });
+        }
+      }
       if (
         openOrderInfos.length &&
         openOrderInfos[0].swap !== null &&
@@ -714,7 +734,17 @@ const commonHistory = async (
       let foundRec = CustomSwap.filter((data) => {
         return data.account_id === fromAccountId;
       });
-
+      if (fromticket.length > 0) {
+        if (from_include_exclude_ticket === 2) {
+          OpenOrderInfos = await OpenOrderInfos.filter((data) => {
+            return !fromticket.includes(String(data.ticket));
+          });
+        } else if (from_include_exclude_ticket === 1) {
+          OpenOrderInfos = await OpenOrderInfos.filter((data) => {
+            return fromticket.includes(String(data.ticket));
+          });
+        }
+      }
       if (
         openOrderInfos.length &&
         openOrderInfos[0].swap !== null &&
@@ -940,7 +970,17 @@ const commonHistory = async (
         let foundRec = CustomSwap.filter((data) => {
           return data.account_id === toAccountId;
         });
-
+        if (toticket.length > 0) {
+          if (to_include_exclude_ticket === 2) {
+            OpenOrderInfos = await OpenOrderInfos.filter((data) => {
+              return !toticket.includes(String(data.ticket));
+            });
+          } else if (to_include_exclude_ticket === 1) {
+            OpenOrderInfos = await OpenOrderInfos.filter((data) => {
+              return toticket.includes(String(data.ticket));
+            });
+          }
+        }
         if (
           openOrderInfos.length &&
           openOrderInfos[0].swap !== null &&
@@ -1114,6 +1154,17 @@ const statusData = async ({
 
     console.log(new Date(), "fs3----------->");
     if (fromOpenOrderInfos && fromOpenOrderInfos.length > 0) {
+      if (fromticket.length > 0) {
+        if (from_include_exclude_ticket === 2) {
+          fromOpenOrderInfos = await fromOpenOrderInfos.filter((data) => {
+            return !fromticket.includes(String(data.ticket));
+          });
+        } else if (from_include_exclude_ticket === 1) {
+          fromOpenOrderInfos = await fromOpenOrderInfos.filter((data) => {
+            return fromticket.includes(String(data.ticket));
+          });
+        }
+      }
       fromSymbolInfo = await symbolModel.findAll({
         where: { name: fromsymbols[0], login: fromAccountInfo.login },
         limit: 1,
@@ -1198,6 +1249,17 @@ const statusData = async ({
     console.log(toOpenOrderInfos, "44==========>");
     console.log(new Date(), "ts3----------->");
     if (toOpenOrderInfos && toOpenOrderInfos.length > 0) {
+      if (toticket.length > 0) {
+        if (to_include_exclude_ticket === 2) {
+          toOpenOrderInfos = await toOpenOrderInfos.filter((data) => {
+            return !toticket.includes(String(data.ticket));
+          });
+        } else if (to_include_exclude_ticket === 1) {
+          toOpenOrderInfos = await toOpenOrderInfos.filter((data) => {
+            return toticket.includes(String(data.ticket));
+          });
+        }
+      }
       toSymbolInfo = await symbolModel.findAll({
         where: { name: tosymbols[0], login: toAccountInfo.login },
         limit: 1,

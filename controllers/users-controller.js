@@ -36,7 +36,7 @@ const fetchAllAccounts = async (req, res, next) => {
 
 const addUser = async (req, res, next) => {
   try {
-    let { login, password, broker, alias } = req.body;
+    let { login, password, broker, alias, is_server } = req.body;
     let accountOneInfo = await accountModel.findOne({
       where: {
         login: login,
@@ -63,6 +63,7 @@ const addUser = async (req, res, next) => {
         alias: alias,
         status: 0,
         active: 1,
+        is_server: is_server,
       });
       return res.status(200).json({ status: true });
     }
