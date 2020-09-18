@@ -211,11 +211,11 @@ const openTrade = async (
       });
       if (fromticket.length > 0) {
         if (from_include_exclude_ticket === 2) {
-          OpenOrderInfos = await OpenOrderInfos.filter((data) => {
+          openOrderInfos = await openOrderInfos.filter((data) => {
             return !fromticket.includes(String(data.ticket));
           });
         } else if (from_include_exclude_ticket === 1) {
-          OpenOrderInfos = await OpenOrderInfos.filter((data) => {
+          openOrderInfos = await openOrderInfos.filter((data) => {
             return fromticket.includes(String(data.ticket));
           });
         }
@@ -451,11 +451,11 @@ const openTrade = async (
       });
       if (toticket.length > 0) {
         if (to_include_exclude_ticket === 2) {
-          OpenOrderInfos = await OpenOrderInfos.filter((data) => {
+          openOrderInfos = await openOrderInfos.filter((data) => {
             return !toticket.includes(String(data.ticket));
           });
         } else if (to_include_exclude_ticket === 1) {
-          OpenOrderInfos = await OpenOrderInfos.filter((data) => {
+          openOrderInfos = await openOrderInfos.filter((data) => {
             return toticket.includes(String(data.ticket));
           });
         }
@@ -736,11 +736,11 @@ const commonHistory = async (
       });
       if (fromticket.length > 0) {
         if (from_include_exclude_ticket === 2) {
-          OpenOrderInfos = await OpenOrderInfos.filter((data) => {
+          openOrderInfos = await openOrderInfos.filter((data) => {
             return !fromticket.includes(String(data.ticket));
           });
         } else if (from_include_exclude_ticket === 1) {
-          OpenOrderInfos = await OpenOrderInfos.filter((data) => {
+          openOrderInfos = await openOrderInfos.filter((data) => {
             return fromticket.includes(String(data.ticket));
           });
         }
@@ -972,11 +972,11 @@ const commonHistory = async (
         });
         if (toticket.length > 0) {
           if (to_include_exclude_ticket === 2) {
-            OpenOrderInfos = await OpenOrderInfos.filter((data) => {
+            openOrderInfos = await openOrderInfos.filter((data) => {
               return !toticket.includes(String(data.ticket));
             });
           } else if (to_include_exclude_ticket === 1) {
-            OpenOrderInfos = await OpenOrderInfos.filter((data) => {
+            openOrderInfos = await openOrderInfos.filter((data) => {
               return toticket.includes(String(data.ticket));
             });
           }
