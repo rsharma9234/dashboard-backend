@@ -81,10 +81,12 @@ const openTrade = async (
           [Sequelize.literal("SUM(lots)"), "lots"],
           [Sequelize.literal("SUM(profit)"), "profit"],
           [Sequelize.literal("SUM(profit+commission+taxes+swap)"), "total"],
+          'ticket'
         ],
-        where: AllWhereConditions,
+        where: {AllWhereConditions, ticket:fromticket},
         raw: true,
       });
+      console.log(openOrderInfos,'account 1');
     } else if (fromRequest == "whatAmCalculating") {
       openOrderInfos = await openOrderModel.findAll({
         where: AllWhereConditions,
@@ -98,6 +100,7 @@ const openTrade = async (
       });
       if (fromticket.length > 0) {
         if (from_include_exclude_ticket === 2) {
+          console.log(openOrderInfos,'account 1.1');
           openOrderInfos = await openOrderInfos.filter((data) => {
             return !fromticket.includes(String(data.ticket));
           });
@@ -126,6 +129,7 @@ const openTrade = async (
       }
       if (fromRequest == "account") {
         openOrderFromInfo = openOrderInfos;
+        console.log(openOrderInfos,'account 2');
       } else if (fromRequest == "whatAmCalculating") {
         for (let openOrderItem of openOrderInfos) {
           totalOfFromOpenOrder +=
@@ -175,12 +179,14 @@ const openTrade = async (
           [Sequelize.literal("SUM(lots)"), "lots"],
           [Sequelize.literal("SUM(profit)"), "profit"],
           [Sequelize.literal("SUM(profit+commission+swap)"), "total"],
+          'ticket'
         ],
         where: {
           account_id: fromAccountId,
           symbol: {
             [Op.in]: fromsymbols,
           },
+          ticket:fromticket,
           // open_time: {
           //   [Op.gte]: startdateFrom,
           //   [Op.lt]: enddateFrom,
@@ -238,6 +244,7 @@ const openTrade = async (
       }
       if (fromRequest == "account") {
         openOrderFromInfo = openOrderInfos;
+        console.log(openOrderInfos,'account 3');
       } else if (fromRequest == "whatAmCalculating") {
         for (let openOrderItem of openOrderInfos) {
           totalOfFromOpenOrder +=
@@ -322,10 +329,12 @@ const openTrade = async (
           [Sequelize.literal("SUM(lots)"), "lots"],
           [Sequelize.literal("SUM(profit)"), "profit"],
           [Sequelize.literal("SUM(profit+commission+taxes+swap)"), "total"],
+          'ticket'
         ],
-        where: AllWhereConditions,
+        where: {AllWhereConditions, ticket:toticket},
         raw: true,
       });
+      console.log(openOrderInfos,'account 4');
     } else if (fromRequest == "whatAmCalculating") {
       openOrderInfos = await openOrderModel.findAll({
         where: AllWhereConditions,
@@ -366,6 +375,7 @@ const openTrade = async (
       }
       if (fromRequest == "account") {
         openOrderToInfo = openOrderInfos;
+        console.log(openOrderInfos,'account 5');
       } else if (fromRequest == "whatAmCalculating") {
         for (let openOrderItem of openOrderInfos) {
           totalOfToOpenOrder +=
@@ -415,12 +425,14 @@ const openTrade = async (
           [Sequelize.literal("SUM(lots)"), "lots"],
           [Sequelize.literal("SUM(profit)"), "profit"],
           [Sequelize.literal("SUM(profit+commission+swap)"), "total"],
+          'ticket'
         ],
         where: {
           account_id: toAccountId,
           symbol: {
             [Op.in]: tosymbols,
           },
+          ticket:toticket,
           // open_time: {
           //   [Op.gte]: startdateTo,
           //   [Op.lt]: enddateTo,
@@ -428,6 +440,7 @@ const openTrade = async (
         },
         raw: true,
       });
+      console.log(openOrderInfos,'account 6');
     } else if (fromRequest == "whatAmCalculating") {
       openOrderInfos = await openOrderModel.findAll({
         where: {
@@ -444,6 +457,7 @@ const openTrade = async (
         raw: true,
       });
     }
+    console.log(openOrderInfos.length,'account 7');
 
     if (openOrderInfos && openOrderInfos.length > 0) {
       let foundRec = CustomSwap.filter((data) => {
@@ -451,7 +465,10 @@ const openTrade = async (
       });
       if (toticket.length > 0) {
         if (to_include_exclude_ticket === 2) {
+      console.log(openOrderInfos, typeof(openOrderInfos[0].ticket), 'account 7.1');
           openOrderInfos = await openOrderInfos.filter((data) => {
+            console.log(toticket, typeof(toticket), "============" )
+            console.log(data.ticket, typeof(data.ticket), "============>" )
             return !toticket.includes(String(data.ticket));
           });
         } else if (to_include_exclude_ticket === 1) {
@@ -460,6 +477,7 @@ const openTrade = async (
           });
         }
       }
+      console.log(openOrderInfos.length,'account 7');
       if (
         openOrderInfos.length &&
         openOrderInfos[0].swap !== null &&
@@ -479,6 +497,7 @@ const openTrade = async (
       }
       if (fromRequest == "account") {
         openOrderToInfo = openOrderInfos;
+        console.log(openOrderInfos,'account 7');
       } else if (fromRequest == "whatAmCalculating") {
         for (let openOrderItem of openOrderInfos) {
           totalOfToOpenOrder +=
@@ -609,8 +628,9 @@ const commonHistory = async (
           [Sequelize.literal("SUM(lots)"), "lots"],
           [Sequelize.literal("SUM(profit)"), "profit"],
           [Sequelize.literal("SUM(profit+commission+taxes+swap)"), "total"],
+          'ticket'
         ],
-        where: AllWhereConditions,
+        where: {AllWhereConditions, ticket:fromticket},
         raw: true,
       });
     } else if (fromRequest == "whatAmCalculating") {
@@ -699,13 +719,14 @@ const commonHistory = async (
           [Sequelize.literal("SUM(lots)"), "lots"],
           [Sequelize.literal("SUM(profit)"), "profit"],
           [Sequelize.literal("SUM(profit+commission+taxes+swap)"), "total"],
+          'ticket'
         ],
         where: {
           account_id: fromAccountId,
           symbol: {
             [Op.in]: fromsymbols,
           },
-
+          ticket:fromticket,
           open_time: {
             [Op.gte]: startdateFrom,
             [Op.lt]: enddateFrom,
@@ -848,8 +869,9 @@ const commonHistory = async (
           [Sequelize.literal("SUM(lots)"), "lots"],
           [Sequelize.literal("SUM(profit)"), "profit"],
           [Sequelize.literal("SUM(profit+commission+taxes+swap)"), "total"],
+          'ticket'
         ],
-        where: AllWhereConditions,
+        where: {AllWhereConditions, ticket:toticket},
         raw: true,
       });
     } else if (fromRequest == "whatAmCalculating") {
@@ -934,6 +956,7 @@ const commonHistory = async (
           [Sequelize.literal("SUM(lots)"), "lots"],
           [Sequelize.literal("SUM(profit)"), "profit"],
           [Sequelize.literal("SUM(profit+commission+taxes+swap)"), "total"],
+          'ticket'
         ],
 
         where: {
@@ -941,6 +964,7 @@ const commonHistory = async (
           symbol: {
             [Op.in]: tosymbols,
           },
+        ticket:toticket,
           open_time: {
             [Op.gte]: startdateTo,
             [Op.lt]: enddateTo,

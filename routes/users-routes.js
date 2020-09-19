@@ -23,6 +23,21 @@ router.post('/mainLogin', [
 router.post('/updateuser', [
     usersController.updateUser
 ]);
+router.post('/create', [
+    usersController.userCreate
+]);
+router.get('/allusers', [
+    usersController.allusers
+]);
+router.post('/login', [
+    usersController.userLogin
+]);
+router.post('/update', [
+    usersController.userUpdate
+]);
+router.post('/delete', [
+    usersController.userDelete
+]);
 
 
 module.exports = router;

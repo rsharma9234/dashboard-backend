@@ -139,6 +139,7 @@ const fetchAllOpenTrade = async (req, res, next) => {
         )
         .then((res) => {
           commonData = res;
+          console.log(commonData,'account');
         })
         .catch((err) => {
           console.log(err);
