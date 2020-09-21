@@ -96,45 +96,88 @@ const checkUserConnected = async (req, res, next) => {
 
 const mainLogin = async (req, res, next) => {
   try {
-    let { username, password } = req.body;
+    let { username, password, logged_in } = req.body;
     let accountCheck = await mainLoginModel.findOne({
       where: { username },
       raw: true,
     });
-    if (accountCheck === null) {
-      let err = new Error();
-      err.status = 404;
-      err.name = "username";
-      err.message = "Invalid username.";
-      return res.status(200).json(err);
-    }
-    if (accountCheck.username != username) {
-      let err = new Error();
-      err.status = 404;
-      err.name = "username";
-      err.message = "Invalid username";
-      return res.status(200).json(err);
-    }
-    if (accountCheck.password !== password) {
-      let err = new Error();
-      err.status = 404;
-      err.name = "password";
-      err.message = "Invalid password.";
-      return res.status(200).json(err);
-    }
-    if (accountCheck.username != username) {
-      let err = new Error();
-      err.status = 404;
-      err.name = "username";
-      err.message = "Invalid password";
-      return res.status(200).json(err);
-    }
-    let accountInfo = await mainLoginModel.findAll({
-      attributes: { exclude: ["password"] },
-      where: { username, password },
+    let userCheck = await userModel.findOne({
+      where: { username },
       raw: true,
     });
-    return res.status(200).json({ rows: accountInfo });
+    if (accountCheck) {
+      if (accountCheck === null) {
+        let err = new Error();
+        err.status = 404;
+        err.name = "username";
+        err.message = "Invalid username.";
+        return res.status(200).json(err);
+      }
+      if (accountCheck.username != username) {
+        let err = new Error();
+        err.status = 404;
+        err.name = "username";
+        err.message = "Invalid username";
+        return res.status(200).json(err);
+      }
+      if (accountCheck.password !== password) {
+        let err = new Error();
+        err.status = 404;
+        err.name = "password";
+        err.message = "Invalid password.";
+        return res.status(200).json(err);
+      }
+      if (accountCheck.username != username) {
+        let err = new Error();
+        err.status = 404;
+        err.name = "username";
+        err.message = "Invalid password";
+        return res.status(200).json(err);
+      }
+      let accountInfo = await mainLoginModel.findAll({
+        attributes: { exclude: ["password"] },
+        where: { username, password },
+        raw: true,
+      });
+      return res.status(200).json({ rows: accountInfo });
+    }
+    if (userCheck) {
+      if (userCheck === null) {
+        let err = new Error();
+        err.status = 404;
+        err.name = "username";
+        err.message = "Invalid username.";
+        return res.status(200).json(err);
+      }
+      if (userCheck.username != username) {
+        let err = new Error();
+        err.status = 404;
+        err.name = "username";
+        err.message = "Invalid username";
+        return res.status(200).json(err);
+      }
+      if (userCheck.password !== password) {
+        let err = new Error();
+        err.status = 404;
+        err.name = "password";
+        err.message = "Invalid password.";
+        return res.status(200).json(err);
+      }
+      if (userCheck.username != username) {
+        let err = new Error();
+        err.status = 404;
+        err.name = "username";
+        err.message = "Invalid password";
+        return res.status(200).json(err);
+      }
+      await userModel.update({ logged_in: 1 }, { where: { username } });
+      let userInfo = await userModel.findAll({
+        attributes: { exclude: ["password"] },
+        where: { username, password },
+        raw: true,
+      });
+      return res.status(200).json({ rows: userInfo });
+    }
   } catch (err) {
     return res.status(err.status || 500).json(err);
   }
@@ -166,7 +209,7 @@ const userCreate = async (req, res, next) => {
     });
     console.log(req.body.username, req.body.password, "req");
     console.log(userOneInfo);
-    if (userOneInfo.length >0) {
+    if (userOneInfo.length > 0) {
       if (userOneInfo[0].username === req.body.username) {
         console.log(userOneInfo[0].username);
         return res
@@ -190,7 +233,7 @@ const allusers = async (req, res, next) => {
   await userModel
     .findAndCountAll()
     .then((data) => {
-      console.log(data,'000000');
+      console.log(data, "000000");
       let page = req.query.page; // page number
       let pages = Math.ceil(data.count / limit);
       offset = limit * (page - 1);
@@ -215,49 +258,18 @@ const allusers = async (req, res, next) => {
     });
 };
 
-
-const userLogin = async (req, res, next) => {
+const userLogout = async (req, res, next) => {
   try {
-    let { username, password, logged_in } = req.body;
-    let userCheck = await userModel.findOne({
-      where: { username },
+    let { id } = req.body;
+    await userModel.findOne({
+      where: { id },
       raw: true,
     });
-    if (userCheck === null) {
-      let err = new Error();
-      err.status = 404;
-      err.name = "username";
-      err.message = "Invalid username.";
-      return res.status(200).json(err);
-    }
-    if (userCheck.username != username) {
-      let err = new Error();
-      err.status = 404;
-      err.name = "username";
-      err.message = "Invalid username";
-      return res.status(200).json(err);
-    }
-    if (userCheck.password !== password) {
-      let err = new Error();
-      err.status = 404;
-      err.name = "password";
-      err.message = "Invalid password.";
-      return res.status(200).json(err);
-    }
-    if (userCheck.username != username) {
-      let err = new Error();
-      err.status = 404;
-      err.name = "username";
-      err.message = "Invalid password";
-      return res.status(200).json(err);
-    }
-    await userModel.update({ logged_in: logged_in }, { where: { username } });
-    let userInfo = await userModel.findAll({
-      attributes: { exclude: ["password"] },
-      where: { username, password },
-      raw: true,
-    });
-    return res.status(200).json({ rows: userInfo });
+    // if (userCheck) {
+      await userModel.update({ logged_in: 0 }, { where: { id } });
+      return res.status(200).json({ message: "Logged out!" });
+    // }
+    // return res.status(200).json({ message: "" });
   } catch (err) {
     return res.status(err.status || 500).json(err);
   }
@@ -265,15 +277,15 @@ const userLogin = async (req, res, next) => {
 const userUpdate = async (req, res, next) => {
   try {
     console.log(req.body);
-    let {id, username}  = req.body;
+    let { id, username } = req.body;
     let userInfo = await userModel.findOne({
       where: {
-        id
+        id,
       },
-      raw: true
+      raw: true,
     });
     if (userInfo) {
-      await userModel.update({username: username},{ where: { id } });
+      await userModel.update({ username: username }, { where: { id } });
       return res.status(200).json({ rows: "Updated" });
     }
   } catch (err) {
@@ -306,7 +318,7 @@ module.exports = {
   checkUserConnected,
   userCreate,
   allusers,
-  userLogin,
+  userLogout,
   userUpdate,
-  userDelete
+  userDelete,
 };

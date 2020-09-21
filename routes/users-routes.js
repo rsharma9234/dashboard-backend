@@ -29,8 +29,8 @@ router.post('/create', [
 router.get('/allusers', [
     usersController.allusers
 ]);
-router.post('/login', [
-    usersController.userLogin
+router.post('/logout', [
+    usersController.userLogout
 ]);
 router.post('/update', [
     usersController.userUpdate
