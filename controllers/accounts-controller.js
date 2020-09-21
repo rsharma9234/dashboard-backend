@@ -114,31 +114,33 @@ const fetchAllOpenTrade = async (req, res, next) => {
       });
       //Function from commonData file
       let commonData;
+      let paramsNewObj = {
+        fromAccountId,
+        fromsymbols,
+        // startdateFrom,
+        // enddateFrom,
+        frommagicAccount,
+        from_include_exclude,
+        CustomSwap,
+        toAccountId,
+        tosymbols,
+        // startdateTo,
+        // enddateTo,
+        tomagicAccount,
+        to_include_exclude,
+        fromticket,
+        toticket,
+        from_include_exclude_ticket,
+        to_include_exclude_ticket,
+      };
       await common
         .openTrade(
-          {
-            fromAccountId,
-            fromsymbols,
-            // startdateFrom,
-            // enddateFrom,
-            frommagicAccount,
-            from_include_exclude,
-            CustomSwap,
-            toAccountId,
-            tosymbols,
-            // startdateTo,
-            // enddateTo,
-            tomagicAccount,
-            to_include_exclude,
-            fromticket,
-            toticket,
-            from_include_exclude_ticket,
-            to_include_exclude_ticket,
-          },
+          paramsNewObj,
           "account"
         )
         .then((res) => {
           commonData = res;
+          console.log(commonData,'account123');
         })
         .catch((err) => {
           console.log(err);
