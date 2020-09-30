@@ -7,7 +7,7 @@ const userModel = models.users;
 const userFilterModel = models.userFilter;
 const filterModel = models.filtered_profile;
 const jwt = require("jsonwebtoken");
-const config = require('../config/token')
+const config = require("../config/token");
 
 const fetchAllAccounts = async (req, res, next) => {
   let limit = 10; // number of records per page
@@ -143,16 +143,13 @@ const mainLogin = async (req, res, next) => {
         where: { username, password },
         raw: true,
       });
-      // if(accountInfo.length > 0){
-      //   req.adminAccountInfo = accountInfo
-      // }
-      // console.log(accountCheck.id , 'accountCheck.id ');
-      // var token = jwt.sign({ id: accountCheck.id }, config.secret, {
-      //   expiresIn: 86400 // 24 hours
-      // });
-      // res.setHeader("x-access-token", token);
-      // console.log(res.setHeader("x-access-token", token), 'token');
-      return res.status(200).json({ rows: accountInfo });
+
+      var token = jwt.sign(accountInfo[0], config.secret, {
+        expiresIn: 86400, // 24 hours
+      });
+      res.setHeader("x-access-token", token);
+      console.log(token, "token");
+      return res.status(200).json({ rows: accountInfo, accessToken: token });
     }
     if (userCheck) {
       if (userCheck === null) {
@@ -189,14 +186,11 @@ const mainLogin = async (req, res, next) => {
         where: { username, password },
         raw: true,
       });
-      // if(userInfo.length > 0){
-      //   req.userAccountInfo = userInfo
-      // }
-      // var token = jwt.sign({ id: userCheck.id }, config.secret, {
-      //   expiresIn: 86400 // 24 hours
-      // });
-      // res.setHeader("x-access-token", token);
-      return res.status(200).json({ rows: userInfo });
+      var token = jwt.sign(userInfo[0], config.secret, {
+        expiresIn: 86400, // 24 hours
+      });
+      res.setHeader("x-access-token", token);
+      return res.status(200).json({ rows: userInfo, accessToken: token });
     }
   } catch (err) {
     return res.status(err.status || 500).json(err);
@@ -243,7 +237,7 @@ const userCreate = async (req, res, next) => {
         where: { username: req.body.username },
         raw: true,
       });
-      console.log(JSON.parse(userforFilter.filter_profile)[0], "userforFilter");
+      console.log(JSON.parse(userforFilter.filter_profile), "userforFilter");
       let f_ids = JSON.parse(userforFilter.filter_profile);
       if (f_ids.length > 0) {
         f_ids.map((item) =>
@@ -343,22 +337,20 @@ const userDelete = async (req, res, next) => {
     return res.status(err.status || 500).json(err);
   }
 };
-const userFilters = async (req, res, next) => {
+const allFilterprofiles = async (req, res, next) => {
   try {
-    let userdata = await userModel.findAll({
-      where: { logged_in: 1 },
-      raw: true,
-    });
-    let userfilter = await userFilterModel.findAll({
-      where: { userId: userdata[0].id },
-    });
-    let JsonData = JSON.stringify(userfilter);
-    let newdata = JSON.parse(JsonData);
-    let dataall = newdata.map((item) => item.filterId);
-    let filterInfo = await filterModel.findAll({
-      where: { id: dataall },
-      raw: true,
-    });
+    // let userdata = await userModel.findAll({
+    //   where: { logged_in: 1 },
+    //   raw: true,
+    // });
+    // let userfilter = await userFilterModel.findAll({
+    //   where: { userId: userdata[0].id },
+    // });
+
+    // let JsonData = JSON.stringify(userfilter);
+    // let newdata = JSON.parse(JsonData);
+    // let dataall = newdata.map((item) => item.filterId);
+    let filterInfo = await filterModel.findAll();
 
     return res.status(200).json({ rows: filterInfo });
   } catch (err) {
@@ -377,5 +369,5 @@ module.exports = {
   userLogout,
   userUpdate,
   userDelete,
-  userFilters,
+  allFilterprofiles,
 };

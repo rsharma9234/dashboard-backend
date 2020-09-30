@@ -3,7 +3,6 @@
 var express = require('express');
 var router = express.Router();
 var usersController = require('../controllers').usersController;
-var authMiddleware = require('../middleware/auth')
 
 router.post('/checkUserConnected', [
     usersController.checkUserConnected
@@ -17,7 +16,7 @@ router.get('/allAccounts', [
     usersController.fetchAllAccounts
 ]);
 
-router.post('/mainLogin',  [
+router.post('/mainLogin', [
     usersController.mainLogin
 ]);
 
@@ -39,8 +38,8 @@ router.post('/update', [
 router.post('/delete', [
     usersController.userDelete
 ]);
-router.get('/userFilerData', [
-    usersController.userFilters
+router.get('/allFilterprofiles', [
+    usersController.allFilterprofiles
 ]);
 
 module.exports = router;

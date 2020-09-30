@@ -18,6 +18,16 @@ const addFilterData = async (req, res, next) => {
 
 const fetchFilterData = async (req, res, next) => {
   try {
+    // console.log(JSON.parse(req.userdata.filter_profile), 'req.userdata.filter_profile');
+    // let where; 
+    // if(req.userdata){
+    //   let id = JSON.parse(req.userdata.filter_profile)
+    //   let newid = id.map(item => {console.log(item); return parseInt(item)})
+    //   console.log(parseInt(newid));
+    //    where = {
+    //     where: {id: newid}
+    //   }
+    // }
     let limit = 10; // number of records per page
     let offset = 0;
     let accountInfo = await accountModel.findAll({
@@ -32,6 +42,7 @@ const fetchFilterData = async (req, res, next) => {
         offset = limit * (page - 1);
         filterModel
           .findAll({
+            // where: where,
             limit: limit,
             offset: offset,
             $sort: { id: 1 },
@@ -77,7 +88,11 @@ const fetchFilterData = async (req, res, next) => {
 };
 
 const fetchActivefilterdata = async (req, res, next) => {
+  console.log(req.userdata ,'req.userdata ');
   try {
+    if(req.userdata){
+
+    }
     let accountInfo = await accountModel.findAll({
       attributes: ["login", "id", "alias"],
       include: [accountsDetailModel],
@@ -158,7 +173,6 @@ const updateFilterData = async (req, res, next) => {
 
         return data;
       });
-      console.log(newInfo, "----------====>");
       return res.status(200).json({ rows: newInfo });
     }
   } catch (err) {
