@@ -271,6 +271,12 @@ const allusers = async (req, res, next) => {
           raw: true,
         })
         .then((userInfo) => {
+          console.log(userInfo);
+          userInfo.map(item => {
+            if(item.filter_profile===''){
+              return item.filter_profile = "[]"
+            }
+          })
           return res.status(200).json({
             rows: userInfo,
             count: data.count,
