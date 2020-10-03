@@ -18,7 +18,7 @@ router.get('/fetchActivefilterdata', authMiddleware.authJwt, [
   filterController.fetchActivefilterdata
 ]);
 
-router.post('/updatefilterdata', [
+router.post('/updatefilterdata', authMiddleware.authJwt,[
   filterController.updateFilterData
 ]);
 router.post('/deletefilter', [

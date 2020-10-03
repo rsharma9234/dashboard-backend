@@ -4,7 +4,6 @@ const models = require("../models");
 const accountModel = models.account;
 const mainLoginModel = models.main_login;
 const userModel = models.users;
-const userFilterModel = models.userFilter;
 const filterModel = models.filtered_profile;
 const jwt = require("jsonwebtoken");
 const config = require("../config/token");
@@ -233,20 +232,20 @@ const userCreate = async (req, res, next) => {
         password: req.body.password,
         filter_profile: req.body.filter_profile,
       });
-      let userforFilter = await userModel.findOne({
-        where: { username: req.body.username },
-        raw: true,
-      });
-      console.log(JSON.parse(userforFilter.filter_profile), "userforFilter");
-      let f_ids = JSON.parse(userforFilter.filter_profile);
-      if (f_ids.length > 0) {
-        f_ids.map((item) =>
-          userFilterModel.create({
-            userId: userforFilter.id,
-            filterId: item,
-          })
-        );
-      }
+      // let userforFilter = await userModel.findOne({
+      //   where: { username: req.body.username },
+      //   raw: true,
+      // });
+      // console.log(JSON.parse(userforFilter.filter_profile), "userforFilter");
+      // let f_ids = JSON.parse(userforFilter.filter_profile);
+      // if (f_ids.length > 0) {
+      //   f_ids.map((item) =>
+      //     userFilterModel.create({
+      //       userId: userforFilter.id,
+      //       filterId: item,
+      //     })
+      //   );
+      // }
       return res.status(200).json({ status: true });
     }
   } catch (err) {
@@ -271,7 +270,6 @@ const allusers = async (req, res, next) => {
           raw: true,
         })
         .then((userInfo) => {
-          console.log(userInfo);
           userInfo.map(item => {
             if(item.filter_profile===''){
               return item.filter_profile = "[]"
@@ -345,17 +343,6 @@ const userDelete = async (req, res, next) => {
 };
 const allFilterprofiles = async (req, res, next) => {
   try {
-    // let userdata = await userModel.findAll({
-    //   where: { logged_in: 1 },
-    //   raw: true,
-    // });
-    // let userfilter = await userFilterModel.findAll({
-    //   where: { userId: userdata[0].id },
-    // });
-
-    // let JsonData = JSON.stringify(userfilter);
-    // let newdata = JSON.parse(JsonData);
-    // let dataall = newdata.map((item) => item.filterId);
     let filterInfo = await filterModel.findAll();
 
     return res.status(200).json({ rows: filterInfo });

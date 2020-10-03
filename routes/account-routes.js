@@ -3,6 +3,7 @@
 var express = require('express');
 var router = express.Router();
 var accountsController = require('../controllers').accountsController;
+var authMiddleware = require('../middleware/auth')
 
 router.get('/fetchAllAccounts', [
     accountsController.fetchAllAccounts
@@ -12,19 +13,19 @@ router.get('/fetchAllSymbol', [
     accountsController.fetchAllSymbol
 ]);
 
-router.get('/fetchAllOpenTrade', [
+router.get('/fetchAllOpenTrade', authMiddleware.authJwt, [
   accountsController.fetchAllOpenTrade
 ]);
 
-router.get('/fetchAllHistoryTrade', [
+router.get('/fetchAllHistoryTrade', authMiddleware.authJwt, [
   accountsController.fetchAllHistoryTrade
 ])
 
-router.get('/fetchLastUpdatedTime',[
+router.get('/fetchLastUpdatedTime', authMiddleware.authJwt,[
   accountsController.fetchLastUpdatedTime
 ])
 
-router.get('/fetchStatusData',[
+router.get('/fetchStatusData', authMiddleware.authJwt,[
   accountsController.fetchStatusData
 ])
 

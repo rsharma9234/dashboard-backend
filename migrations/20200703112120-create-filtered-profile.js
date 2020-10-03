@@ -34,6 +34,11 @@ module.exports = {
         default: 0,
         field: 'status'
     },
+    user_status: {
+      type: Sequelize.INTEGER(1),
+      default: 0,
+      field: 'user_status'
+  },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

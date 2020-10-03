@@ -47,8 +47,18 @@ const fetchAllSymbol = async (req, res, next) => {
 const fetchAllOpenTrade = async (req, res, next) => {
   try {
     // Get Filter Profile Data Using Status 1
+    let status = {};
+    if (req.userdata) {
+      status = {
+        user_status: 1,
+      };
+    } else {
+      status = {
+        status: 1,
+      };
+    }
     let filteredInfo = await filteredProfileModel.findOne({
-      where: { status: 1 },
+      where: status,
       raw: true,
     });
 
@@ -140,7 +150,7 @@ const fetchAllOpenTrade = async (req, res, next) => {
         )
         .then((res) => {
           commonData = res;
-          console.log(commonData,'account123');
+          // console.log(commonData,'account123');
         })
         .catch((err) => {
           console.log(err);
@@ -169,8 +179,18 @@ const fetchAllOpenTrade = async (req, res, next) => {
 const fetchLastUpdatedTime = async (req, res, next) => {
   try {
     // Get Filter Profile Data Using Status 1
+    let status = {};
+    if (req.userdata) {
+      status = {
+        user_status: 1,
+      };
+    } else {
+      status = {
+        status: 1,
+      };
+    }
     let filteredInfo = await filteredProfileModel.findOne({
-      where: { status: 1 },
+      where: status,
       raw: true,
     });
 
@@ -199,8 +219,18 @@ const fetchLastUpdatedTime = async (req, res, next) => {
 const fetchAllHistoryTrade = async (req, res, next) => {
   try {
     // Get Filter Profile Data Using Status 1
+    let status = {};
+    if (req.userdata) {
+      status = {
+        user_status: 1,
+      };
+    } else {
+      status = {
+        status: 1,
+      };
+    }
     let filteredInfo = await filteredProfileModel.findOne({
-      where: { status: 1 },
+      where: status,
       raw: true,
     });
 
@@ -363,8 +393,18 @@ const fetchAllHistoryTrade = async (req, res, next) => {
 
 const fetchStatusData = async (req, res, next) => {
   try {
+    let status = {};
+    if (req.userdata) {
+      status = {
+        user_status: 1,
+      };
+    } else {
+      status = {
+        status: 1,
+      };
+    }
     let filteredInfo = await filteredProfileModel.findOne({
-      where: { status: 1 },
+      where: status,
       raw: true,
     });
     let filterInfo = filteredInfo;

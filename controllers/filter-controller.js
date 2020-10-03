@@ -1,5 +1,5 @@
 "use strict";
-
+const { Op } = require("sequelize");
 const models = require("../models");
 const filterModel = models.filtered_profile;
 const accountModel = models.account;
@@ -18,16 +18,16 @@ const addFilterData = async (req, res, next) => {
 
 const fetchFilterData = async (req, res, next) => {
   try {
-    // console.log(JSON.parse(req.userdata.filter_profile), 'req.userdata.filter_profile');
-    // let where; 
-    // if(req.userdata){
-    //   let id = JSON.parse(req.userdata.filter_profile)
-    //   let newid = id.map(item => {console.log(item); return parseInt(item)})
-    //   console.log(parseInt(newid));
-    //    where = {
-    //     where: {id: newid}
-    //   }
-    // }
+    let where = {};
+    if (req.userdata) {
+      let proId = JSON.parse(req.userdata.filter_profile);
+      let id = proId;
+      where = {
+        id: {
+          [Op.in]: id,
+        },
+      };
+    }
     let limit = 10; // number of records per page
     let offset = 0;
     let accountInfo = await accountModel.findAll({
@@ -42,7 +42,7 @@ const fetchFilterData = async (req, res, next) => {
         offset = limit * (page - 1);
         filterModel
           .findAll({
-            // where: where,
+            where: where,
             limit: limit,
             offset: offset,
             $sort: { id: 1 },
@@ -80,7 +80,7 @@ const fetchFilterData = async (req, res, next) => {
           });
       })
       .catch(function (error) {
-        res.status(500).send("Internal Server Error");
+        res.status(500).send("Internal Server Error", console.log(error));
       });
   } catch (err) {
     return res.status(err.status || 500).json(err);
@@ -88,17 +88,23 @@ const fetchFilterData = async (req, res, next) => {
 };
 
 const fetchActivefilterdata = async (req, res, next) => {
-  console.log(req.userdata ,'req.userdata ');
   try {
-    if(req.userdata){
-
+    let status = {};
+    if (req.userdata) {
+      status = {
+        user_status: 1,
+      };
+    } else {
+      status = {
+        status: 1,
+      };
     }
     let accountInfo = await accountModel.findAll({
       attributes: ["login", "id", "alias"],
       include: [accountsDetailModel],
     });
     let filterInfo = await filterModel.findAll({
-      where: { status: 1 },
+      where: status,
       raw: true,
     });
     let swapInfo = await CustomSwapModel.findAll({ raw: true });
@@ -153,8 +159,19 @@ const updateFilterData = async (req, res, next) => {
       include: [accountsDetailModel],
     });
     if (filterInfos != null) {
-      await filterModel.update({ status: 0 }, { where: { status: 1 } });
-      await filterModel.update({ status: status }, { where: { id: id } });
+      if (req.userdata) {
+        await filterModel.update(
+          { user_status: 0 },
+          { where: { user_status: 1 } }
+        );
+        await filterModel.update(
+          { user_status: status },
+          { where: { id: id } }
+        );
+      } else {
+        await filterModel.update({ status: 0 }, { where: { status: 1 } });
+        await filterModel.update({ status: status }, { where: { id: id } });
+      }
       let filterInfo = await filterModel.findAll({ raw: true });
       let newInfo = filterInfo.map((data) => {
         let newRecord = accountInfo.filter(
