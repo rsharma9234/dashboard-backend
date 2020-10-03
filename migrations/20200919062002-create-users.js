@@ -14,8 +14,14 @@ module.exports = {
       password: {
         type: Sequelize.STRING
       },
+      filter_profile: {
+        type: Sequelize.STRING
+      },
       logged_in: {
         type: Sequelize.INTEGER
+      },
+      role: {
+        type: Sequelize.STRING
       },
       // createdAt: {
       //   allowNull: false,

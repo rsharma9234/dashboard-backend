@@ -54,6 +54,11 @@ module.exports = (sequelize, DataTypes) => {
         default: 0,
         field: "status",
       },
+      user_status: {
+        type: DataTypes.INTEGER(1),
+        default: 0,
+        field: "user_status",
+      },
       auto_close: DataTypes.INTEGER,
     },
     {

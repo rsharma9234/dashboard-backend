@@ -38,6 +38,8 @@ router.post('/update', [
 router.post('/delete', [
     usersController.userDelete
 ]);
-
+router.get('/allFilterprofiles', [
+    usersController.allFilterprofiles
+]);
 
 module.exports = router;

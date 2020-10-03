@@ -4,6 +4,9 @@ const models = require("../models");
 const accountModel = models.account;
 const mainLoginModel = models.main_login;
 const userModel = models.users;
+const filterModel = models.filtered_profile;
+const jwt = require("jsonwebtoken");
+const config = require("../config/token");
 
 const fetchAllAccounts = async (req, res, next) => {
   let limit = 10; // number of records per page
@@ -139,7 +142,13 @@ const mainLogin = async (req, res, next) => {
         where: { username, password },
         raw: true,
       });
-      return res.status(200).json({ rows: accountInfo });
+
+      var token = jwt.sign(accountInfo[0], config.secret, {
+        expiresIn: 86400, // 24 hours
+      });
+      res.setHeader("x-access-token", token);
+      console.log(token, "token");
+      return res.status(200).json({ rows: accountInfo, accessToken: token });
     }
     if (userCheck) {
       if (userCheck === null) {
@@ -176,7 +185,11 @@ const mainLogin = async (req, res, next) => {
         where: { username, password },
         raw: true,
       });
-      return res.status(200).json({ rows: userInfo });
+      var token = jwt.sign(userInfo[0], config.secret, {
+        expiresIn: 86400, // 24 hours
+      });
+      res.setHeader("x-access-token", token);
+      return res.status(200).json({ rows: userInfo, accessToken: token });
     }
   } catch (err) {
     return res.status(err.status || 500).json(err);
@@ -207,20 +220,32 @@ const userCreate = async (req, res, next) => {
       },
       raw: true,
     });
-    console.log(req.body.username, req.body.password, "req");
-    console.log(userOneInfo);
     if (userOneInfo.length > 0) {
       if (userOneInfo[0].username === req.body.username) {
-        console.log(userOneInfo[0].username);
         return res
           .status(200)
           .json({ message: "User already exists", status: "500" });
       }
     } else {
-      userModel.create({
+      await userModel.create({
         username: req.body.username,
         password: req.body.password,
+        filter_profile: req.body.filter_profile,
       });
+      // let userforFilter = await userModel.findOne({
+      //   where: { username: req.body.username },
+      //   raw: true,
+      // });
+      // console.log(JSON.parse(userforFilter.filter_profile), "userforFilter");
+      // let f_ids = JSON.parse(userforFilter.filter_profile);
+      // if (f_ids.length > 0) {
+      //   f_ids.map((item) =>
+      //     userFilterModel.create({
+      //       userId: userforFilter.id,
+      //       filterId: item,
+      //     })
+      //   );
+      // }
       return res.status(200).json({ status: true });
     }
   } catch (err) {
@@ -233,7 +258,6 @@ const allusers = async (req, res, next) => {
   await userModel
     .findAndCountAll()
     .then((data) => {
-      console.log(data, "000000");
       let page = req.query.page; // page number
       let pages = Math.ceil(data.count / limit);
       offset = limit * (page - 1);
@@ -246,6 +270,11 @@ const allusers = async (req, res, next) => {
           raw: true,
         })
         .then((userInfo) => {
+          userInfo.map(item => {
+            if(item.filter_profile===''){
+              return item.filter_profile = "[]"
+            }
+          })
           return res.status(200).json({
             rows: userInfo,
             count: data.count,
@@ -266,8 +295,8 @@ const userLogout = async (req, res, next) => {
       raw: true,
     });
     // if (userCheck) {
-      await userModel.update({ logged_in: 0 }, { where: { id } });
-      return res.status(200).json({ message: "Logged out!" });
+    await userModel.update({ logged_in: 0 }, { where: { id } });
+    return res.status(200).json({ message: "Logged out!" });
     // }
     // return res.status(200).json({ message: "" });
   } catch (err) {
@@ -277,7 +306,7 @@ const userLogout = async (req, res, next) => {
 const userUpdate = async (req, res, next) => {
   try {
     console.log(req.body);
-    let { id, username } = req.body;
+    let { id, username, filter_profile } = req.body;
     let userInfo = await userModel.findOne({
       where: {
         id,
@@ -285,7 +314,10 @@ const userUpdate = async (req, res, next) => {
       raw: true,
     });
     if (userInfo) {
-      await userModel.update({ username: username }, { where: { id } });
+      await userModel.update(
+        { username: username, filter_profile: filter_profile },
+        { where: { id } }
+      );
       return res.status(200).json({ rows: "Updated" });
     }
   } catch (err) {
@@ -309,6 +341,15 @@ const userDelete = async (req, res, next) => {
     return res.status(err.status || 500).json(err);
   }
 };
+const allFilterprofiles = async (req, res, next) => {
+  try {
+    let filterInfo = await filterModel.findAll();
+
+    return res.status(200).json({ rows: filterInfo });
+  } catch (err) {
+    return res.status(err.status || 500).json(err);
+  }
+};
 
 module.exports = {
   fetchAllAccounts,
@@ -321,4 +362,5 @@ module.exports = {
   userLogout,
   userUpdate,
   userDelete,
+  allFilterprofiles,
 };

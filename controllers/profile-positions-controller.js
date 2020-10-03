@@ -16,8 +16,19 @@ const common = require("./commonData");
 const calculatingOpenTrade = async (req, res, next) => {
   //open postions data goes here
   try {
+    let status = {};
+    if (req.userdata) {
+
+      status = {
+        user_status: 1,
+      };
+    } else {
+      status = {
+        status: 1,
+      };
+    }
     let filteredInfo = await filteredProfileModel.findOne({
-      where: { status: 1 },
+      where: status,
       raw: true,
     });
     let accountInfo = await accountModel.findAll({
@@ -134,15 +145,25 @@ const calculatingOpenTrade = async (req, res, next) => {
       toOpenOrderInfo: [],
     });
   } catch (err) {
-    return res.status(err.status || 500).json(err);
+    return res.status(err.status || 500).json(console.log(err));
   }
 };
 
 const calculatingHistoryTrade = async (req, res, next) => {
   // close position data goes here
   try {
+    let status = {};
+    if (req.userdata) {
+      status = {
+        user_status: 1,
+      };
+    } else {
+      status = {
+        status: 1,
+      };
+    }
     let filteredInfo = await filteredProfileModel.findOne({
-      where: { status: 1 },
+      where: status,
       raw: true,
     });
     let accountInfo = await accountModel.findAll({
@@ -299,8 +320,18 @@ const calculatingHistoryTrade = async (req, res, next) => {
 
 const calculatingCommission = async (req, res, next) => {
   try {
+    let status = {};
+    if (req.userdata) {
+      status = {
+        user_status: 1,
+      };
+    } else {
+      status = {
+        status: 1,
+      };
+    }
     let filteredInfo = await filteredProfileModel.findOne({
-      where: { status: 1 },
+      where: status,
       raw: true,
     });
     let commission_acount_id = filteredInfo.commission_acount_id;

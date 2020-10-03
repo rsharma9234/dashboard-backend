@@ -15,7 +15,8 @@ module.exports = (sequelize, DataTypes) => {
   };
   main_login.init({
     username: DataTypes.STRING,
-    password: DataTypes.STRING
+    password: DataTypes.STRING,
+    role: DataTypes.STRING,
   }, {
     createdAt: false,
     updatedAt: false,
