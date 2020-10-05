@@ -1,5 +1,7 @@
 const jwt = require("jsonwebtoken");
 const config = require("../config/token");
+const models = require("../models");
+const userModel = models.users;
 
 exports.authJwt = (req, res, next) => {
   const token = req.headers["x-access-token"];
@@ -9,7 +11,7 @@ exports.authJwt = (req, res, next) => {
     });
   }
 
-  jwt.verify(token, config.secret, (err, decoded) => {
+  jwt.verify(token, config.secret, async(err, decoded) => {
     if (err) {
       return res.status(401).send({
         message: "Unauthorized!",
@@ -18,7 +20,13 @@ exports.authJwt = (req, res, next) => {
     // console.log(decoded, "decoded");
     req.userId = decoded.id;
     if(decoded.role === 'user'){
-      req.userdata = decoded
+      let userInfo = await userModel.findOne({
+        where: {
+          id: decoded.id
+        },
+        raw: true
+      })
+      req.userdata = userInfo
       // console.log(req.userdata, 'user data');
     }
     next();
