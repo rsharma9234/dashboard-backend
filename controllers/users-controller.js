@@ -197,21 +197,37 @@ const mainLogin = async (req, res, next) => {
 };
 const updateUser = async (req, res, next) => {
   try {
-    let { id, alias } = req.body;
+    let { id, alias, password } = req.body;
     let filterInfo = await accountModel.findOne({
       where: {
         id,
       },
     });
     if (filterInfo) {
-      await accountModel.update({ alias: alias }, { where: { id } });
+      await accountModel.update({ alias: alias, password: password }, { where: { id } });
       return res.status(200).json({ rows: "Updated" });
     }
   } catch (err) {
     return res.status(err.status || 500).json(err);
   }
 };
-
+const deleteUser = async (req, res, next) => {
+  try {
+    let { id } = req.body;
+    let deleteInfo = await accountModel.findOne({
+      where: {
+        id,
+      },
+    });
+    if (deleteInfo) {
+      await accountModel.destroy({ where: { id } });
+      // await filterModel.update({status:1}, { where:{ id }});
+      return res.status(200).json({ rows: "Deleted" });
+    }
+  } catch (err) {
+    return res.status(err.status || 500).json(console.log(err));
+  }
+};
 const userCreate = async (req, res, next) => {
   try {
     let userOneInfo = await userModel.findAll({
@@ -356,6 +372,7 @@ module.exports = {
   addUser,
   mainLogin,
   updateUser,
+  deleteUser,
   checkUserConnected,
   userCreate,
   allusers,

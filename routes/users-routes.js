@@ -23,6 +23,9 @@ router.post('/mainLogin', [
 router.post('/updateuser', [
     usersController.updateUser
 ]);
+router.post('/deleteuser', [
+    usersController.deleteUser
+]);
 router.post('/create', [
     usersController.userCreate
 ]);
