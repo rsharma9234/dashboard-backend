@@ -147,7 +147,6 @@ const mainLogin = async (req, res, next) => {
         expiresIn: 86400, // 24 hours
       });
       res.setHeader("x-access-token", token);
-      console.log(token, "token");
       return res.status(200).json({ rows: accountInfo, accessToken: token });
     }
     if (userCheck) {
