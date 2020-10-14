@@ -29,8 +29,8 @@ const cronSwapValues = async () => {
       profile_id: filterInfo[0].id,
       account_login: fromAccount,
       symbol: fromSymbol,
-      swap_long: fromSymbolInfo.swap_long,
-      swap_short: fromSymbolInfo.swap_short,
+      swap_long: fromSymbolInfo == null ? 0 :fromSymbolInfo.swap_long,
+      swap_short: fromSymbolInfo == null ? 0 :fromSymbolInfo.swap_short,
     })
     
     let toAccountInfo = await accountModel.findAll({
@@ -51,8 +51,8 @@ const cronSwapValues = async () => {
       profile_id: filterInfo[0].id,
       account_login: toAccount,
       symbol: toSymbol,
-      swap_long: toSymbolInfo.swap_long,
-      swap_short: toSymbolInfo.swap_short,
+      swap_long: toSymbolInfo == null ? 0 :toSymbolInfo.swap_long,
+      swap_short: toSymbolInfo == null ? 0 :toSymbolInfo.swap_short,
     })
 };
 
