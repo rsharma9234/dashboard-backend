@@ -1379,7 +1379,28 @@ const statusData = async ({
         [Op.in]: frommagicAccount,
       };
     }
-    // console.log(new Date(), "1----------->");
+    if (fromticket.length > 0) {
+    fromOpenOrderInfos = await openOrderModel.findAll({
+      attributes: [
+        "order_type",
+        "lots",
+        "symbol",
+        "ticket"
+      ],
+      where: {
+        account_id: fromAccountId,
+        magic_number: forIncludeExclude,
+        symbol: {
+          [Op.in]: fromsymbols,
+        },
+        // open_time: {
+        //   [Op.gte]: startdateFrom,
+        //   [Op.lt]: enddateFrom,
+        // },
+      },
+      raw: true,
+    });
+  }else {
     fromOpenOrderInfos = await openOrderModel.findAll({
       attributes: [
         "order_type",
@@ -1392,18 +1413,16 @@ const statusData = async ({
         symbol: {
           [Op.in]: fromsymbols,
         },
-        open_time: {
-          [Op.gte]: startdateFrom,
-          [Op.lt]: enddateFrom,
-        },
+        // open_time: {
+        //   [Op.gte]: startdateFrom,
+        //   [Op.lt]: enddateFrom,
+        // },
       },
       group: "symbol",
       limit: 1,
       raw: true,
     });
-    // console.log(fromOpenOrderInfos, "11==========>");
-
-    // console.log(new Date(), "fs1----------->");
+  }
     if (fromOpenOrderInfos && fromOpenOrderInfos.length > 0) {
       if (fromticket.length > 0) {
         if (from_include_exclude_ticket === 2) {
@@ -1416,6 +1435,12 @@ const statusData = async ({
           });
         }
       }
+      if(fromOpenOrderInfos && fromOpenOrderInfos.length>1){
+        let sumofLots = fromOpenOrderInfos.reduce((previousValue, currentValue) => {
+          return previousValue + currentValue.lots;
+        }, 0)
+        fromOpenOrderInfos[0].lots = sumofLots;
+      }
       fromSymbolInfo = await symbolModel.findAll({
         where: {
           name: fromOpenOrderInfos[0].symbol,
@@ -1425,9 +1450,7 @@ const statusData = async ({
         raw: true,
       });
     }
-    // console.log(new Date(), "fs2----------->");
   } else {
-    // console.log(new Date(), "2----------->");
     let newTicket;
     if (fromticket.length > 0) {
       if (from_include_exclude_ticket === 2) {
@@ -1445,10 +1468,10 @@ const statusData = async ({
           account_id: fromAccountInfo.id,
           symbol: fromsymbols[0],
           ticket: newTicket,
-          open_time: {
-            [Op.gte]: startdateTo,
-            [Op.lt]: enddateTo,
-          },
+          // open_time: {
+          //   [Op.gte]: startdateTo,
+          //   [Op.lt]: enddateTo,
+          // },
         },
         raw: true,
       });
@@ -1459,17 +1482,15 @@ const statusData = async ({
         where: {
           account_id: fromAccountInfo.id,
           symbol: fromsymbols[0],
-          open_time: {
-            [Op.gte]: startdateTo,
-            [Op.lt]: enddateTo,
-          },
+          // open_time: {
+          //   [Op.gte]: startdateTo,
+          //   [Op.lt]: enddateTo,
+          // },
         },
         raw: true,
       });
     }
-    // console.log(fromOpenOrderInfos, "22==========>");
-
-    // console.log(new Date(), "fs3----------->");
+    
     if (fromOpenOrderInfos && fromOpenOrderInfos.length > 0) {
       fromSymbolInfo = await symbolModel.findAll({
         where: { name: fromsymbols[0], login: fromAccountInfo.login },
@@ -1477,12 +1498,9 @@ const statusData = async ({
         raw: true,
       });
     }
-    // console.log(new Date(), "fs4----------->");
   }
   //Check Include Exclude Status And Symbols For Account "To"
   if (to_include_exclude !== 0) {
-    // let forIncludeExclude;
-    // let forIncludeExcludeticket;
     if (to_include_exclude === 2) {
       forIncludeExclude = {
         [Op.notIn]: tomagicAccount,
@@ -1492,12 +1510,13 @@ const statusData = async ({
         [Op.in]: tomagicAccount,
       };
     }
-    // console.log(new Date(), "3----------->");
+    if (toticket.length > 0) {
     toOpenOrderInfos = await openOrderModel.findAll({
       attributes: [
         "order_type",
-        [Sequelize.literal("SUM(lots)"), "lots"],
+        "lots",
         "symbol",
+        "ticket"
       ],
       where: {
         account_id: toAccountId,
@@ -1505,17 +1524,36 @@ const statusData = async ({
         symbol: {
           [Op.in]: tosymbols,
         },
-        open_time: {
-          [Op.gte]: startdateTo,
-          [Op.lt]: enddateTo,
+        // open_time: {
+        //   [Op.gte]: startdateTo,
+        //   [Op.lt]: enddateTo,
+        // },
+      },
+      raw: true,
+    });
+  }else{
+    toOpenOrderInfos = await openOrderModel.findAll({
+      attributes: [
+        "order_type",
+        [Sequelize.literal("SUM(lots)"), "lots"],
+        "symbol"
+      ],
+      where: {
+        account_id: toAccountId,
+        magic_number: forIncludeExclude,
+        symbol: {
+          [Op.in]: tosymbols,
         },
+        // open_time: {
+        //   [Op.gte]: startdateTo,
+        //   [Op.lt]: enddateTo,
+        // },
       },
       group: "symbol",
       limit: 1,
       raw: true,
     });
-    // console.log(toOpenOrderInfos, "33==========>");
-    // console.log(new Date(), "ts1----------->");
+  }
     if (toOpenOrderInfos && toOpenOrderInfos.length > 0) {
       if (toticket.length > 0) {
         if (to_include_exclude_ticket === 2) {
@@ -1528,6 +1566,12 @@ const statusData = async ({
           });
         }
       }
+    if(toOpenOrderInfos && toOpenOrderInfos.length>1){
+      let sumofLots = toOpenOrderInfos.reduce((previousValue, currentValue) => {
+        return previousValue + currentValue.lots;
+      }, 0)
+      toOpenOrderInfos[0].lots = sumofLots;
+    }
       toSymbolInfo = await symbolModel.findAll({
         where: {
           name: toOpenOrderInfos[0].symbol,
@@ -1537,9 +1581,7 @@ const statusData = async ({
         raw: true,
       });
     }
-    // console.log(new Date(), "ts2----------->");
   } else {
-    // console.log(new Date(), "4----------->");
     let newTicket;
     if (toticket.length > 0) {
       if (to_include_exclude_ticket === 2) {
@@ -1557,10 +1599,10 @@ const statusData = async ({
           account_id: toAccountInfo.id,
           symbol: tosymbols[0],
           ticket: newTicket,
-          open_time: {
-            [Op.gte]: startdateTo,
-            [Op.lt]: enddateTo,
-          },
+          // open_time: {
+          //   [Op.gte]: startdateTo,
+          //   [Op.lt]: enddateTo,
+          // },
         },
         raw: true,
       });
@@ -1571,16 +1613,14 @@ const statusData = async ({
         where: {
           account_id: toAccountInfo.id,
           symbol: tosymbols[0],
-          open_time: {
-            [Op.gte]: startdateTo,
-            [Op.lt]: enddateTo,
-          },
+          // open_time: {
+          //   [Op.gte]: startdateTo,
+          //   [Op.lt]: enddateTo,
+          // },
         },
         raw: true,
       });
     }
-    // console.log(toOpenOrderInfos, "44==========>");
-    // console.log(new Date(), "ts3----------->");
     if (toOpenOrderInfos && toOpenOrderInfos.length > 0) {
       toSymbolInfo = await symbolModel.findAll({
         where: { name: tosymbols[0], login: toAccountInfo.login },
@@ -1588,7 +1628,6 @@ const statusData = async ({
         raw: true,
       });
     }
-    // console.log(new Date(), "ts4----------->");
   }
   return (response = {
     fromAccountInfo: fromAccountInfo,
