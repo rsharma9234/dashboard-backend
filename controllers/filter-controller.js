@@ -238,6 +238,9 @@ const updateFilterDataFull = async (req, res, next) => {
       to_include_exclude_status,
       from_include_exclude_status_ticket,
       to_include_exclude_status_ticket,
+      startdateComm,
+      enddateComm,
+      comm_magic_number,
     } = req.body;
     let filterUpdate = await filterModel.findOne({
       where: {
@@ -267,6 +270,9 @@ const updateFilterDataFull = async (req, res, next) => {
           to_include_exclude_status: to_include_exclude_status,
           from_include_exclude_status_ticket: from_include_exclude_status_ticket,
           to_include_exclude_status_ticket: to_include_exclude_status_ticket,
+          startdateComm: startdateComm,
+          enddateComm: enddateComm,
+          comm_magic_number: comm_magic_number,
         },
         { where: { id } }
       );

@@ -19,6 +19,15 @@ module.exports = {
         type: Sequelize.DATE,
         field: 'enddateFrom'
       },
+      comm_magic_number: Sequelize.STRING,
+      startdateComm: {
+        type: Sequelize.DATE,
+        field: 'startdateComm'
+      },
+      enddateComm: {
+        type: Sequelize.DATE,
+        field: 'enddateComm'
+      },
       from_symbols: Sequelize.STRING,
       startdateTo: {
         type: Sequelize.DATE,

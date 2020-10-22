@@ -335,8 +335,24 @@ const calculatingCommission = async (req, res, next) => {
       raw: true,
     });
     let commission_acount_id = filteredInfo.commission_acount_id;
+    let startdateComm = filteredInfo.startdateComm;
+    let enddateComm =
+      filteredInfo.enddateComm == null || filteredInfo.enddateComm == ""
+        ? new Date()
+        : filteredInfo.enddateComm;
+    let comm_magic_number = filteredInfo.comm_magic_number != "" &&
+      filteredInfo.comm_magic_number != null &&
+      JSON.parse(filteredInfo.comm_magic_number);
     let historyOrderData = await historyOrderModel.findAll({
-      where: { account_id: commission_acount_id, order_type: 6 },
+      where: {
+        account_id: commission_acount_id,
+        order_type: 6,
+        magic_number: { [Op.in]: comm_magic_number },
+        open_time: {
+          [Op.gte]: startdateComm,
+          [Op.lt]: enddateComm,
+        },
+      },
       attributes: { exclude: ["id"] },
       raw: true,
     });
