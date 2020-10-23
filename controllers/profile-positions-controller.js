@@ -343,19 +343,48 @@ const calculatingCommission = async (req, res, next) => {
     let comm_magic_number = filteredInfo.comm_magic_number != "" &&
       filteredInfo.comm_magic_number != null &&
       JSON.parse(filteredInfo.comm_magic_number);
-    let historyOrderData = await historyOrderModel.findAll({
-      where: {
-        account_id: commission_acount_id,
-        order_type: 6,
-        magic_number: { [Op.in]: comm_magic_number },
-        open_time: {
-          [Op.gte]: startdateComm,
-          [Op.lt]: enddateComm,
+    let forIncludeExclude;
+    let historyOrderData = [];
+    if (filteredInfo.comm_include_exclude_status !== 0) {
+      if (filteredInfo.comm_include_exclude_status === 2) {
+        forIncludeExclude = {
+          [Op.notIn]: comm_magic_number,
+        };
+      } else {
+        forIncludeExclude = {
+          [Op.in]: comm_magic_number,
+        };
+      }
+
+      historyOrderData = await historyOrderModel.findAll({
+        where: {
+          account_id: commission_acount_id,
+          order_type: 6,
+          magic_number: forIncludeExclude,
+          open_time: {
+            [Op.gte]: startdateComm,
+            [Op.lt]: enddateComm,
+          },
         },
-      },
-      attributes: { exclude: ["id"] },
-      raw: true,
-    });
+        attributes: { exclude: ["id"] },
+        raw: true,
+        logging: true
+      });
+
+    } else {
+      historyOrderData = await historyOrderModel.findAll({
+        where: {
+          account_id: commission_acount_id,
+          order_type: 6,
+          open_time: {
+            [Op.gte]: startdateComm,
+            [Op.lt]: enddateComm,
+          },
+        },
+        attributes: { exclude: ["id"] },
+        raw: true,
+      });
+    }
     let accountTableDetails = await accountsDetailModel.findAll({
       where: { account_id: commission_acount_id },
       attributes: { exclude: ["id"] },
