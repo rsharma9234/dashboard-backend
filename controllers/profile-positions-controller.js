@@ -390,10 +390,15 @@ const calculatingCommission = async (req, res, next) => {
       raw: true,
     });
     let totalProfit = 0;
+    let commission = 0;
+    let equity = accountTableDetails.map((data) => data.equity);
     let profit = historyOrderData.map((data) => data.profit);
     totalProfit = profit.reduce((a, b) => a + b, 0);
-    let equity = accountTableDetails.map((data) => data.equity);
-    let commission = totalProfit - equity;
+    if (totalProfit !== null) {
+      commission = totalProfit - equity;
+    } else {
+      commission = totalProfit;
+    }
     return res.status(200).json({
       commission_acount_id: commission_acount_id,
       equity: equity,
