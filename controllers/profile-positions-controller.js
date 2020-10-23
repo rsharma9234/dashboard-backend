@@ -395,7 +395,7 @@ const calculatingCommission = async (req, res, next) => {
     });
     let totalProfit = 0;
     let commission = 0;
-    let equity = accountTableDetails.map((data) => data.equity);
+//     let equity = accountTableDetails.map((data) => data.equity);
     let equity =
         accountTableDetails && accountTableDetails.length > 0
           ? accountTableDetails[0].equity
