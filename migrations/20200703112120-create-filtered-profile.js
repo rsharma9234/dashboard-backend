@@ -43,6 +43,11 @@ module.exports = {
         default: 0,
         field: 'status'
     },
+    comm_include_exclude_status: {
+      type: Sequelize.INTEGER(1),
+      default: 0,
+      field: 'comm_include_exclude_status'
+  },
     user_status: {
       type: Sequelize.INTEGER(1),
       default: 0,

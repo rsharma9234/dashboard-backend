@@ -26,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
       to_include_exclude_status: DataTypes.INTEGER,
       from_include_exclude_status_ticket: DataTypes.INTEGER,
       to_include_exclude_status_ticket: DataTypes.INTEGER,
-
+      comm_include_exclude_status: DataTypes.INTEGER,
       startdateComm: {
         type: DataTypes.DATE,
         default: new Date(),
