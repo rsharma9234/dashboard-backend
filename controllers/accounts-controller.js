@@ -241,15 +241,58 @@ const fetchAllHistoryTrade = async (req, res, next) => {
     });
 
     let commission_acount_id = filteredInfo.commission_acount_id;
-
+    let startdateComm = filteredInfo.startdateComm;
+    let enddateComm =
+      filteredInfo.enddateComm == null || filteredInfo.enddateComm == ""
+        ? new Date()
+        : filteredInfo.enddateComm;
+    let comm_magic_number = filteredInfo.comm_magic_number != "" &&
+      filteredInfo.comm_magic_number != null &&
+      JSON.parse(filteredInfo.comm_magic_number);
     // Calculate Profit According To Order Type
-    let historyOrderInfo = await historyOrderModel.findAll({
+    let forIncludeExclude;
+    let historyOrderInfo = [];
+    if (filteredInfo.comm_include_exclude_status !== 0) {
+      if (filteredInfo.comm_include_exclude_status === 2) {
+        forIncludeExclude = {
+          [Op.notIn]: comm_magic_number,
+        };
+      } else {
+        forIncludeExclude = {
+          [Op.in]: comm_magic_number,
+        };
+      }
+    historyOrderInfo = await historyOrderModel.findAll({
       attributes: [
         [Sequelize.literal("SUM(profit)"), "profit"], // coming null
       ],
-      where: { order_type: 6, account_id: commission_acount_id },
+      where: {
+         order_type: 6, 
+         account_id: commission_acount_id,
+         magic_number: forIncludeExclude,
+         open_time: {
+           [Op.gte]: startdateComm,
+           [Op.lt]: enddateComm,
+         },
+       },
       raw: true,
     });
+  }else{
+    historyOrderInfo = await historyOrderModel.findAll({
+      attributes: [
+        [Sequelize.literal("SUM(profit)"), "profit"], // coming null
+      ],
+      where: {
+         order_type: 6, 
+         account_id: commission_acount_id,
+         open_time: {
+           [Op.gte]: startdateComm,
+           [Op.lt]: enddateComm,
+         },
+       },
+      raw: true,
+    });
+  }
 
     let customSwapTable = await CustomSwapModel.findAll({
       attributes: { exclude: ["id"] },

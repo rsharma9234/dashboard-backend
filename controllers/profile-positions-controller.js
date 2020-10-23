@@ -368,7 +368,6 @@ const calculatingCommission = async (req, res, next) => {
         },
         attributes: { exclude: ["id"] },
         raw: true,
-        logging: true
       });
 
     } else {
