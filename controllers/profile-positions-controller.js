@@ -366,7 +366,9 @@ const calculatingCommission = async (req, res, next) => {
             [Op.lt]: enddateComm,
           },
         },
-        attributes: { exclude: ["id"] },
+       attributes: [
+          [Sequelize.literal("SUM(profit)"), "profit"], // coming null
+        ],
         raw: true,
       });
 
@@ -380,7 +382,9 @@ const calculatingCommission = async (req, res, next) => {
             [Op.lt]: enddateComm,
           },
         },
-        attributes: { exclude: ["id"] },
+        attributes: [
+          [Sequelize.literal("SUM(profit)"), "profit"], // coming null
+        ],
         raw: true,
       });
     }
@@ -392,8 +396,13 @@ const calculatingCommission = async (req, res, next) => {
     let totalProfit = 0;
     let commission = 0;
     let equity = accountTableDetails.map((data) => data.equity);
-    let profit = historyOrderData.map((data) => data.profit);
-    totalProfit = profit.reduce((a, b) => a + b, 0);
+    let equity =
+        accountTableDetails && accountTableDetails.length > 0
+          ? accountTableDetails[0].equity
+          : 0;
+//     let profit = historyOrderData.map((data) => data.profit);
+//     totalProfit = profit.reduce((a, b) => a + b, 0);
+    totalProfit = eval(historyOrderData[0].profit);
     if (totalProfit !== null) {
       commission = totalProfit - equity;
     } else {
