@@ -1,30 +1,30 @@
 {
   "files": {
-    "main.css": "/static/css/main.134ee309.chunk.css",
-    "main.js": "/static/js/main.cfc07f6c.chunk.js",
-    "main.js.map": "/static/js/main.cfc07f6c.chunk.js.map",
+    "main.css": "/static/css/main.80a814c8.chunk.css",
+    "main.js": "/static/js/main.e4ad9bb5.chunk.js",
+    "main.js.map": "/static/js/main.e4ad9bb5.chunk.js.map",
     "runtime-main.js": "/static/js/runtime-main.2c219ed3.js",
     "runtime-main.js.map": "/static/js/runtime-main.2c219ed3.js.map",
-    "static/css/2.8eaafd74.chunk.css": "/static/css/2.8eaafd74.chunk.css",
-    "static/js/2.8e19483d.chunk.js": "/static/js/2.8e19483d.chunk.js",
-    "static/js/2.8e19483d.chunk.js.map": "/static/js/2.8e19483d.chunk.js.map",
+    "static/css/2.ca450100.chunk.css": "/static/css/2.ca450100.chunk.css",
+    "static/js/2.3038760c.chunk.js": "/static/js/2.3038760c.chunk.js",
+    "static/js/2.3038760c.chunk.js.map": "/static/js/2.3038760c.chunk.js.map",
     "index.html": "/index.html",
-    "precache-manifest.fea5e451111cc2c5b15d30136741f506.js": "/precache-manifest.fea5e451111cc2c5b15d30136741f506.js",
+    "precache-manifest.00bfcefcb56b447e28541919893ae06d.js": "/precache-manifest.00bfcefcb56b447e28541919893ae06d.js",
     "service-worker.js": "/service-worker.js",
-    "static/css/2.8eaafd74.chunk.css.map": "/static/css/2.8eaafd74.chunk.css.map",
-    "static/css/main.134ee309.chunk.css.map": "/static/css/main.134ee309.chunk.css.map",
-    "static/js/2.8e19483d.chunk.js.LICENSE.txt": "/static/js/2.8e19483d.chunk.js.LICENSE.txt",
-    "static/js/main.cfc07f6c.chunk.js.LICENSE.txt": "/static/js/main.cfc07f6c.chunk.js.LICENSE.txt",
-    "static/media/pe-icon-7-stroke.css": "/static/media/Pe-icon-7-stroke.dedf2698.svg",
+    "static/css/2.ca450100.chunk.css.map": "/static/css/2.ca450100.chunk.css.map",
+    "static/css/main.80a814c8.chunk.css.map": "/static/css/main.80a814c8.chunk.css.map",
+    "static/js/2.3038760c.chunk.js.LICENSE.txt": "/static/js/2.3038760c.chunk.js.LICENSE.txt",
+    "static/js/main.e4ad9bb5.chunk.js.LICENSE.txt": "/static/js/main.e4ad9bb5.chunk.js.LICENSE.txt",
+    "static/media/pe-icon-7-stroke.css": "/static/media/Pe-icon-7-stroke.c45f7de0.svg",
     "static/media/bootstrap.min.css": "/static/media/glyphicons-halflings-regular.fa277232.woff",
     "static/media/notifications.css": "/static/media/notification.c0d3c94c.eot",
     "static/media/sidebar-3.jpg": "/static/media/sidebar-3.34535b95.jpg"
   },
   "entrypoints": [
     "static/js/runtime-main.2c219ed3.js",
-    "static/css/2.8eaafd74.chunk.css",
-    "static/js/2.8e19483d.chunk.js",
-    "static/css/main.134ee309.chunk.css",
-    "static/js/main.cfc07f6c.chunk.js"
+    "static/css/2.ca450100.chunk.css",
+    "static/js/2.3038760c.chunk.js",
+    "static/css/main.80a814c8.chunk.css",
+    "static/js/main.e4ad9bb5.chunk.js"
   ]
 }
